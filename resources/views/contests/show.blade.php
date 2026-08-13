@@ -1,0 +1,135 @@
+@extends('layouts.app')
+
+@section('title', $contest->title.' — TalentStage')
+
+@section('screen-kicker', 'FR7 · Contest')
+@section('screen-title', $contest->title)
+@section('screen-sub', 'Submit entry · one vote per user · leaderboard')
+
+@section('content')
+@php $me = auth()->user(); @endphp
+
+<div class="contest-top" style="display: flex; gap: var(--space-6); align-items: stretch">
+
+    {{-- ── The chinh: mo ta + phase strip + nop bai (mockup Contest) ── --}}
+    <div class="card" style="flex: 1.6; padding: var(--space-6); gap: var(--space-3)">
+        <div class="card-kicker">{{ $contest->statusLabel() }}</div>
+        @if ($contest->description)
+            <p style="margin: 0; font-size: 13.5px; line-height: 1.6; text-align: justify; max-width: 640px">{{ $contest->description }}</p>
+        @endif
+        <p class="muted-i" style="margin: 0">Mỗi creator gửi một video đã được duyệt. Mỗi tài khoản bình chọn một lần cho một bài dự thi.</p>
+
+        {{-- May trang thai 4 pha tu 3 moc thoi gian --}}
+        @php
+            $phases = [
+                ['Mở nộp bài', $contest->start_at->format('d/m H:i'), 'upcoming'],
+                ['Đóng nộp bài', $contest->submission_deadline->format('d/m H:i'), 'submission'],
+                ['Bình chọn', $contest->submission_deadline->format('d/m').' — '.$contest->end_at->format('d/m'), 'voting'],
+                ['Công bố', $contest->end_at->format('d/m H:i'), 'ended'],
+            ];
+        @endphp
+        <div class="phase-strip">
+            @foreach ($phases as [$k, $v, $phase])
+                <div class="phase {{ $contest->status === $phase ? 'current' : '' }}">
+                    <div class="phase-k">{{ $k }}</div>
+                    <div class="phase-v">{{ $v }}</div>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Nop bai --}}
+        <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap">
+            @if ($myEntry)
+                <span class="tag tag-accent" style="font-size: 11px">Đã gửi bài ✓ — «{{ $myEntry->video->title }}»</span>
+            @elseif ($me?->isCreator() && $contest->isAcceptingSubmissions())
+                @if ($eligibleVideos->isNotEmpty())
+                    <form method="POST" action="{{ route('contests.entries.store', $contest) }}" style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap">
+                        @csrf
+                        <select class="input" name="video_id" required style="width: auto; min-width: 220px">
+                            <option value="">— Chọn video đã duyệt của bạn —</option>
+                            @foreach ($eligibleVideos as $v)
+                                <option value="{{ $v->id }}">{{ $v->title }}</option>
+                            @endforeach
+                        </select>
+                        <button class="btn btn-primary btn-sm">Gửi bài dự thi · Submit entry</button>
+                    </form>
+                @else
+                    <span class="muted-i">Bạn chưa có video đã duyệt + công khai để dự thi — <a href="{{ route('videos.create') }}">đăng video</a> trước nhé.</span>
+                @endif
+            @elseif ($contest->status === 'upcoming')
+                <span class="muted-i">Cuộc thi chưa mở nhận bài.</span>
+            @elseif (! $me)
+                <span class="muted-i"><a href="{{ route('login') }}">Đăng nhập</a> để dự thi hoặc bình chọn.</span>
+            @endif
+        </div>
+    </div>
+
+    {{-- ── Leaderboard ── --}}
+    <div class="card" style="flex: 1; padding: var(--space-4); gap: var(--space-2)">
+        <div class="card-kicker">Bảng xếp hạng · Leaderboard</div>
+        @forelse ($leaderboard as $i => $entry)
+            <div style="display: flex; align-items: baseline; gap: var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--color-divider)">
+                <span class="rank-num" style="font-size: 20px; width: 26px">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                <a href="{{ route('videos.show', $entry->video) }}" style="flex: 1; font-size: 13px">{{ $entry->user->name }} — {{ \Illuminate\Support\Str::limit($entry->video->title, 28) }}</a>
+                <span class="num" style="font-size: 13px; color: var(--color-neutral-700)">{{ number_format($entry->votes_count) }}</span>
+            </div>
+        @empty
+            <span class="muted-i">Chưa có bài dự thi.</span>
+        @endforelse
+    </div>
+</div>
+
+{{-- ── Luoi bai du thi + nut binh chon ── --}}
+<section style="display: flex; flex-direction: column; gap: var(--space-3)">
+    <h3 style="font-size: 20px; margin: 0">Bài dự thi · Contest entries <span class="meta num">({{ $entries->count() }})</span></h3>
+    <div class="grid-4">
+        @forelse ($entries as $entry)
+            <div class="card video-card" style="cursor: default">
+                <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb hatch-mid" style="display: flex">
+                    @if ($entry->video->thumbnail && file_exists(public_path('storage/'.$entry->video->thumbnail)))
+                        <img src="{{ asset('storage/'.$entry->video->thumbnail) }}" alt="">
+                    @else
+                        <span class="slot-note">[ thumbnail ]</span>
+                    @endif
+                </a>
+                <div class="video-card-body" style="gap: var(--space-2)">
+                    <span class="video-card-title" style="font-size: 16px">{{ $entry->video->title }}</span>
+                    <span class="meta">{{ $entry->user->name }} · <span class="num">{{ number_format($entry->votes_count) }}</span> phiếu</span>
+
+                    @if ($contest->isVotingOpen())
+                        @auth
+                            @if ($votedEntryId === $entry->id)
+                                <span class="tag tag-accent" style="font-size: 10.5px; align-self: flex-start">Đã bình chọn ✓</span>
+                            @elseif ($votedEntryId !== null)
+                                <span class="muted-i" style="font-size: 11px">Đã dùng lượt bình chọn</span>
+                            @elseif ($entry->user_id === $me->id)
+                                <span class="muted-i" style="font-size: 11px">Bài của bạn</span>
+                            @else
+                                <form method="POST" action="{{ route('entries.vote', $entry) }}">
+                                    @csrf
+                                    <button class="btn btn-secondary btn-xs">Bình chọn · Vote</button>
+                                </form>
+                            @endif
+                        @else
+                            <span class="muted-i" style="font-size: 11px"><a href="{{ route('login') }}">Đăng nhập</a> để bình chọn</span>
+                        @endauth
+                    @elseif ($contest->status === 'ended' && $loop->first)
+                        <span class="tag tag-accent" style="font-size: 10.5px; align-self: flex-start">🏆 Quán quân</span>
+                    @endif
+                </div>
+            </div>
+        @empty
+            <div class="card" style="grid-column: 1 / -1; align-items: center; padding: var(--space-6)">
+                <span class="muted-i">Chưa có bài dự thi nào.</span>
+            </div>
+        @endforelse
+    </div>
+    <span class="muted-i">Trạng thái tự chuyển theo 3 mốc thời gian: mở nộp bài → đóng nộp bài → mở bình chọn → công bố kết quả.</span>
+</section>
+@endsection
+
+@push('scripts')
+<style>
+    @media (max-width: 1080px) { .contest-top { flex-direction: column; } }
+</style>
+@endpush

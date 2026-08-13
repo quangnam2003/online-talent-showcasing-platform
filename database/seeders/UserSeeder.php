@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'bio' => 'Tài khoản quản trị hệ thống TalentStage.',
                 'location' => 'Hà Nội',
+                'achievements' => null, // dong nhat so cot voi cac dong duoi (bulk insert)
                 'is_active' => true,
                 'created_at' => $now->copy()->subDays(60),
                 'updated_at' => $now,

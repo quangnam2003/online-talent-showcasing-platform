@@ -1,0 +1,246 @@
+@extends('layouts.app')
+
+@section('title', $video->title.' — TalentStage')
+
+@section('screen-kicker', 'FR4 · Engagement')
+@section('screen-title', 'Xem video')
+@section('screen-sub', 'Watch — like, comment, rate, follow')
+
+@section('content')
+@php $me = auth()->user(); @endphp
+
+@if ($video->status !== 'approved')
+    <div class="flash flash-error">
+        <span>Video đang ở trạng thái <strong>{{ ['pending' => 'chờ duyệt', 'rejected' => 'bị từ chối'][$video->status] ?? $video->status }}</strong> — chỉ bạn (và admin) nhìn thấy trang này.</span>
+    </div>
+@elseif ($video->privacy === 'private')
+    <div class="flash">
+        <span>Video ở chế độ <strong>riêng tư</strong> — chỉ bạn (và admin) xem được.</span>
+    </div>
+@endif
+
+<div class="watch-grid" style="display: grid; grid-template-columns: 1.9fr 1fr; gap: var(--space-6); align-items: start">
+
+    {{-- ══ Cot trai: player + tuong tac + binh luan ══ --}}
+    <div style="display: flex; flex-direction: column; gap: var(--space-4)">
+
+        <div class="plate" style="aspect-ratio: 16/9; background: #201f1d; display: flex; align-items: center; justify-content: center; overflow: hidden">
+            @if ($video->file_path && file_exists(public_path('storage/'.$video->file_path)))
+                <video controls preload="metadata" style="width: 100%; height: 100%; background: #000"
+                       @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail))) poster="{{ asset('storage/'.$video->thumbnail) }}" @endif>
+                    <source src="{{ asset('storage/'.$video->file_path) }}">
+                    Trình duyệt không hỗ trợ phát video.
+                </video>
+            @else
+                <span class="slot-note" style="color: var(--color-neutral-400)">[ trình phát video — file mẫu không tồn tại ]</span>
+            @endif
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-2)">
+            <h2 style="font-weight: 400; font-size: 28px; margin: 0">{{ $video->title }}</h2>
+
+            {{-- hang: tac gia + follow + like/share --}}
+            <div class="watch-actions" style="display: flex; align-items: center; gap: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-divider); flex-wrap: wrap">
+                <a href="{{ route('users.show', $video->user) }}" style="display: flex; align-items: center; gap: var(--space-2); text-decoration: none; color: inherit">
+                    <span class="avatar avatar-lg">
+                        @if ($video->user->avatar)
+                            <img src="{{ asset('storage/'.$video->user->avatar) }}" alt="">
+                        @else
+                            {{ mb_substr($video->user->name, 0, 1) }}
+                        @endif
+                    </span>
+                    <span style="display: flex; flex-direction: column">
+                        <span style="font-size: 14px">{{ $video->user->name }}</span>
+                        <span class="meta">{{ number_format($video->user->followers_count) }} người theo dõi</span>
+                    </span>
+                </a>
+
+                @auth
+                    @if ($me->id !== $video->user_id)
+                        <form method="POST" action="{{ route('follows.toggle', $video->user) }}">
+                            @csrf
+                            <button class="btn btn-secondary btn-sm">{{ $isFollowing ? 'Đang theo dõi ✓' : 'Theo dõi · Follow' }}</button>
+                        </form>
+                    @endif
+                @endauth
+
+                <div style="margin-left: auto; display: flex; gap: var(--space-2); align-items: center">
+                    @auth
+                        <form method="POST" action="{{ route('reactions.store', $video) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="like">
+                            <button class="btn btn-ghost btn-sm num">
+                                {{ $myReaction?->liked ? '♥' : '♡' }} Thích {{ number_format($video->likes_count) }}
+                            </button>
+                        </form>
+                    @else
+                        <span class="btn btn-ghost btn-sm num" style="cursor: default">♡ {{ number_format($video->likes_count) }}</span>
+                    @endauth
+                    <span class="meta"><span class="num">{{ number_format($video->views) }}</span> lượt xem</span>
+                </div>
+            </div>
+
+            {{-- hang: cham sao --}}
+            <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap">
+                <span class="label-up" style="font-size: 12px">Chấm điểm tài năng</span>
+                <div style="display: flex; gap: var(--space-1)">
+                    @for ($n = 1; $n <= 5; $n++)
+                        @auth
+                            <form method="POST" action="{{ route('reactions.store', $video) }}" style="display: inline">
+                                @csrf
+                                <input type="hidden" name="action" value="rate">
+                                <input type="hidden" name="stars" value="{{ $n }}">
+                                <button style="all: unset; cursor: pointer; font-size: 20px; line-height: 1; color: {{ $n <= ($myReaction?->stars ?? 0) ? 'var(--color-accent)' : 'var(--color-neutral-400)' }}">
+                                    {{ $n <= ($myReaction?->stars ?? 0) ? '★' : '☆' }}
+                                </button>
+                            </form>
+                        @else
+                            <span style="font-size: 20px; line-height: 1; color: {{ $n <= round($video->avg_rating) ? 'var(--color-accent)' : 'var(--color-neutral-400)' }}">
+                                {{ $n <= round($video->avg_rating) ? '★' : '☆' }}
+                            </span>
+                        @endauth
+                    @endfor
+                </div>
+                <span class="meta">{{ number_format($video->avg_rating, 1) }} / 5</span>
+                <span class="tag tag-outline" style="font-size: 10px; margin-left: auto">{{ $video->category->name }}</span>
+            </div>
+
+            @if ($video->description)
+                <p style="margin: var(--space-2) 0 0; font-size: 13.5px; line-height: 1.6; text-align: justify; color: var(--color-neutral-800)">{{ $video->description }}</p>
+            @endif
+        </div>
+
+        {{-- ── Binh luan ── --}}
+        <div style="display: flex; flex-direction: column; gap: var(--space-3)">
+            <h3 style="font-size: 19px; margin: 0" class="num">{{ number_format($video->comments_count) }} bình luận · Comments</h3>
+
+            @if ($video->allow_comments)
+                @auth
+                    <form method="POST" action="{{ route('comments.store', $video) }}" style="display: flex; gap: var(--space-2)">
+                        @csrf
+                        <input class="input" name="content" placeholder="Viết bình luận… / Write a comment" required style="flex: 1">
+                        <button class="btn btn-primary btn-sm">Gửi</button>
+                    </form>
+                @else
+                    <span class="muted-i"><a href="{{ route('login') }}">Đăng nhập</a> để bình luận.</span>
+                @endauth
+            @else
+                <span class="muted-i">Chủ video đã tắt bình luận.</span>
+            @endif
+
+            @foreach ($comments as $comment)
+                <div style="display: flex; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-divider)">
+                    <span class="avatar">
+                        @if ($comment->user->avatar)
+                            <img src="{{ asset('storage/'.$comment->user->avatar) }}" alt="">
+                        @else
+                            {{ mb_substr($comment->user->name, 0, 1) }}
+                        @endif
+                    </span>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1">
+                        <span style="font-size: 12.5px">
+                            <a href="{{ route('users.show', $comment->user) }}">{{ $comment->user->name }}</a>
+                            @if ($comment->user->isMentor()) <span class="tag tag-accent" style="font-size: 9px">Mentor</span> @endif
+                            <span class="muted-i">· {{ $comment->created_at->diffForHumans() }}</span>
+                        </span>
+                        <span style="font-size: 13.5px; line-height: 1.55">{{ $comment->content }}</span>
+
+                        <div style="display: flex; gap: var(--space-3); align-items: center">
+                            @auth
+                                @if ($video->allow_comments)
+                                    <button type="button" class="btn btn-ghost btn-xs" style="padding-left: 0"
+                                            onclick="const f = this.closest('div').parentElement.querySelector('.reply-form'); f.style.display = f.style.display === 'none' ? 'flex' : 'none'">
+                                        Trả lời · Reply
+                                    </button>
+                                @endif
+                                @if ($me->id === $comment->user_id || $me->isAdmin() || $me->id === $video->user_id)
+                                    <form method="POST" action="{{ route('comments.destroy', $comment) }}" onsubmit="return confirm('Xóa bình luận này?')">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-ghost btn-xs" style="color: var(--color-danger)">Xóa</button>
+                                    </form>
+                                @endif
+                            @endauth
+                        </div>
+
+                        @auth
+                            <form method="POST" action="{{ route('comments.store', $video) }}" class="reply-form" style="display: none; gap: var(--space-2)">
+                                @csrf
+                                <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                <input class="input" name="content" placeholder="Trả lời {{ $comment->user->name }}…" required style="flex: 1; font-size: 12.5px; min-height: 32px">
+                                <button class="btn btn-primary btn-xs">Gửi</button>
+                            </form>
+                        @endauth
+
+                        {{-- Tra loi 1 cap --}}
+                        @foreach ($comment->replies as $reply)
+                            <div style="display: flex; gap: var(--space-2); padding: var(--space-2) 0 0 var(--space-3); border-left: 2px solid var(--color-divider)">
+                                <span class="avatar" style="width: 24px; height: 24px; font-size: 11px">
+                                    @if ($reply->user->avatar)
+                                        <img src="{{ asset('storage/'.$reply->user->avatar) }}" alt="">
+                                    @else
+                                        {{ mb_substr($reply->user->name, 0, 1) }}
+                                    @endif
+                                </span>
+                                <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                                    <span style="font-size: 12px">
+                                        <a href="{{ route('users.show', $reply->user) }}">{{ $reply->user->name }}</a>
+                                        <span class="muted-i">· {{ $reply->created_at->diffForHumans() }}</span>
+                                    </span>
+                                    <span style="font-size: 13px; line-height: 1.5">{{ $reply->content }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- ══ Cot phai: nhan xet mentor + xem tiep ══ --}}
+    <div style="display: flex; flex-direction: column; gap: var(--space-3)">
+        @if ($mentorComment)
+            <div class="card" style="padding: var(--space-4); gap: var(--space-2)">
+                <div class="card-kicker">Nhận xét từ mentor · FR6</div>
+                <p style="margin: 0; font-size: 13px; line-height: 1.6; text-align: justify">{{ $mentorComment->content }}</p>
+                <span class="muted-i">{{ $mentorComment->user->name }} · {{ $mentorComment->created_at->diffForHumans() }}</span>
+            </div>
+        @endif
+
+        @if ($me && ($me->id === $video->user_id || $me->isAdmin()))
+            <div class="card" style="padding: var(--space-4); gap: var(--space-2)">
+                <div class="card-kicker">Quản lý video</div>
+                <div style="display: flex; gap: var(--space-2)">
+                    <a class="btn btn-secondary btn-xs" href="{{ route('videos.edit', $video) }}">Sửa</a>
+                    <form method="POST" action="{{ route('videos.destroy', $video) }}" onsubmit="return confirm('Xóa video này?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-ghost btn-xs" style="color: var(--color-danger)">Xóa video</button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
+        <div class="kicker" style="color: var(--color-neutral-500)">Xem tiếp · Up next</div>
+        @forelse ($upNext as $next)
+            <a class="card" href="{{ route('videos.show', $next) }}" style="flex-direction: row; gap: var(--space-3); padding: var(--space-2); align-items: center; text-decoration: none; color: inherit">
+                <div class="hatch-mid" style="width: 96px; height: 60px; flex: 0 0 96px; border: 1px solid var(--color-divider); overflow: hidden">
+                    @if ($next->thumbnail && file_exists(public_path('storage/'.$next->thumbnail)))
+                        <img src="{{ asset('storage/'.$next->thumbnail) }}" style="width: 100%; height: 100%; object-fit: cover" alt="">
+                    @endif
+                </div>
+                <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                    <span style="font-size: 13px; line-height: 1.3">{{ $next->title }}</span>
+                    <span class="meta">{{ $next->user->name }} · {{ number_format($next->views) }} lượt xem</span>
+                </span>
+            </a>
+        @empty
+            <span class="muted-i">Chưa có video khác.</span>
+        @endforelse
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<style>
+    @media (max-width: 1080px) { .watch-grid { grid-template-columns: 1fr !important; } }
+</style>
+@endpush
