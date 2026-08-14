@@ -1,0 +1,71 @@
+services:
+  # =========================================
+  # LARAVEL APP (image build từ Dockerfile)
+  # =========================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: quangnam2512/online-talent:latest
+    container_name: online-talent-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      APP_NAME: TalentStage
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8000
+      # Sinh key bằng: php artisan key:generate --show  rồi đặt vào .env (APP_KEY=base64:...)
+      APP_KEY: ${APP_KEY:-}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: talentstage
+      DB_USERNAME: talentstage
+      DB_PASSWORD: Talent@123
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: database
+      CACHE_STORE: database
+      AUTO_MIGRATE: "true"
+    volumes:
+      - app-storage:/var/www/html/storage/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - online-talent
+
+  # =========================================
+  # MYSQL DATABASE
+  # =========================================
+  db:
+    image: mysql:8.0
+    container_name: online-talent-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: talentstage
+      MYSQL_USER: talentstage
+      MYSQL_PASSWORD: Talent@123
+      MYSQL_ROOT_PASSWORD: Talent@123
+    # Mở comment nếu cần kết nối DB từ máy host (đổi port nếu bị trùng)
+    # ports:
+    #   - "33061:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-utalentstage", "-pTalent@123"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - online-talent
+
+volumes:
+  db-data:
+  app-storage:
+
+networks:
+  online-talent:
+    driver: bridge

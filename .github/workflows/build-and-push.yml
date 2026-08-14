@@ -1,0 +1,89 @@
+name: Build & Push Docker Image
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: quangnam2512/online-talent
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # =========================================
+      # BƯỚC 1: LẤY CODE TỪ REPO
+      # =========================================
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # =========================================
+      # BƯỚC 2: XÁC ĐỊNH VERSION THEO COMMIT
+      # =========================================
+      - name: Set image tags
+        id: meta
+        run: |
+          SHORT_SHA=$(git rev-parse --short=7 HEAD)
+          COMMIT_DATE=$(git log -1 --format=%cd --date=format:'%Y%m%d')
+          IMAGE_TAG="${COMMIT_DATE}-${SHORT_SHA}"
+
+          echo "short_sha=$SHORT_SHA"         >> $GITHUB_OUTPUT
+          echo "image_tag=$IMAGE_TAG"         >> $GITHUB_OUTPUT
+          echo "Image tag: $IMAGE_TAG"
+
+      # =========================================
+      # BƯỚC 3: TẠO GIT TAG THEO COMMIT
+      # =========================================
+      - name: Push commit-based tag to GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.meta.outputs.image_tag }}
+          git push origin ${{ steps.meta.outputs.image_tag }}
+
+      # =========================================
+      # BƯỚC 4: SETUP DOCKER BUILDX + CACHE
+      # =========================================
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # =========================================
+      # BƯỚC 5: BUILD & PUSH IMAGE LÊN DOCKER HUB
+      # =========================================
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.image_tag }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      # Tránh cache tăng kích thước vô hạn
+      - name: Rotate build cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
