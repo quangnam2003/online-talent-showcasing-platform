@@ -8,12 +8,12 @@
 @if ($video->status !== 'approved')
     <div class="flash flash-error">
         <x-icon name="info" size="16" />
-        <span>Video đang ở trạng thái <strong>{{ ['pending' => 'chờ duyệt', 'rejected' => 'bị từ chối'][$video->status] ?? $video->status }}</strong> — chỉ bạn (và admin) nhìn thấy trang này.</span>
+        <span>Tiết mục đang ở trạng thái <strong>{{ ['pending' => 'chờ duyệt', 'rejected' => 'bị từ chối'][$video->status] ?? $video->status }}</strong> — chỉ bạn và quản trị viên nhìn thấy trang này.@if ($video->status === 'pending') Quản trị viên đã được thông báo; bạn sẽ nhận kết quả qua chuông thông báo.@endif</span>
     </div>
 @elseif ($video->privacy === 'private')
     <div class="flash">
         <x-icon name="lock" size="16" />
-        <span>Video ở chế độ <strong>riêng tư</strong> — chỉ bạn (và admin) xem được.</span>
+        <span>Tiết mục ở chế độ <strong>riêng tư</strong> — chỉ bạn và quản trị viên xem được.</span>
     </div>
 @endif
 
@@ -22,20 +22,36 @@
     {{-- ══ Cot trai: player + tuong tac + binh luan ══ --}}
     <div style="display: flex; flex-direction: column; gap: var(--space-4)">
 
-        <div class="player">
-            @if ($video->file_path && file_exists(public_path('storage/'.$video->file_path)))
-                <video controls preload="metadata"
-                       @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail))) poster="{{ asset('storage/'.$video->thumbnail) }}" @endif>
-                    <source src="{{ asset('storage/'.$video->file_path) }}">
-                    Trình duyệt không hỗ trợ phát video.
-                </video>
-            @else
-                <div class="player-empty">
-                    <x-icon name="video-off" size="36" />
-                    <span>Video này hiện chưa có tệp phát</span>
-                </div>
-            @endif
-        </div>
+        @php $hasFile = $video->file_path && file_exists(public_path('storage/'.$video->file_path)); @endphp
+        @if ($hasFile && $video->isAudio())
+            {{-- Tiet muc am thanh: cover mau the loai (hoac anh bia) + trinh phat audio --}}
+            <div class="player player-audio" style="--cat: {{ $video->category->colorVar() }}">
+                @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)))
+                    <img class="player-audio-cover" src="{{ asset('storage/'.$video->thumbnail) }}" alt="">
+                @else
+                    <span class="player-audio-art" aria-hidden="true"><x-icon name="mic" size="72" /></span>
+                @endif
+                <span class="thumb-badge thumb-badge-audio player-audio-tag"><x-icon name="mic" size="11" /> Bản thu âm</span>
+                <audio controls preload="metadata" src="{{ asset('storage/'.$video->file_path) }}" @if ($video->mime_type) type="{{ $video->mime_type }}" @endif>
+                    Trình duyệt không hỗ trợ phát âm thanh.
+                </audio>
+            </div>
+        @else
+            <div class="player">
+                @if ($hasFile)
+                    <video controls preload="metadata"
+                           @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail))) poster="{{ asset('storage/'.$video->thumbnail) }}" @endif>
+                        <source src="{{ asset('storage/'.$video->file_path) }}" @if ($video->mime_type) type="{{ $video->mime_type }}" @endif>
+                        Trình duyệt không hỗ trợ phát video.
+                    </video>
+                @else
+                    <div class="player-empty">
+                        <x-icon name="video-off" size="36" />
+                        <span>Tiết mục này hiện chưa có tệp phát</span>
+                    </div>
+                @endif
+            </div>
+        @endif
 
         <div style="display: flex; flex-direction: column; gap: var(--space-2)">
             <h1 style="font-size: 26px; margin: 0; line-height: 1.2">{{ $video->title }}</h1>
@@ -78,6 +94,9 @@
                         <span class="btn btn-ghost btn-sm num" style="cursor: default"><x-icon name="heart" size="15" /> Thích {{ number_format($video->likes_count) }}</span>
                     @endauth
                     <span class="meta" style="display: inline-flex; align-items: center; gap: 4px"><x-icon name="eye" size="14" /> <span class="num">{{ number_format($video->views) }}</span> lượt xem</span>
+                    @if ($video->durationLabel())
+                        <span class="meta" style="display: inline-flex; align-items: center; gap: 4px"><x-icon name="clock" size="14" /> <span class="num">{{ $video->durationLabel() }}</span></span>
+                    @endif
                 </div>
             </div>
 
@@ -225,11 +244,7 @@
         <div class="kicker" style="color: var(--color-neutral-500)">Xem tiếp</div>
         @forelse ($upNext as $next)
             <a class="card" href="{{ route('videos.show', $next) }}" style="flex-direction: row; gap: var(--space-3); padding: var(--space-2); align-items: center; text-decoration: none; color: inherit">
-                <div class="hatch-mid" style="width: 96px; height: 60px; flex: 0 0 96px; border: 1px solid var(--color-divider); overflow: hidden">
-                    @if ($next->thumbnail && file_exists(public_path('storage/'.$next->thumbnail)))
-                        <img src="{{ asset('storage/'.$next->thumbnail) }}" style="width: 100%; height: 100%; object-fit: cover" alt="">
-                    @endif
-                </div>
+                <div class="hatch-mid thumb-sm" style="width: 96px; height: 60px; flex: 0 0 96px">@include('partials.thumb', ['video' => $next, 'compact' => true])</div>
                 <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
                     <span style="font-size: 13px; line-height: 1.3">{{ $next->title }}</span>
                     <span class="meta">{{ $next->user->name }} · {{ number_format($next->views) }} lượt xem</span>

@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\User;
 use App\Models\Video;
+use App\Notifications\VideoSubmitted;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -20,23 +24,36 @@ class VideoController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    /**
+     * FR2: nhan tiet muc (video hoac am thanh), luu o trang thai "cho duyet", bao cho admin.
+     * Form gui bang XHR (co thanh tien trinh) → tra JSON; gui thuong → redirect kem flash.
+     */
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
             'description' => ['nullable', 'string', 'max:5000'],
             'privacy' => ['required', 'in:public,private'],
-            'video' => ['required', 'file', 'mimetypes:video/mp4,video/quicktime,video/webm', 'max:102400'], // 100MB
+            'video' => ['required', 'file', 'mimetypes:'.implode(',', Video::MEDIA_MIMES), 'max:102400'], // 100MB
             'thumbnail' => ['nullable', 'image', 'max:4096'],
+            'duration' => ['nullable', 'integer', 'min:0', 'max:86400'],
         ], [
-            'title.required' => 'Vui lòng nhập tiêu đề.',
+            'title.required' => 'Vui lòng nhập tiêu đề cho tiết mục.',
+            'title.max' => 'Tiêu đề tối đa 255 ký tự.',
             'category_id.required' => 'Vui lòng chọn thể loại.',
-            'video.required' => 'Vui lòng chọn file video.',
-            'video.mimetypes' => 'Định dạng phải là mp4 / mov / webm.',
-            'video.max' => 'Video tối đa 100MB.',
-            'thumbnail.max' => 'Thumbnail tối đa 4MB.',
+            'category_id.exists' => 'Thể loại không hợp lệ.',
+            'description.max' => 'Mô tả tối đa 5000 ký tự.',
+            'video.required' => 'Bạn chưa chọn tệp video hoặc âm thanh.',
+            'video.file' => 'Tệp không hợp lệ, vui lòng chọn lại.',
+            'video.uploaded' => 'Tệp không tải lên được — thường do vượt quá 100 MB hoặc kết nối bị gián đoạn. Hãy thử lại với tệp nhỏ hơn.',
+            'video.mimetypes' => 'Định dạng chưa hỗ trợ. Chấp nhận video MP4 / MOV / WEBM hoặc âm thanh MP3 / M4A / WAV / OGG / FLAC.',
+            'video.max' => 'Tệp vượt quá giới hạn 100 MB.',
+            'thumbnail.image' => 'Ảnh bìa phải là tệp hình ảnh (JPG, PNG, WEBP…).',
+            'thumbnail.max' => 'Ảnh bìa tối đa 4 MB.',
         ]);
+
+        $file = $request->file('video');
 
         $video = Video::create([
             'user_id' => auth()->id(),
@@ -46,14 +63,33 @@ class VideoController extends Controller
             'privacy' => $data['privacy'],
             'allow_comments' => $request->boolean('allow_comments'),
             'status' => 'pending', // FR8: cho admin duyet
-            'file_path' => $request->file('video')->store('videos', 'public'),
+            'file_path' => $file->store('videos', 'public'),
+            'mime_type' => $file->getMimeType(),
+            'duration' => $data['duration'] ?? null,
             'thumbnail' => $request->hasFile('thumbnail')
                 ? $request->file('thumbnail')->store('thumbnails', 'public')
                 : null,
         ]);
 
-        return redirect()->route('videos.mine')
-            ->with('success', 'Đã gửi video "'.$video->title.'" — chờ admin duyệt.');
+        // Bao cho moi quan tri vien dang hoat dong: co muc moi trong hang doi kiem duyet
+        $video->setRelation('user', auth()->user());
+        Notification::send(User::where('role', 'admin')->where('is_active', true)->get(), new VideoSubmitted($video));
+
+        $label = $video->isAudio() ? 'bản thu âm' : 'video';
+        $message = 'Đã gửi '.$label.' "'.$video->title.'" tới quản trị viên để duyệt. Bạn sẽ nhận thông báo ngay khi có kết quả.';
+
+        session()->flash('success', $message);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'message' => $message,
+                'redirect' => route('videos.mine'),
+                'video' => ['id' => $video->id, 'url' => route('videos.show', $video)],
+            ]);
+        }
+
+        return redirect()->route('videos.mine');
     }
 
     // FR2 + FR4: trang xem video
@@ -129,6 +165,14 @@ class VideoController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
             'privacy' => ['required', 'in:public,private'],
             'thumbnail' => ['nullable', 'image', 'max:4096'],
+        ], [
+            'title.required' => 'Vui lòng nhập tiêu đề cho tiết mục.',
+            'title.max' => 'Tiêu đề tối đa 255 ký tự.',
+            'category_id.required' => 'Vui lòng chọn thể loại.',
+            'category_id.exists' => 'Thể loại không hợp lệ.',
+            'description.max' => 'Mô tả tối đa 5000 ký tự.',
+            'thumbnail.image' => 'Ảnh bìa phải là tệp hình ảnh (JPG, PNG, WEBP…).',
+            'thumbnail.max' => 'Ảnh bìa tối đa 4 MB.',
         ]);
 
         if ($request->hasFile('thumbnail')) {

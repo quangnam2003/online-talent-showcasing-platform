@@ -47,6 +47,9 @@ RUN apt-get update \
     && docker-php-ext-install pdo_mysql bcmath intl zip opcache \
     && rm -rf /var/lib/apt/lists/*
 
+# Giới hạn upload 100 MB cho FR2 (mặc định của image chỉ 2 MB → upload video luôn thất bại)
+COPY docker/php-uploads.ini /usr/local/etc/php/conf.d/zz-talentstage-uploads.ini
+
 # Trỏ DocumentRoot vào thư mục public/ của Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \

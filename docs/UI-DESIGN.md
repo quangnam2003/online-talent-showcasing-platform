@@ -18,17 +18,17 @@ Mã nguồn: tokens/components trong **`public/css/talentstage.css`**; tương t
 | Spacing | 4.6 / 9.2 / 13.8 / 18.4 / 27.6 / 36.8px (`--space-1…8`) |
 | Bo góc / bóng | 2 / 4 / 7px; ô tìm kiếm & chip: pill 999px; bóng `--shadow-sm/md/lg` chỉ khi hover / menu / dialog |
 | Placeholder ảnh | **không** dùng chữ chú thích: thumbnail thiếu → `.thumb-ph` (vòng tròn tint thể loại + icon play); ô nhỏ `.hatch-mid` → gradient dịu + play mờ; hero/cover → `.ph-art` (gradient + icon mic mờ); avatar thiếu → chữ cái đầu trên nền `accent-100` |
-| Ngôn ngữ | Toàn bộ nhãn UI **tiếng Việt** (thời gian tương đối cũng tiếng Việt — `Carbon::setLocale('vi')` trong `AppServiceProvider`); tên vai trò Creator/Mentor/Admin giữ nguyên như thuật ngữ sản phẩm |
+| Ngôn ngữ | Toàn bộ nhãn UI **tiếng Việt**; `APP_LOCALE=vi` + `lang/vi/{validation,auth,pagination}.php` nên thông báo lỗi form cũng tiếng Việt (rule thiếu tự rơi về tiếng Anh của framework); thời gian tương đối tiếng Việt (`Carbon::setLocale('vi')`); tên vai trò Creator/Mentor/Admin giữ nguyên như thuật ngữ sản phẩm |
 
 ## 2. Khung trang (`layouts/app.blade.php`)
 
 - **Sidebar 250px** (sticky, drawer trên mobile): logo mark vuông bo góc gradient vàng + wordmark **TalentStage** + tagline "Sân khấu tài năng trực tuyến"; nav dạng **icon + nhãn**, chia nhóm nhỏ:
   - *(không nhãn)*: Trang chủ · Tìm kiếm · Bảng tin (đăng nhập) · Cuộc thi
   - **Cộng đồng**: Nhóm · Tin nhắn (creator/mentor, badge chưa đọc) · Thông báo (badge chưa đọc)
-  - **Kênh của tôi** (creator): Đăng video · Video của tôi · Hồ sơ của tôi — user khác: **Tài khoản**: Hồ sơ của tôi
+  - **Kênh của tôi** (creator): Đăng tiết mục · Tiết mục của tôi · Hồ sơ của tôi — user khác: **Tài khoản**: Hồ sơ của tôi
   - **Quản trị** (admin): Tổng quan · Kiểm duyệt (badge số video chờ) · Người dùng · Danh mục · Cuộc thi
   - Mục active: nền `accent-100`, viền trái vàng, chữ 600, icon vàng. Chân sidebar: thẻ user (avatar · tên · vai trò) + nút icon Đăng xuất; khách: Đăng nhập / Tạo tài khoản.
-- **Header** sticky (nền mờ blur): nút ☰ (mobile), ô tìm kiếm pill có icon, 4 chip thể loại `.cat-chip`, bên phải: nút **Đăng video** (creator), chuông thông báo `.icon-btn` + `.badge-dot`, **menu tài khoản** `details.menu > .ts-user` (Hồ sơ, Sửa hồ sơ, Video của tôi, Tin nhắn, Khu quản trị, Đăng xuất); khách: Đăng nhập / Đăng ký.
+- **Header** sticky (nền mờ blur): nút ☰ (mobile), ô tìm kiếm pill có icon, 4 chip thể loại `.cat-chip`, bên phải: nút **Đăng tiết mục** (creator), chuông thông báo `.icon-btn` + `.badge-dot`, **menu tài khoản** `details.menu > .ts-user` (Hồ sơ, Sửa hồ sơ, Tiết mục của tôi, Tin nhắn, Khu quản trị, Đăng xuất); khách: Đăng nhập / Đăng ký.
 - **Tiêu đề trang**: `screen-kicker` = breadcrumb (`.crumbs`, dùng block section để chứa link) → `screen-title` (30px/600) → `screen-sub` (mô tả 13.5px). Trang xem video và hồ sơ **không** dùng khối này — tiêu đề video / tên người dùng chính là h1 trong nội dung.
 - **Footer**: logo nhỏ + tagline · liên kết Khám phá / Cuộc thi / Nhóm / Sơ đồ trang · © năm.
 
@@ -47,7 +47,7 @@ Token chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-spring` (nảy nh�
 - Form: `.field` + `.label-up`, `.input`, `.is-invalid` + `.err-msg`, `.seg`, `.radio`, `.dropzone` (+ `-ico/-title/-hint/-name`, input `.visually-hidden`)
 - Thẻ: `.card` (`-kicker/-title/-body/-meta`), `.tag` (`-accent/-outline/-neutral/-muted/-status`), `.cat-chip` (`.active`)
 - Bảng `.table`; hộp thoại `.dialog*`; flash `.flash` / `.flash-error`; panel `.reveal` + `.reveal-inner`; menu `.menu` / `.menu-panel` / `.menu-item` / `.menu-head` / `.menu-sep`; breadcrumb `.crumbs` (+ `.sep`)
-- Đặc thù app: `.video-card` (+`.video-thumb`, `.thumb-ph`, `.video-card-cat`), `.hero-plate/.hero-box/.ph-art/.ph-art-ico`, `.player/.player-empty`, `.rank-row`+`.rank-num`, `.phase-strip`+`.phase.current`, `.bubble.me/.them`, `.stat`, `.line-tabs`, `.auth-tabs`, `.stars/.star[data-on]`, `.avatar` (`-lg/-xl`), `.kicker`, `.meta`, `.muted-i`, `.grid-4/.grid-2`
+- Đặc thù app: `.video-card` (+`.video-thumb`, `.thumb-ph`, `.thumb-badge` âm thanh/thời lượng — partial `partials/thumb`, `.video-card-cat`), `.attach-card/.progress/.steps`, `.noti-ico`, `.hero-plate/.hero-box/.ph-art/.ph-art-ico`, `.player/.player-empty`, `.rank-row`+`.rank-num`, `.phase-strip`+`.phase.current`, `.bubble.me/.them`, `.stat`, `.line-tabs`, `.auth-tabs`, `.stars/.star[data-on]`, `.avatar` (`-lg/-xl`), `.kicker`, `.meta`, `.muted-i`, `.grid-4/.grid-2`
 
 ## 5. Trang chính
 
@@ -55,9 +55,9 @@ Token chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-spring` (nảy nh�
 |---|---|---|
 | Trang chủ | `/` | Hero (`.ph-art` khi chưa có ảnh) + "Đang thịnh hành" + lưới video 4 cột + cuộc thi đang diễn ra |
 | Tìm kiếm | `/explore` | Ô tìm + sắp xếp + dãy `.cat-chip` lọc thể loại (giữ `q`/`sort`) |
-| Xem video | `/videos/{id}` | `.player` (empty-state icon), h1 tiêu đề, tác giả + Theo dõi, Thích, chấm sao, chip thể loại, bình luận + trả lời `.reveal`; cột phải: nhận xét mentor, quản lý, Xem tiếp |
+| Xem video | `/videos/{id}` | `.player` (video) hoặc `.player-audio` (bản thu âm: cover màu thể loại + `<audio>`), h1 tiêu đề, tác giả + Theo dõi, Thích, lượt xem, thời lượng, chấm sao, chip thể loại, bình luận + trả lời `.reveal`; cột phải: nhận xét mentor, quản lý, Xem tiếp |
 | Hồ sơ | `/users/{id}`, `/profile/edit` | h1 tên + tag vai trò + nơi ở + thành tích + 4 `.stat`; hành động cột phải; lưới video |
-| Đăng video | `/videos/create`, `/my-videos`, `/videos/{id}/edit` | `.dropzone` kéo thả + form; bảng trạng thái duyệt `.tag-status` |
+| Đăng tiết mục | `/videos/create`, `/my-videos`, `/videos/{id}/edit` | `.dropzone` kéo thả (video **hoặc âm thanh**) → `.attach-card` kiểu "Your work" (xem trước · tên · loại/dung lượng/thời lượng · nút gỡ); gửi bằng XHR: `.progress` + trạng thái, lỗi theo trường `[data-error-for]`, thành công → chuyển tới danh sách kèm flash; panel `.steps` "tiết mục đi đâu sau khi gửi"; bảng trạng thái duyệt `.tag-status` |
 | Bảng tin / Thông báo | `/feed`, `/notifications` | Card hoạt động; gợi ý theo dõi |
 | Nhóm | `/groups`, `/groups/{id}`, `/groups/create` | Danh sách trái + bảng thảo luận phải |
 | Tin nhắn | `/messages`, `/messages/{user}` | Threads + khung chat `.bubble` |

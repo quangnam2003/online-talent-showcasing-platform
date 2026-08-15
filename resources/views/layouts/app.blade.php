@@ -39,8 +39,8 @@
     ];
     if ($me?->isCreator()) {
         $navGroups[] = ['label' => 'Kênh của tôi', 'items' => [
-            ['Đăng video', 'upload', url('/videos/create'), 'videos/create'],
-            ['Video của tôi', 'film', url('/my-videos'), 'my-videos|videos/*/edit'],
+            ['Đăng tiết mục', 'upload', url('/videos/create'), 'videos/create'],
+            ['Tiết mục của tôi', 'film', url('/my-videos'), 'my-videos|videos/*/edit'],
             ['Hồ sơ của tôi', 'user', url('/users/'.$me->id), 'users/'.$me->id.'|profile/edit'],
         ]];
     } elseif ($me) {
@@ -150,7 +150,7 @@
 
             <div class="ts-header-right">
                 @if ($me?->isCreator())
-                    <a class="btn btn-primary btn-sm" href="{{ url('/videos/create') }}"><x-icon name="upload" size="15" /> Đăng video</a>
+                    <a class="btn btn-primary btn-sm" href="{{ url('/videos/create') }}"><x-icon name="upload" size="15" /> Đăng tiết mục</a>
                 @endif
                 @auth
                     <a class="icon-btn" href="{{ url('/notifications') }}" aria-label="Thông báo{{ $unreadNoti ? " ($unreadNoti chưa đọc)" : '' }}" title="Thông báo">
@@ -180,7 +180,7 @@
                             <a class="menu-item" href="{{ url('/users/'.$me->id) }}"><x-icon name="user" size="16" /> Hồ sơ của tôi</a>
                             <a class="menu-item" href="{{ url('/profile/edit') }}"><x-icon name="settings" size="16" /> Sửa hồ sơ</a>
                             @if ($me->isCreator())
-                                <a class="menu-item" href="{{ url('/my-videos') }}"><x-icon name="film" size="16" /> Video của tôi</a>
+                                <a class="menu-item" href="{{ url('/my-videos') }}"><x-icon name="film" size="16" /> Tiết mục của tôi</a>
                             @endif
                             @if ($isCM)
                                 <a class="menu-item" href="{{ url('/messages') }}"><x-icon name="message" size="16" /> Tin nhắn @if ($unreadMsg)<span class="badge">{{ $unreadMsg }}</span>@endif</a>
@@ -216,6 +216,13 @@
                 <div class="flash flash-error" role="alert">
                     <x-icon name="info" size="16" />
                     <span>{{ session('error') }}</span>
+                    <button type="button" onclick="tsDismiss(this)" aria-label="Đóng">×</button>
+                </div>
+            @elseif ($errors->any())
+                {{-- form gui khong hop le (khi khong dung XHR): tom tat de nguoi dung biet vi sao trang tai lai --}}
+                <div class="flash flash-error" role="alert">
+                    <x-icon name="info" size="16" />
+                    <span>Chưa thể gửi — vui lòng kiểm tra lại {{ $errors->count() }} mục được đánh dấu bên dưới.</span>
                     <button type="button" onclick="tsDismiss(this)" aria-label="Đóng">×</button>
                 </div>
             @endif

@@ -95,6 +95,7 @@
    2. BASE
    ══════════════════════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; } /* thuoc tinh hidden luon thang cac rule display: flex/grid cua class */
 html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--color-bg); color: var(--color-text);
@@ -445,6 +446,100 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
 .dropzone-title u { text-decoration-color: var(--color-accent); text-underline-offset: 3px; color: var(--color-accent-700); }
 .dropzone-hint { font-size: 12px; color: var(--color-neutral-600); }
 .dropzone-name { font-size: 12.5px; color: var(--c-sport); font-weight: 600; }
+
+/* the dinh kem sau khi chon tep (kieu "Your work" — xem truoc · ten · loai/dung luong/thoi luong · go) */
+.attach { display: flex; flex-direction: column; gap: var(--space-1); }
+.attach-card {
+  display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border: 1px solid var(--color-divider); border-radius: var(--radius-lg); background: var(--color-bg);
+  animation: ts-scale-in var(--dur-3) var(--ease-out) backwards;
+  transition: border-color var(--dur-2) var(--ease-out), background-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
+}
+.attach-card.is-uploading { border-color: var(--color-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.attach-card.is-done { border-color: var(--c-sport); background: color-mix(in oklch, var(--c-sport) 7%, var(--color-bg)); }
+.attach-card.is-error { border-color: var(--color-danger); }
+.attach-preview {
+  width: 112px; height: 68px; flex: none; border-radius: var(--radius-md); overflow: hidden;
+  background: #141311; color: #fff; display: grid; place-items: center; position: relative;
+}
+.attach-preview video, .attach-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.attach-preview.is-audio { background: linear-gradient(135deg, var(--color-accent-700), var(--color-accent-500)); }
+.attach-preview .icon { opacity: .9; }
+.attach-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.attach-name { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach-meta { font-size: 12px; color: var(--color-neutral-600); font-variant-numeric: tabular-nums; }
+.attach-status { font-size: 12px; color: var(--color-neutral-700); font-variant-numeric: tabular-nums; min-height: 1em; }
+.attach-card.is-done .attach-status { color: var(--c-sport); font-weight: 600; }
+.attach-card.is-error .attach-status { color: var(--color-danger); font-weight: 600; }
+.attach-remove { color: var(--color-neutral-600); }
+.attach-remove:hover { color: var(--color-danger); background: color-mix(in srgb, var(--color-danger) 10%, transparent); }
+.progress { height: 6px; border-radius: 999px; background: var(--color-neutral-200); overflow: hidden; margin: 2px 0; }
+.progress-bar {
+  display: block; height: 100%; width: 0; border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent-500), var(--color-accent-700));
+  transition: width var(--dur-2) var(--ease-out);
+}
+.progress-bar.is-indeterminate { width: 40%; animation: ts-progress-slide 1.1s var(--ease-in-out) infinite; }
+@keyframes ts-progress-slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+.thumb-preview { width: 64px; height: 40px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--color-divider); flex: none; }
+
+/* badge tren thumbnail: loai am thanh + thoi luong */
+.thumb-badge {
+  position: absolute; bottom: 6px; display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 4px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.4;
+  background: rgba(20, 19, 17, .72); color: #fff; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.thumb-badge-time { right: 6px; }
+.thumb-badge-audio { left: 6px; }
+.thumb-sm { position: relative; overflow: hidden; border: 1px solid var(--color-divider); }
+.thumb-sm img { width: 100%; height: 100%; object-fit: cover; }
+.thumb-sm .thumb-badge { font-size: 9.5px; padding: 1px 5px; bottom: 4px; }
+.thumb-sm .thumb-badge-time { right: 4px; } .thumb-sm .thumb-badge-audio { left: 4px; }
+.thumb-ph-audio::before { display: none; }
+.thumb-ph-audio .icon { margin: 0; }
+
+/* trinh phat am thanh: cover mau the loai + <audio> ─────────────────────── */
+.player-audio {
+  --cat: var(--color-accent); position: relative; display: block;
+  background:
+    radial-gradient(60% 80% at 80% 0%, color-mix(in oklch, var(--cat) 45%, transparent), transparent 70%),
+    linear-gradient(160deg, color-mix(in oklch, var(--cat) 30%, #141311), #141311 70%);
+}
+.player-audio-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .85; }
+.player-audio-art {
+  position: absolute; inset: 0; display: grid; place-items: center; color: color-mix(in oklch, var(--cat) 60%, #fff);
+  opacity: .9;
+}
+.player-audio-tag { position: absolute; top: 12px; left: 12px; }
+.player-audio audio {
+  position: absolute; left: var(--space-3); right: var(--space-3); bottom: var(--space-3); width: calc(100% - var(--space-3) * 2);
+  border-radius: 999px; background: rgba(255,255,255,.92); box-shadow: var(--shadow-md);
+}
+
+/* danh sach buoc (quy trinh duyet) */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: step; font-size: 13px; line-height: 1.55; }
+.steps li { position: relative; padding-left: 34px; }
+.steps li::before {
+  counter-increment: step; content: counter(step);
+  position: absolute; left: 0; top: 0; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 11.5px; font-weight: 700;
+  background: var(--color-accent-100); color: var(--color-accent-800); border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+.steps li:not(:last-child)::after {
+  content: ""; position: absolute; left: 11.5px; top: 26px; bottom: -8px; width: 1px; background: var(--color-divider);
+}
+.steps .tag { vertical-align: middle; }
+
+/* thong bao: icon tron mau theo loai */
+.noti.is-unread { border-left: 2px solid var(--color-accent); background: var(--color-accent-100); }
+.noti-ico {
+  width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center;
+  background: var(--color-neutral-100); color: var(--color-neutral-600); border: 1px solid var(--color-divider);
+}
+.noti-ok { background: color-mix(in oklch, var(--c-sport) 14%, transparent); color: var(--c-sport); border-color: transparent; }
+.noti-bad { background: color-mix(in oklch, var(--c-acting) 14%, transparent); color: var(--c-acting); border-color: transparent; }
+.noti-accent { background: var(--color-accent-100); color: var(--color-accent-700); border-color: transparent; }
+.noti-muted { color: var(--color-neutral-500); }
 
 /* ── chu dan ─────────────────────────────────────────────────────────── */
 .kicker {

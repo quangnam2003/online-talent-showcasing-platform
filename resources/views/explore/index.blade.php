@@ -46,13 +46,7 @@
 <div class="grid-4">
     @forelse ($videos as $video)
         <a class="card video-card" href="{{ route('videos.show', $video) }}" style="--cat: {{ $video->category->colorVar() }}">
-            <div class="video-thumb">
-                @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)))
-                    <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}" loading="lazy">
-                @else
-                    <span class="thumb-ph" aria-hidden="true"></span>
-                @endif
-            </div>
+            <div class="video-thumb">@include('partials.thumb', ['video' => $video])</div>
             <div class="video-card-body">
                 <span class="video-card-cat">{{ $video->category->name }}</span>
                 <span class="video-card-title">{{ $video->title }}</span>

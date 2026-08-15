@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Video của tôi — TalentStage')
+@section('title', 'Tiết mục của tôi — TalentStage')
 
-@section('screen-title', 'Video của tôi')
-@section('screen-sub', 'Theo dõi trạng thái duyệt, chỉnh sửa hoặc xóa video bạn đã đăng.')
+@section('screen-title', 'Tiết mục của tôi')
+@section('screen-sub', 'Theo dõi trạng thái duyệt, chỉnh sửa hoặc xóa video và bản thu âm bạn đã đăng.')
 
 @section('content')
 <div style="display: flex; justify-content: space-between; align-items: center">
-    <span class="meta">{{ $videos->count() }} video</span>
-    <a class="btn btn-primary btn-sm" href="{{ route('videos.create') }}"><x-icon name="upload" size="14" /> Đăng video mới</a>
+    <span class="meta">{{ $videos->count() }} tiết mục</span>
+    <a class="btn btn-primary btn-sm" href="{{ route('videos.create') }}"><x-icon name="upload" size="14" /> Đăng tiết mục mới</a>
 </div>
 
 <table class="table" style="font-size: 13px">
     <thead>
-        <tr><th>Video</th><th>Thể loại</th><th>Quyền xem</th><th>Lượt xem</th><th>♡</th><th>Trạng thái</th><th>Gửi lúc</th><th></th></tr>
+        <tr><th>Tiết mục</th><th>Thể loại</th><th>Quyền xem</th><th>Lượt xem</th><th>♡</th><th>Trạng thái</th><th>Gửi lúc</th><th></th></tr>
     </thead>
     <tbody>
         @forelse ($videos as $video)
@@ -21,7 +21,7 @@
                 $t = ['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'][$video->status];
             @endphp
             <tr>
-                <td><a href="{{ route('videos.show', $video) }}">{{ \Illuminate\Support\Str::limit($video->title, 40) }}</a></td>
+                <td><a href="{{ route('videos.show', $video) }}" style="display: inline-flex; align-items: center; gap: 6px">@if ($video->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-600)" />@endif {{ \Illuminate\Support\Str::limit($video->title, 40) }}</a></td>
                 <td><span style="color: {{ $video->category->colorVar() }}; font-weight: 600; font-size: 12px">{{ $video->category->name }}</span></td>
                 <td class="muted-i">{{ $video->privacy === 'public' ? 'Công khai' : 'Riêng tư' }}</td>
                 <td class="num">{{ number_format($video->views) }}</td>

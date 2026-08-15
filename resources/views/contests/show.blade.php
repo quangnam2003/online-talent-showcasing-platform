@@ -85,13 +85,7 @@
     <div class="grid-4">
         @forelse ($entries as $entry)
             <div class="card video-card" style="cursor: default; --cat: {{ $entry->video->category->colorVar() }}">
-                <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb" style="display: flex">
-                    @if ($entry->video->thumbnail && file_exists(public_path('storage/'.$entry->video->thumbnail)))
-                        <img src="{{ asset('storage/'.$entry->video->thumbnail) }}" alt="" loading="lazy">
-                    @else
-                        <span class="thumb-ph" aria-hidden="true"></span>
-                    @endif
-                </a>
+                <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb" style="display: flex">@include('partials.thumb', ['video' => $entry->video])</a>
                 <div class="video-card-body" style="gap: var(--space-2)">
                     <span class="video-card-title" style="font-size: 16px">{{ $entry->video->title }}</span>
                     <span class="meta">{{ $entry->user->name }} · <span class="num">{{ number_format($entry->votes_count) }}</span> phiếu</span>

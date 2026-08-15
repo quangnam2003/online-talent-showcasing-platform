@@ -14,7 +14,7 @@ class Video extends Model
 
     protected $fillable = [
         'user_id', 'category_id', 'title', 'description',
-        'file_path', 'thumbnail', 'privacy', 'allow_comments', 'status',
+        'file_path', 'mime_type', 'duration', 'thumbnail', 'privacy', 'allow_comments', 'status',
     ];
 
     protected function casts(): array
@@ -23,7 +23,48 @@ class Video extends Model
             'allow_comments' => 'boolean',
             'avg_rating' => 'float',
             'trending_score' => 'float',
+            'duration' => 'integer',
         ];
+    }
+
+    /* ---------- Loai tep (video / am thanh) ---------- */
+
+    // Cac dinh dang tiet muc duoc chap nhan khi upload (FR2) — dung chung cho validate + accept="…"
+    public const MEDIA_MIMES = [
+        'video/mp4', 'video/quicktime', 'video/webm',
+        'audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/x-wav', 'audio/wave',
+        'audio/ogg', 'audio/webm', 'audio/flac', 'audio/x-flac',
+    ];
+
+    public const AUDIO_EXTENSIONS = ['mp3', 'mpga', 'm4a', 'aac', 'wav', 'ogg', 'oga', 'weba', 'flac'];
+
+    // 'audio' hoac 'video' — uu tien mime_type luu khi upload, du phong theo duoi tep (ban ghi cu)
+    public function getMediaTypeAttribute(): string
+    {
+        if ($this->mime_type && str_starts_with($this->mime_type, 'audio/')) {
+            return 'audio';
+        }
+        $ext = strtolower(pathinfo((string) $this->file_path, PATHINFO_EXTENSION));
+
+        return in_array($ext, self::AUDIO_EXTENSIONS, true) ? 'audio' : 'video';
+    }
+
+    public function isAudio(): bool
+    {
+        return $this->media_type === 'audio';
+    }
+
+    // "3:24" / "1:02:05" — null neu chua co thoi luong
+    public function durationLabel(): ?string
+    {
+        if (! $this->duration) {
+            return null;
+        }
+        $h = intdiv($this->duration, 3600);
+        $m = intdiv($this->duration % 3600, 60);
+        $s = $this->duration % 60;
+
+        return $h > 0 ? sprintf('%d:%02d:%02d', $h, $m, $s) : sprintf('%d:%02d', $m, $s);
     }
 
     /* ---------- Quan he ---------- */

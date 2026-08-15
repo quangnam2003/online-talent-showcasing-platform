@@ -2,7 +2,7 @@
 
 @section('title', 'Sửa video — TalentStage')
 
-@section('screen-kicker')<a href="{{ route('videos.mine') }}">Video của tôi</a><span class="sep">/</span><span>{{ \Illuminate\Support\Str::limit($video->title, 40) }}</span>@endsection
+@section('screen-kicker')<a href="{{ route('videos.mine') }}">Tiết mục của tôi</a><span class="sep">/</span><span>{{ \Illuminate\Support\Str::limit($video->title, 40) }}</span>@endsection
 @section('screen-title', 'Sửa video')
 
 @section('content')

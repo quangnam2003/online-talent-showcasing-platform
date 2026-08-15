@@ -5,12 +5,12 @@ Nền tảng web trưng bày tài năng trực tuyến — nơi creator đăng v
 ## Tính năng chính
 
 - **Khám phá & bảng tin** — xem video thịnh hành, theo danh mục, và feed theo người theo dõi
-- **Upload & duyệt video** — creator đăng video (tối đa 100MB); admin duyệt trước khi công khai
+- **Đăng & duyệt tiết mục** — creator đăng video (MP4/MOV/WEBM) hoặc bản thu âm (MP3/M4A/WAV/OGG/FLAC) tối đa 100MB, có thanh tiến trình và báo kết quả gửi; admin được thông báo và duyệt trước khi công khai
 - **Tương tác** — like, chấm sao, bình luận / trả lời, theo dõi creator
 - **Nhóm cộng đồng** — tham gia nhóm, đăng bài thảo luận (chỉ thành viên thấy)
 - **Tin nhắn** — chat creator ↔ mentor, badge tin chưa đọc
 - **Cuộc thi** — nộp bài, bình chọn (1 phiếu/người), theo dõi trạng thái cuộc thi
-- **Thông báo** — duyệt video, người theo dõi mới, v.v.
+- **Thông báo** — tiết mục mới chờ duyệt (admin), kết quả duyệt (creator), người theo dõi mới
 - **Quản trị** — dashboard admin: người dùng, danh mục, video chờ duyệt, cuộc thi
 
 Giao diện web hoàn chỉnh (nền giấy ấm, typography Public Sans, sidebar icon + menu tài khoản, mỗi thể loại một màu, chuyển động mượt) — xem [docs/UI-DESIGN.md](docs/UI-DESIGN.md).

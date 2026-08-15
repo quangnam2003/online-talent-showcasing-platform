@@ -1,0 +1,161 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Thong bao validation tieng Viet
+|--------------------------------------------------------------------------
+| Chi dich cac rule ma app dang dung / hay gap. Rule chua co o day se tu
+| dong roi ve ban tieng Anh mac dinh cua framework (fallback_locale = en).
+| :attribute duoc thay bang ten truong trong muc 'attributes' ben duoi.
+*/
+
+return [
+    'accepted' => 'Bạn cần chấp nhận :attribute.',
+    'active_url' => ':attribute không phải là một URL hợp lệ.',
+    'after' => ':attribute phải là thời điểm sau :date.',
+    'after_or_equal' => ':attribute phải từ :date trở đi.',
+    'alpha' => ':attribute chỉ được chứa chữ cái.',
+    'alpha_dash' => ':attribute chỉ được chứa chữ, số, gạch ngang và gạch dưới.',
+    'alpha_num' => ':attribute chỉ được chứa chữ và số.',
+    'array' => ':attribute phải là một danh sách.',
+    'before' => ':attribute phải là thời điểm trước :date.',
+    'before_or_equal' => ':attribute phải trước hoặc bằng :date.',
+    'between' => [
+        'array' => ':attribute phải có từ :min đến :max mục.',
+        'file' => ':attribute phải có dung lượng từ :min đến :max KB.',
+        'numeric' => ':attribute phải nằm trong khoảng :min – :max.',
+        'string' => ':attribute phải dài từ :min đến :max ký tự.',
+    ],
+    'boolean' => ':attribute phải là đúng hoặc sai.',
+    'confirmed' => 'Xác nhận :attribute không khớp.',
+    'current_password' => 'Mật khẩu hiện tại không đúng.',
+    'date' => ':attribute không phải là ngày hợp lệ.',
+    'date_format' => ':attribute không đúng định dạng :format.',
+    'different' => ':attribute và :other phải khác nhau.',
+    'digits' => ':attribute phải gồm :digits chữ số.',
+    'digits_between' => ':attribute phải gồm :min đến :max chữ số.',
+    'dimensions' => ':attribute có kích thước ảnh không hợp lệ.',
+    'distinct' => ':attribute có giá trị bị trùng.',
+    'email' => ':attribute phải là địa chỉ email hợp lệ.',
+    'ends_with' => ':attribute phải kết thúc bằng một trong: :values.',
+    'exists' => ':attribute đã chọn không hợp lệ.',
+    'file' => ':attribute phải là một tệp.',
+    'filled' => ':attribute không được để trống.',
+    'gt' => [
+        'array' => ':attribute phải có nhiều hơn :value mục.',
+        'file' => ':attribute phải lớn hơn :value KB.',
+        'numeric' => ':attribute phải lớn hơn :value.',
+        'string' => ':attribute phải dài hơn :value ký tự.',
+    ],
+    'gte' => [
+        'array' => ':attribute phải có từ :value mục trở lên.',
+        'file' => ':attribute phải từ :value KB trở lên.',
+        'numeric' => ':attribute phải lớn hơn hoặc bằng :value.',
+        'string' => ':attribute phải dài từ :value ký tự trở lên.',
+    ],
+    'image' => ':attribute phải là hình ảnh.',
+    'in' => ':attribute đã chọn không hợp lệ.',
+    'in_array' => ':attribute không tồn tại trong :other.',
+    'integer' => ':attribute phải là số nguyên.',
+    'ip' => ':attribute phải là địa chỉ IP hợp lệ.',
+    'json' => ':attribute phải là chuỗi JSON hợp lệ.',
+    'lt' => [
+        'array' => ':attribute phải có ít hơn :value mục.',
+        'file' => ':attribute phải nhỏ hơn :value KB.',
+        'numeric' => ':attribute phải nhỏ hơn :value.',
+        'string' => ':attribute phải ngắn hơn :value ký tự.',
+    ],
+    'lte' => [
+        'array' => ':attribute không được có quá :value mục.',
+        'file' => ':attribute không được lớn hơn :value KB.',
+        'numeric' => ':attribute phải nhỏ hơn hoặc bằng :value.',
+        'string' => ':attribute không được dài quá :value ký tự.',
+    ],
+    'lowercase' => ':attribute phải viết thường.',
+    'max' => [
+        'array' => ':attribute không được có quá :max mục.',
+        'file' => ':attribute không được lớn hơn :max KB.',
+        'numeric' => ':attribute không được lớn hơn :max.',
+        'string' => ':attribute không được dài quá :max ký tự.',
+    ],
+    'max_digits' => ':attribute không được quá :max chữ số.',
+    'mimes' => ':attribute phải là tệp thuộc loại: :values.',
+    'mimetypes' => ':attribute phải là tệp thuộc loại: :values.',
+    'min' => [
+        'array' => ':attribute phải có ít nhất :min mục.',
+        'file' => ':attribute phải có dung lượng tối thiểu :min KB.',
+        'numeric' => ':attribute phải tối thiểu là :min.',
+        'string' => ':attribute phải có ít nhất :min ký tự.',
+    ],
+    'min_digits' => ':attribute phải có ít nhất :min chữ số.',
+    'not_in' => ':attribute đã chọn không hợp lệ.',
+    'not_regex' => 'Định dạng :attribute không hợp lệ.',
+    'numeric' => ':attribute phải là số.',
+    'password' => [
+        'letters' => ':attribute phải chứa ít nhất một chữ cái.',
+        'mixed' => ':attribute phải chứa cả chữ hoa và chữ thường.',
+        'numbers' => ':attribute phải chứa ít nhất một chữ số.',
+        'symbols' => ':attribute phải chứa ít nhất một ký tự đặc biệt.',
+        'uncompromised' => ':attribute đã xuất hiện trong một vụ rò rỉ dữ liệu, vui lòng chọn mật khẩu khác.',
+    ],
+    'present' => ':attribute phải có mặt.',
+    'prohibited' => ':attribute không được phép.',
+    'regex' => 'Định dạng :attribute không hợp lệ.',
+    'required' => 'Vui lòng nhập :attribute.',
+    'required_if' => ':attribute là bắt buộc khi :other là :value.',
+    'required_unless' => ':attribute là bắt buộc trừ khi :other nằm trong :values.',
+    'required_with' => ':attribute là bắt buộc khi có :values.',
+    'required_without' => ':attribute là bắt buộc khi không có :values.',
+    'same' => ':attribute và :other phải giống nhau.',
+    'size' => [
+        'array' => ':attribute phải có đúng :size mục.',
+        'file' => ':attribute phải có dung lượng :size KB.',
+        'numeric' => ':attribute phải bằng :size.',
+        'string' => ':attribute phải dài đúng :size ký tự.',
+    ],
+    'starts_with' => ':attribute phải bắt đầu bằng một trong: :values.',
+    'string' => ':attribute phải là chuỗi ký tự.',
+    'timezone' => ':attribute phải là múi giờ hợp lệ.',
+    'unique' => ':attribute đã được sử dụng.',
+    'uploaded' => ':attribute tải lên thất bại — tệp có thể vượt quá giới hạn của máy chủ.',
+    'uppercase' => ':attribute phải viết hoa.',
+    'url' => ':attribute phải là URL hợp lệ.',
+    'uuid' => ':attribute phải là UUID hợp lệ.',
+
+    /*
+    | Thong bao tuy chinh theo truong ('truong.rule' => 'noi dung')
+    */
+    'custom' => [],
+
+    /*
+    | Ten hien thi cua cac truong trong form (thay cho ten ky thuat)
+    */
+    'attributes' => [
+        'name' => 'họ tên',
+        'email' => 'email',
+        'password' => 'mật khẩu',
+        'password_confirmation' => 'xác nhận mật khẩu',
+        'role' => 'vai trò',
+        'title' => 'tiêu đề',
+        'description' => 'mô tả',
+        'category_id' => 'thể loại',
+        'privacy' => 'quyền xem',
+        'video' => 'tệp tiết mục',
+        'thumbnail' => 'ảnh bìa',
+        'duration' => 'thời lượng',
+        'avatar' => 'ảnh đại diện',
+        'bio' => 'giới thiệu',
+        'location' => 'nơi ở',
+        'achievements' => 'thành tích',
+        'content' => 'nội dung',
+        'reason' => 'lý do',
+        'slug' => 'slug',
+        'start_at' => 'thời điểm mở nhận bài',
+        'submission_deadline' => 'hạn nộp bài',
+        'end_at' => 'thời điểm kết thúc',
+        'video_id' => 'video dự thi',
+        'stars' => 'số sao',
+        'action' => 'thao tác',
+        'q' => 'từ khóa',
+    ],
+];

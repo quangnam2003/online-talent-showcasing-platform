@@ -41,7 +41,7 @@ sudo apt install -y php8.3-mysql php8.3-xml php8.3-gd
 # 1b. Tạo database `talentstage` + user `talentstage` / mật khẩu `Talent@123` (khớp sẵn với .env)
 sudo mysql < scripts/setup-mysql.sql
 
-# 1c. Nâng giới hạn upload lên 100MB (yêu cầu FR2 - upload video)
+# 1c. Nâng giới hạn upload lên 100MB (yêu cầu FR2 - đăng video / bản thu âm) — với Docker thì KHÔNG cần: image đã kèm docker/php-uploads.ini
 sudo sed -i 's/^upload_max_filesize.*/upload_max_filesize = 100M/; s/^post_max_size.*/post_max_size = 100M/' /etc/php/8.3/cli/php.ini
 ```
 
@@ -161,7 +161,7 @@ Mở lần lượt và đối chiếu:
 - [ ] `http://localhost:8000/register` — tạo tài khoản mới, chọn vai trò Creator/Mentor → đăng ký xong tự đăng nhập
 
 > **Toàn bộ chức năng đã mở** (59 routes): Explore, Profile, Upload/Duyệt, Nhóm, Tin nhắn, Cuộc thi + Vote, Bảng tin, Thông báo, khu Admin. Thử thêm:
-> - [ ] Creator: đăng video → thấy "Chờ duyệt" → đăng nhập Admin duyệt → creator nhận **thông báo**
+> - [ ] Creator: đăng video hoặc **bản thu âm (mp3/m4a/wav)** → thẻ đính kèm hiện tên · loại · dung lượng · thời lượng → bấm Gửi duyệt thấy thanh tiến trình → "Đã gửi duyệt thành công" → **Admin nhận thông báo** (chuông + badge Kiểm duyệt) → Admin duyệt → creator nhận **thông báo**
 > - [ ] Like / chấm sao / bình luận / trả lời trong trang video — số liệu cập nhật ngay
 > - [ ] Nhắn tin creator ↔ mentor (badge số tin chưa đọc trên sidebar)
 > - [ ] Nhóm: join → đăng bài (bảng thảo luận chỉ thành viên thấy)
@@ -200,7 +200,9 @@ docker compose version
 docker compose up -d --build
 ```
 
-- **Kết quả mong đợi:** `docker ps` thấy 2 container: `online-talent-app` (cổng `8000→80`) và `online-talent-db` (MySQL 8, trạng thái `healthy`). Container app **tự chạy migrate** khi khởi động (biến `AUTO_MIGRATE=true` trong compose) — tạo đủ 17 bảng, nhưng **chưa có dữ liệu**.
+- **Kết quả mong đợi:** `docker ps` thấy 2 container: `online-talent-app` (cổng `8000→80`) và `online-talent-db` (MySQL 8, trạng thái `healthy`). Container app **tự chạy migrate** khi khởi động (biến `AUTO_MIGRATE=true` trong compose) — tạo đủ bảng, nhưng **chưa có dữ liệu**.
+
+> **Giới hạn upload:** image đã cài `docker/php-uploads.ini` (`upload_max_filesize=100M`, `post_max_size=110M`) nên đăng video / bản thu âm tới 100 MB hoạt động ngay. Nếu bạn build image từ trước khi có file này, chạy lại `docker compose up -d --build` — kiểm tra bằng `docker exec online-talent-app php -i | grep upload_max_filesize`.
 
 ### D3 — Seed dữ liệu mẫu *(bắt buộc lần đầu)*
 
@@ -247,6 +249,7 @@ docker exec online-talent-app php artisan db:seed --force
 | Trang lỗi 500 + log in `No application encryption key` | Thiếu `APP_KEY` trong `.env` | Làm D1 rồi `docker compose up -d` lại |
 | Cổng 8000 bận (`port is already allocated`) | Cổng bị process khác chiếm | Sửa `ports` trong `docker-compose.yml` thành `"8001:80"` rồi `up -d` lại |
 | Sửa code nhưng web không đổi | Image cũ + config/view đã cache | `docker compose up -d --build` (entrypoint tự cache lại) |
+| Gửi tiết mục báo "Tệp không tải lên được" / lỗi 413 dù tệp < 100 MB | Image cũ chưa có `docker/php-uploads.ini` (PHP mặc định chỉ nhận 2 MB) | `docker compose up -d --build` rồi kiểm tra `docker exec online-talent-app php -i \| grep upload_max_filesize` → phải là `100M` |
 
 ---
 
@@ -274,7 +277,7 @@ docker exec online-talent-app php artisan db:seed --force
 | `Vite manifest not found` | Không dùng Vite trong project này | Không bao giờ gặp nếu giữ nguyên layout; nếu gặp thì kiểm tra view có gọi `@vite` không (phải bỏ) |
 | Ảnh avatar/thumbnail không hiện | Chưa link storage | `php artisan storage:link` |
 | `Address already in use` khi serve | Cổng 8000 đang bận | `php artisan serve --port=8001` |
-| Upload video 100MB bị chặn | php.ini chưa nâng giới hạn | Bước 1c, sau đó **tắt và bật lại** `php artisan serve` |
+| Đăng tiết mục 100MB bị chặn ("Tệp không tải lên được") | php.ini chưa nâng giới hạn | Bước 1c, sau đó **tắt và bật lại** `php artisan serve` |
 | Sửa view/route không thấy thay đổi | Cache cũ | `php artisan optimize:clear` rồi F5 |
 | Lỗi 500 không rõ nguyên nhân | — | Xem 50 dòng cuối log: `tail -50 storage/logs/laravel.log` |
 
