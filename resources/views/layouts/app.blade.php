@@ -13,74 +13,85 @@
     <script src="{{ asset('js/talentstage.js') }}" defer></script>
 </head>
 <body>
+@php
+    $me = auth()->user();
+    $isCM = $me && ($me->isCreator() || $me->isMentor());
+    $unreadNoti = $me ? $me->unreadNotifications()->count() : 0;
+    $unreadMsg = $isCM ? $me->unreadMessagesCount() : 0;
+    $pendingCount = 0;
+    if ($me?->isAdmin()) {
+        try { $pendingCount = \App\Models\Video::where('status', 'pending')->count(); } catch (\Throwable $e) {}
+    }
+
+    // Nav sidebar: [nhan, icon, url, pattern active (null = trang chu), badge]
+    $navGroups = [
+        ['label' => null, 'items' => array_values(array_filter([
+            ['Trang chủ', 'home', route('home'), null],
+            ['Tìm kiếm', 'search', url('/explore'), 'explore'],
+            $me ? ['Bảng tin', 'rss', url('/feed'), 'feed'] : null,
+            ['Cuộc thi', 'trophy', url('/contests'), 'contests*'],
+        ]))],
+        ['label' => 'Cộng đồng', 'items' => array_values(array_filter([
+            ['Nhóm', 'users', url('/groups'), 'groups*'],
+            $isCM ? ['Tin nhắn', 'message', url('/messages'), 'messages*', $unreadMsg] : null,
+            $me ? ['Thông báo', 'bell', url('/notifications'), 'notifications', $unreadNoti] : null,
+        ]))],
+    ];
+    if ($me?->isCreator()) {
+        $navGroups[] = ['label' => 'Kênh của tôi', 'items' => [
+            ['Đăng video', 'upload', url('/videos/create'), 'videos/create'],
+            ['Video của tôi', 'film', url('/my-videos'), 'my-videos|videos/*/edit'],
+            ['Hồ sơ của tôi', 'user', url('/users/'.$me->id), 'users/'.$me->id.'|profile/edit'],
+        ]];
+    } elseif ($me) {
+        $navGroups[] = ['label' => 'Tài khoản', 'items' => [
+            ['Hồ sơ của tôi', 'user', url('/users/'.$me->id), 'users/'.$me->id.'|profile/edit'],
+        ]];
+    }
+    if ($me?->isAdmin()) {
+        $navGroups[] = ['label' => 'Quản trị', 'items' => [
+            ['Tổng quan', 'dashboard', url('/admin'), 'admin'],
+            ['Kiểm duyệt', 'list-checks', url('/admin/videos'), 'admin/videos*', $pendingCount],
+            ['Người dùng', 'users', url('/admin/users'), 'admin/users*'],
+            ['Danh mục', 'tag', url('/admin/categories'), 'admin/categories*'],
+            ['Cuộc thi', 'trophy', url('/admin/contests'), 'admin/contests*'],
+        ]];
+    }
+@endphp
 <div class="ts-shell">
     <div class="ts-scrim" aria-hidden="true"></div>
 
-    {{-- ═══ SIDEBAR — 4 nhom nav danh so, giong mockup ═══ --}}
-    <aside class="ts-sidebar">
-        <div class="ts-brand">
-            <a class="ts-brand-name" href="{{ route('home') }}">TalentStage</a>
-            <span class="ts-brand-sub">Online Talent Showcasing</span>
-        </div>
-
-        @php
-            $me = auth()->user();
-            // [nhan VN, nhan EN, tag FR, url, pattern active, hien thi?]
-            $navGroups = [
-                '01 · Truy cập & nội dung' => array_values(array_filter([
-                    !$me ? ['Đăng ký / Đăng nhập', 'Register & log in', 'FR1', route('login'), 'login|register'] : null,
-                    $me ? ['Hồ sơ của tôi', 'My profile', 'FR1', url('/users/'.$me->id), 'users/'.$me->id] : null,
-                    $me?->isCreator() ? ['Đăng & duyệt', 'Upload & approval', 'FR2', url('/videos/create'), 'videos/create'] : null,
-                    $me?->isCreator() ? ['Video của tôi', 'My videos', 'FR2', url('/my-videos'), 'my-videos'] : null,
-                ])),
-                '02 · Khám phá & tương tác' => array_values(array_filter([
-                    ['Khám phá', 'Discover', 'FR3', route('home'), null], // active khi la trang chu
-                    ['Tìm kiếm & lọc', 'Explore', 'FR3', url('/explore'), 'explore'],
-                    $me ? ['Bảng tin', 'Personalised feed', 'FR4', url('/feed'), 'feed'] : null,
-                    $me ? ['Thông báo', 'Notifications', 'SYS', url('/notifications'), 'notifications', $me->unreadNotifications()->count()] : null,
-                ])),
-                '03 · Nhóm & cố vấn' => array_values(array_filter([
-                    ['Nhóm', 'Groups', 'FR5', url('/groups'), 'groups*'],
-                    ($me?->isCreator() || $me?->isMentor()) ? ['Tin nhắn', 'Mentorship', 'FR6', url('/messages'), 'messages*', $me->unreadMessagesCount()] : null,
-                ])),
-                '04 · Cuộc thi' => [
-                    ['Cuộc thi', 'Contest', 'FR7', url('/contests'), 'contests*'],
-                ],
-            ];
-            if ($me?->isAdmin()) {
-                $navGroups['05 · Quản trị'] = [
-                    ['Kiểm duyệt', 'Moderation', 'FR8', url('/admin/videos'), 'admin/videos*'],
-                    ['Dashboard', 'Overview', 'AD', url('/admin'), 'admin'],
-                    ['Người dùng', 'Users', 'AD', url('/admin/users'), 'admin/users*'],
-                    ['Danh mục', 'Categories', 'AD', url('/admin/categories'), 'admin/categories*'],
-                    ['Quản lý cuộc thi', 'Contests', 'AD', url('/admin/contests'), 'admin/contests*'],
-                ];
-            }
-        @endphp
+    {{-- ═══ SIDEBAR ═══ --}}
+    <aside class="ts-sidebar" aria-label="Điều hướng chính">
+        <a class="ts-logo" href="{{ route('home') }}" aria-label="TalentStage — Trang chủ">
+            <span class="ts-logo-mark"><x-icon name="mic" size="18" /></span>
+            <span class="ts-logo-txt">
+                <span class="ts-logo-name">TalentStage</span>
+                <span class="ts-logo-sub">Sân khấu tài năng trực tuyến</span>
+            </span>
+        </a>
 
         <nav class="ts-nav">
-            @foreach ($navGroups as $label => $items)
-                @if (count($items))
+            @foreach ($navGroups as $group)
+                @if (count($group['items']))
                     <div class="ts-nav-group">
-                        <div class="ts-nav-label">{{ $label }}</div>
+                        @if ($group['label'])
+                            <div class="ts-nav-label">{{ $group['label'] }}</div>
+                        @endif
                         <div class="ts-nav-items">
-                            @foreach ($items as $item)
+                            @foreach ($group['items'] as $item)
                                 @php
-                                    [$vi, $en, $fr, $url, $pattern] = $item;
-                                    $badge = $item[5] ?? 0;
+                                    [$label, $icon, $url, $pattern] = $item;
+                                    $badge = $item[4] ?? 0;
                                     $active = $pattern === null
                                         ? request()->is('/')
                                         : request()->is(...explode('|', $pattern));
                                 @endphp
-                                <a class="ts-nav-item {{ $active ? 'active' : '' }}" href="{{ $url }}">
-                                    <span>
-                                        <span class="ts-nav-vi">{{ $vi }}</span>
-                                        <span class="ts-nav-en">{{ $en }}</span>
-                                    </span>
+                                <a class="ts-nav-item {{ $active ? 'active' : '' }}" href="{{ $url }}" @if ($active) aria-current="page" @endif>
+                                    <x-icon :name="$icon" size="18" />
+                                    <span class="ts-nav-txt">{{ $label }}</span>
                                     @if ($badge > 0)
-                                        <span class="tag tag-accent num">{{ $badge }}</span>
-                                    @else
-                                        <span class="tag tag-outline">{{ $fr }}</span>
+                                        <span class="badge">{{ $badge > 99 ? '99+' : $badge }}</span>
                                     @endif
                                 </a>
                             @endforeach
@@ -92,7 +103,7 @@
 
         <div class="ts-side-foot">
             @auth
-                <div style="display: flex; align-items: center; gap: var(--space-2)">
+                <a class="ts-me" href="{{ url('/users/'.$me->id) }}" title="Xem hồ sơ">
                     <span class="avatar">
                         @if ($me->avatar)
                             <img src="{{ asset('storage/'.$me->avatar) }}" alt="{{ $me->name }}">
@@ -100,20 +111,19 @@
                             {{ mb_substr($me->name, 0, 1) }}
                         @endif
                     </span>
-                    <span style="display: flex; flex-direction: column; min-width: 0">
-                        <span style="font-size: 12.5px">{{ $me->name }}</span>
-                        <span class="muted-i" style="font-size: 10px">{{ ucfirst($me->role) }}</span>
+                    <span class="ts-me-txt">
+                        <span class="ts-me-name">{{ $me->name }}</span>
+                        <span class="ts-me-role">{{ ucfirst($me->role) }}</span>
                     </span>
-                </div>
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="btn btn-ghost btn-xs" style="padding-left: 0">Đăng xuất · Log out</button>
+                    <button type="submit" class="icon-btn" title="Đăng xuất" aria-label="Đăng xuất"><x-icon name="log-out" size="17" /></button>
                 </form>
             @else
-                <a class="btn btn-primary btn-sm" href="{{ route('register') }}">Đăng ký · Register</a>
-                <a class="btn btn-secondary btn-sm" href="{{ route('login') }}">Đăng nhập · Log in</a>
+                <a class="btn btn-primary btn-sm" href="{{ route('login') }}"><x-icon name="log-in" size="15" /> Đăng nhập</a>
+                <a class="btn btn-secondary btn-sm" href="{{ route('register') }}">Tạo tài khoản</a>
             @endauth
-            <a href="{{ route('sitemap') }}" class="muted-i" style="font-size: 10.5px">Sơ đồ trang · Sitemap</a>
         </div>
     </aside>
 
@@ -121,11 +131,12 @@
     <main class="ts-main">
 
         <header class="ts-header">
-            <button class="ts-menu-btn" type="button" onclick="tsToggleNav()" aria-label="Mở menu">☰</button>
+            <button class="ts-menu-btn" type="button" onclick="tsToggleNav()" aria-label="Mở menu"><x-icon name="menu" size="18" /></button>
 
-            <form class="search" method="GET" action="{{ url('/explore') }}">
+            <form class="search" method="GET" action="{{ url('/explore') }}" role="search">
+                <x-icon name="search" size="16" class="search-ico" />
                 <input class="input" type="search" name="q" value="{{ request('q') }}"
-                       placeholder="Tìm tài năng, thể loại, creator… / Search talent">
+                       placeholder="Tìm video, creator, thể loại…" aria-label="Tìm kiếm">
             </form>
 
             {{-- chip the loai: moi the loai mot sac (--cat), chip dang chon duoc danh dau --}}
@@ -139,24 +150,54 @@
 
             <div class="ts-header-right">
                 @if ($me?->isCreator())
-                    <a class="btn btn-primary btn-sm" href="{{ url('/videos/create') }}">Đăng video · Upload</a>
+                    <a class="btn btn-primary btn-sm" href="{{ url('/videos/create') }}"><x-icon name="upload" size="15" /> Đăng video</a>
                 @endif
                 @auth
-                    <a class="ts-user" href="{{ url('/users/'.$me->id) }}">
-                        <span class="avatar">
-                            @if ($me->avatar)
-                                <img src="{{ asset('storage/'.$me->avatar) }}" alt="{{ $me->name }}">
-                            @else
-                                {{ mb_substr($me->name, 0, 1) }}
-                            @endif
-                        </span>
-                        <span class="ts-user-name" style="display: flex; flex-direction: column">
-                            <span style="font-size: 12.5px">{{ $me->name }}</span>
-                            <span class="muted-i" style="font-size: 10px">{{ ucfirst($me->role) }}</span>
-                        </span>
+                    <a class="icon-btn" href="{{ url('/notifications') }}" aria-label="Thông báo{{ $unreadNoti ? " ($unreadNoti chưa đọc)" : '' }}" title="Thông báo">
+                        <x-icon name="bell" size="18" />
+                        @if ($unreadNoti > 0)<span class="badge badge-dot">{{ $unreadNoti > 9 ? '9+' : $unreadNoti }}</span>@endif
                     </a>
+                    <details class="menu ts-user-menu">
+                        <summary class="ts-user" aria-label="Menu tài khoản">
+                            <span class="avatar">
+                                @if ($me->avatar)
+                                    <img src="{{ asset('storage/'.$me->avatar) }}" alt="{{ $me->name }}">
+                                @else
+                                    {{ mb_substr($me->name, 0, 1) }}
+                                @endif
+                            </span>
+                            <span class="ts-user-name">
+                                <span>{{ $me->name }}</span>
+                                <span class="ts-me-role">{{ ucfirst($me->role) }}</span>
+                            </span>
+                            <x-icon name="chevron-down" size="14" class="chev" />
+                        </summary>
+                        <div class="menu-panel">
+                            <div class="menu-head">
+                                <strong>{{ $me->name }}</strong>
+                                <span>{{ $me->email }}</span>
+                            </div>
+                            <a class="menu-item" href="{{ url('/users/'.$me->id) }}"><x-icon name="user" size="16" /> Hồ sơ của tôi</a>
+                            <a class="menu-item" href="{{ url('/profile/edit') }}"><x-icon name="settings" size="16" /> Sửa hồ sơ</a>
+                            @if ($me->isCreator())
+                                <a class="menu-item" href="{{ url('/my-videos') }}"><x-icon name="film" size="16" /> Video của tôi</a>
+                            @endif
+                            @if ($isCM)
+                                <a class="menu-item" href="{{ url('/messages') }}"><x-icon name="message" size="16" /> Tin nhắn @if ($unreadMsg)<span class="badge">{{ $unreadMsg }}</span>@endif</a>
+                            @endif
+                            @if ($me->isAdmin())
+                                <a class="menu-item" href="{{ url('/admin') }}"><x-icon name="shield" size="16" /> Khu quản trị</a>
+                            @endif
+                            <div class="menu-sep"></div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="menu-item"><x-icon name="log-out" size="16" /> Đăng xuất</button>
+                            </form>
+                        </div>
+                    </details>
                 @else
                     <a class="btn btn-ghost btn-sm" href="{{ route('login') }}">Đăng nhập</a>
+                    <a class="btn btn-primary btn-sm" href="{{ route('register') }}">Đăng ký</a>
                 @endauth
             </div>
         </header>
@@ -166,27 +207,33 @@
             {{-- flash --}}
             @if (session('success'))
                 <div class="flash" role="status">
+                    <x-icon name="check" size="16" />
                     <span>{{ session('success') }}</span>
                     <button type="button" onclick="tsDismiss(this)" aria-label="Đóng">×</button>
                 </div>
             @endif
             @if (session('error'))
                 <div class="flash flash-error" role="alert">
+                    <x-icon name="info" size="16" />
                     <span>{{ session('error') }}</span>
                     <button type="button" onclick="tsDismiss(this)" aria-label="Đóng">×</button>
                 </div>
             @endif
 
-            {{-- tieu de man hinh: kicker / ten / phu de (pattern cua mockup) --}}
+            {{-- tieu de trang: breadcrumb (tuy chon) / tieu de / mo ta ngan / hanh dong ben phai (tuy chon) --}}
             @hasSection('screen-title')
                 <div class="screen-head">
                     <div class="screen-head-txt">
-                        <span class="kicker">@yield('screen-kicker')</span>
+                        @hasSection('screen-kicker')
+                            <nav class="crumbs" aria-label="Breadcrumb">@yield('screen-kicker')</nav>
+                        @endif
                         <h1 class="screen-title">@yield('screen-title')</h1>
-                        <span class="screen-sub">@yield('screen-sub')</span>
+                        @hasSection('screen-sub')
+                            <p class="screen-sub">@yield('screen-sub')</p>
+                        @endif
                     </div>
                     @hasSection('screen-side')
-                        <div class="screen-cases">@yield('screen-side')</div>
+                        <div class="screen-side">@yield('screen-side')</div>
                     @endif
                 </div>
             @endif
@@ -195,16 +242,22 @@
         </div>
 
         <footer class="ts-footer">
-            <span style="font-family: var(--font-heading); font-size: 16px">TalentStage</span>
-            <span class="muted-i">Nền tảng trình diễn tài năng trực tuyến — Đồ án 2026</span>
-            <a href="{{ route('sitemap') }}" style="font-size: 12.5px; margin-left: auto">Sơ đồ trang · Sitemap</a>
-            <a href="{{ url('/explore') }}" style="font-size: 12.5px">Khám phá</a>
-            <a href="{{ url('/contests') }}" style="font-size: 12.5px">Cuộc thi</a>
+            <a class="ts-footer-brand" href="{{ route('home') }}">
+                <span class="ts-logo-mark ts-logo-mark-sm"><x-icon name="mic" size="13" /></span>
+                <span>TalentStage</span>
+            </a>
+            <span class="ts-footer-tag">Nền tảng trình diễn tài năng trực tuyến</span>
+            <nav class="ts-footer-links" aria-label="Liên kết chân trang">
+                <a href="{{ url('/explore') }}">Khám phá</a>
+                <a href="{{ url('/contests') }}">Cuộc thi</a>
+                <a href="{{ url('/groups') }}">Nhóm</a>
+                <a href="{{ route('sitemap') }}">Sơ đồ trang</a>
+            </nav>
+            <span class="ts-footer-copy">© {{ date('Y') }} TalentStage</span>
         </footer>
     </main>
 </div>
 
-{{-- tuong tac giao dien (drawer, flash, panel mo/dong) nam trong public/js/talentstage.js --}}
 @stack('scripts')
 </body>
 </html>

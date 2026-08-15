@@ -2,9 +2,9 @@
 
 @section('title', 'Người dùng — TalentStage Admin')
 
-@section('screen-kicker', 'Admin · Users')
-@section('screen-title', 'Quản lý người dùng')
-@section('screen-sub', 'Khóa / mở tài khoản — tài khoản khóa không thể đăng nhập')
+@section('screen-kicker')<a href="{{ route('admin.dashboard') }}">Quản trị</a><span class="sep">/</span><span>Người dùng</span>@endsection
+@section('screen-title', 'Người dùng')
+@section('screen-sub', 'Tìm kiếm, khóa hoặc mở khóa tài khoản — tài khoản bị khóa không thể đăng nhập.')
 
 @section('content')
 <form method="GET" action="{{ route('admin.users.index') }}" style="display: flex; gap: var(--space-2); max-width: 420px">
@@ -47,7 +47,7 @@
                               onsubmit="return confirm('{{ $user->is_active ? 'Khóa' : 'Mở khóa' }} tài khoản {{ $user->name }}?')">
                             @csrf @method('PATCH')
                             <button class="btn {{ $user->is_active ? 'btn-ghost' : 'btn-secondary' }} btn-xs" style="{{ $user->is_active ? 'color: var(--color-danger)' : '' }}">
-                                {{ $user->is_active ? 'Khóa · Suspend' : 'Mở khóa' }}
+                                {{ $user->is_active ? 'Khóa' : 'Mở khóa' }}
                             </button>
                         </form>
                     @else

@@ -2,14 +2,14 @@
 
 @section('title', 'Kiểm duyệt video — TalentStage Admin')
 
-@section('screen-kicker', 'FR8 · Moderation')
-@section('screen-title', 'Kiểm duyệt')
-@section('screen-sub', 'Admin — review, approve, reject with reason')
+@section('screen-kicker')<a href="{{ route('admin.dashboard') }}">Quản trị</a><span class="sep">/</span><span>Kiểm duyệt</span>@endsection
+@section('screen-title', 'Kiểm duyệt video')
+@section('screen-sub', 'Xem video mới gửi, phê duyệt hoặc từ chối kèm lý do — creator sẽ nhận thông báo.')
 
 @section('content')
 {{-- ── Tab gach chan theo trang thai (mockup Moderation) ── --}}
 <div class="line-tabs">
-    @foreach (['pending' => 'Chờ duyệt · Pending', 'approved' => 'Đã duyệt · Approved', 'rejected' => 'Từ chối · Rejected'] as $s => $label)
+    @foreach (['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'] as $s => $label)
         <a class="line-tab {{ $status === $s ? 'active' : '' }}" href="{{ route('admin.videos.index', ['status' => $s]) }}">
             {{ $label }} <span class="num">({{ $counts[$s] ?? 0 }})</span>
         </a>
@@ -45,7 +45,7 @@
                     <div style="display: flex; flex-direction: column; gap: var(--space-1)">
                         <form method="POST" action="{{ route('admin.videos.approve', $video) }}">
                             @csrf @method('PATCH')
-                            <button class="btn btn-primary btn-xs" style="width: 100%">Duyệt · Approve</button>
+                            <button class="btn btn-primary btn-xs" style="width: 100%"><x-icon name="check" size="13" /> Duyệt</button>
                         </form>
                         <button type="button" class="btn btn-ghost btn-xs" aria-expanded="false"
                                 onclick="tsToggle(this, '.reject-panel')">

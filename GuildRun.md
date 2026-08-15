@@ -154,10 +154,10 @@ php artisan serve
 
 Mở lần lượt và đối chiếu:
 
-- [ ] `http://localhost:8000` — trang chủ: nền giấy ấm, chữ Public Sans, **sidebar trái** có các nhóm nav đánh số 01→04, hero + "Đang thịnh hành" + lưới video (viền trên màu theo thể loại, nội dung fade-in so le khi vào trang)
-- [ ] `http://localhost:8000/sitemap` — sơ đồ 10 nhóm màn hình (yêu cầu đề bài, có link ở chân sidebar + footer)
-- [ ] `http://localhost:8000/login` — đăng nhập `admin@talentstage.test / Admin@123` → sidebar hiện thêm nhóm **05 · Quản trị**
-- [ ] Đăng xuất → đăng nhập `creator1@talentstage.test` → header hiện nút **"Đăng video · Upload"**
+- [ ] `http://localhost:8000` — trang chủ: nền giấy ấm, chữ Public Sans, **sidebar trái** có logo + menu icon (Trang chủ, Tìm kiếm, Cuộc thi, Nhóm…), hero + "Đang thịnh hành" + lưới video (viền trên màu theo thể loại, nội dung fade-in so le khi vào trang)
+- [ ] `http://localhost:8000/sitemap` — sơ đồ 10 nhóm màn hình (yêu cầu đề bài, có link "Sơ đồ trang" ở footer)
+- [ ] `http://localhost:8000/login` — đăng nhập `admin@talentstage.test / Admin@123` → sidebar hiện thêm nhóm **Quản trị** (Tổng quan, Kiểm duyệt có badge số video chờ, Người dùng, Danh mục, Cuộc thi)
+- [ ] Đăng xuất → đăng nhập `creator1@talentstage.test` → header hiện nút **"Đăng video"**, chuông thông báo và menu tài khoản (bấm avatar); sidebar có nhóm **Kênh của tôi**
 - [ ] `http://localhost:8000/register` — tạo tài khoản mới, chọn vai trò Creator/Mentor → đăng ký xong tự đăng nhập
 
 > **Toàn bộ chức năng đã mở** (59 routes): Explore, Profile, Upload/Duyệt, Nhóm, Tin nhắn, Cuộc thi + Vote, Bảng tin, Thông báo, khu Admin. Thử thêm:
@@ -280,4 +280,4 @@ docker exec online-talent-app php artisan db:seed --force
 
 ---
 
-*Tài liệu liên quan: [docs/SITEMAP.md](docs/SITEMAP.md) (danh sách 23+ màn hình) · [docs/UI-DESIGN.md](docs/UI-DESIGN.md) (hệ thống thiết kế Classical + map mockup → trang thật).*
+*Tài liệu liên quan: [docs/SITEMAP.md](docs/SITEMAP.md) (danh sách 23+ màn hình) · [docs/UI-DESIGN.md](docs/UI-DESIGN.md) (hệ thống thiết kế UI + danh sách trang).*

@@ -14,10 +14,10 @@ class ContestController extends Controller
         $contests = Contest::withCount('entries')->orderByDesc('start_at')->get();
 
         $groups = [
-            'submission' => ['Đang nhận bài · Accepting entries', $contests->where('status', 'submission')],
-            'voting' => ['Đang bình chọn · Voting open', $contests->where('status', 'voting')],
-            'upcoming' => ['Sắp diễn ra · Upcoming', $contests->where('status', 'upcoming')],
-            'ended' => ['Đã kết thúc · Ended', $contests->where('status', 'ended')],
+            'submission' => ['Đang nhận bài', $contests->where('status', 'submission')],
+            'voting' => ['Đang bình chọn', $contests->where('status', 'voting')],
+            'upcoming' => ['Sắp diễn ra', $contests->where('status', 'upcoming')],
+            'ended' => ['Đã kết thúc', $contests->where('status', 'ended')],
         ];
 
         return view('contests.index', compact('groups'));

@@ -2,9 +2,8 @@
 
 @section('title', ($activeGroup?->name ?? 'Nhóm').' — TalentStage')
 
-@section('screen-kicker', 'FR5 · Groups')
-@section('screen-title', 'Nhóm & thảo luận')
-@section('screen-sub', 'Groups — browse, join, post in members-only board')
+@section('screen-title', 'Nhóm')
+@section('screen-sub', 'Tham gia nhóm theo sở thích, trao đổi và học hỏi cùng những người có chung đam mê.')
 
 @section('content')
 @php $me = auth()->user(); @endphp
@@ -14,7 +13,7 @@
     {{-- ── Cot trai: danh sach nhom (mockup Groups) ── --}}
     <div style="display: flex; flex-direction: column; gap: var(--space-2)">
         <form method="GET" action="{{ route('groups.index') }}">
-            <input class="input" type="search" name="q" value="{{ $q }}" placeholder="Tìm nhóm · Browse groups" style="font-size: 13px">
+            <input class="input" type="search" name="q" value="{{ $q }}" placeholder="Tìm nhóm…" style="font-size: 13px">
         </form>
 
         @forelse ($groups as $g)
@@ -28,7 +27,7 @@
         @endforelse
 
         @auth
-            <a class="btn btn-secondary btn-sm" href="{{ route('groups.create') }}">+ Tạo nhóm · Create group</a>
+            <a class="btn btn-secondary btn-sm" href="{{ route('groups.create') }}"><x-icon name="plus" size="14" /> Tạo nhóm mới</a>
         @else
             <span class="muted-i"><a href="{{ route('login') }}">Đăng nhập</a> để tham gia hoặc tạo nhóm.</span>
         @endauth
@@ -63,7 +62,7 @@
                         @else
                             <form method="POST" action="{{ route('groups.join', $activeGroup) }}">
                                 @csrf
-                                <button class="btn btn-primary btn-sm">Tham gia · Join</button>
+                                <button class="btn btn-primary btn-sm"><x-icon name="user-plus" size="14" /> Tham gia nhóm</button>
                             </form>
                         @endif
                     </div>
@@ -78,7 +77,7 @@
                 {{-- Form dang bai inline (members-only) --}}
                 <form method="POST" action="{{ route('groups.posts.store', $activeGroup) }}" style="display: flex; gap: var(--space-2)">
                     @csrf
-                    <input class="input" name="content" placeholder="Đăng bài trong nhóm… / Post in group discussion" required style="flex: 1">
+                    <input class="input" name="content" placeholder="Chia sẻ điều gì đó với nhóm…" required style="flex: 1">
                     <button class="btn btn-primary btn-sm">Đăng</button>
                 </form>
 

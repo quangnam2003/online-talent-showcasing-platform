@@ -2,9 +2,9 @@
 
 @section('title', $contest->title.' — TalentStage')
 
-@section('screen-kicker', 'FR7 · Contest')
+@section('screen-kicker')<a href="{{ route('contests.index') }}">Cuộc thi</a><span class="sep">/</span><span>{{ $contest->statusLabel() }}</span>@endsection
 @section('screen-title', $contest->title)
-@section('screen-sub', 'Submit entry · one vote per user · leaderboard')
+@section('screen-sub', 'Nhận bài '.$contest->start_at->format('d/m/Y').' — '.$contest->submission_deadline->format('d/m/Y').' · Bình chọn đến '.$contest->end_at->format('d/m/Y'))
 
 @section('content')
 @php $me = auth()->user(); @endphp
@@ -51,7 +51,7 @@
                                 <option value="{{ $v->id }}">{{ $v->title }}</option>
                             @endforeach
                         </select>
-                        <button class="btn btn-primary btn-sm">Gửi bài dự thi · Submit entry</button>
+                        <button class="btn btn-primary btn-sm"><x-icon name="send" size="14" /> Gửi bài dự thi</button>
                     </form>
                 @else
                     <span class="muted-i">Bạn chưa có video đã duyệt + công khai để dự thi — <a href="{{ route('videos.create') }}">đăng video</a> trước nhé.</span>
@@ -66,7 +66,7 @@
 
     {{-- ── Leaderboard ── --}}
     <div class="card" style="flex: 1; padding: var(--space-4); gap: var(--space-2)">
-        <div class="card-kicker">Bảng xếp hạng · Leaderboard</div>
+        <div class="card-kicker">Bảng xếp hạng</div>
         @forelse ($leaderboard as $i => $entry)
             <div style="display: flex; align-items: baseline; gap: var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--color-divider)">
                 <span class="rank-num" style="font-size: 20px; width: 26px">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
@@ -81,7 +81,7 @@
 
 {{-- ── Luoi bai du thi + nut binh chon ── --}}
 <section style="display: flex; flex-direction: column; gap: var(--space-3)">
-    <h3 style="font-size: 20px; margin: 0">Bài dự thi · Contest entries <span class="meta num">({{ $entries->count() }})</span></h3>
+    <h3 style="font-size: 20px; margin: 0">Bài dự thi <span class="meta num">({{ $entries->count() }})</span></h3>
     <div class="grid-4">
         @forelse ($entries as $entry)
             <div class="card video-card" style="cursor: default; --cat: {{ $entry->video->category->colorVar() }}">
@@ -89,7 +89,7 @@
                     @if ($entry->video->thumbnail && file_exists(public_path('storage/'.$entry->video->thumbnail)))
                         <img src="{{ asset('storage/'.$entry->video->thumbnail) }}" alt="" loading="lazy">
                     @else
-                        <span class="slot-note">[ thumbnail ]</span>
+                        <span class="thumb-ph" aria-hidden="true"></span>
                     @endif
                 </a>
                 <div class="video-card-body" style="gap: var(--space-2)">
@@ -107,7 +107,7 @@
                             @else
                                 <form method="POST" action="{{ route('entries.vote', $entry) }}">
                                     @csrf
-                                    <button class="btn btn-secondary btn-xs">Bình chọn · Vote</button>
+                                    <button class="btn btn-secondary btn-xs"><x-icon name="heart" size="13" /> Bình chọn</button>
                                 </form>
                             @endif
                         @else
@@ -124,7 +124,7 @@
             </div>
         @endforelse
     </div>
-    <span class="muted-i">Trạng thái tự chuyển theo 3 mốc thời gian: mở nộp bài → đóng nộp bài → mở bình chọn → công bố kết quả.</span>
+    <span class="muted-i">Cuộc thi tự động chuyển giai đoạn: nhận bài → đóng nhận bài → bình chọn → công bố kết quả.</span>
 </section>
 @endsection
 

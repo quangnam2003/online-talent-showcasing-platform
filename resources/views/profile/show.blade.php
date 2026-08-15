@@ -2,12 +2,8 @@
 
 @section('title', $user->name.' — TalentStage')
 
-@section('screen-kicker', 'FR1 · Profile')
-@section('screen-title', $user->name)
-@section('screen-sub', ($user->isCreator() ? 'Creator profile' : ($user->isMentor() ? 'Mentor profile' : 'Admin')).($user->location ? ' — '.$user->location : ''))
-
 @section('content')
-{{-- ── Dau trang ho so: chan dung 168px + thong tin + hanh dong (mockup Profile) ── --}}
+{{-- ── Dau trang ho so: chan dung 168px + ten/vai tro/gioi thieu + hanh dong ── --}}
 <div class="profile-head" style="display: flex; gap: var(--space-6); align-items: flex-start; border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-6)">
     <div class="plate avatar-xl" style="flex: 0 0 168px">
         @if ($user->avatar)
@@ -18,17 +14,21 @@
     </div>
 
     <div style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1; min-width: 0">
-        <div style="display: flex; gap: var(--space-1); flex-wrap: wrap">
+        <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap">
+            <h1 style="font-size: 30px; margin: 0; line-height: 1.15">{{ $user->name }}</h1>
             <span class="tag tag-accent" style="font-size: 10.5px">{{ ucfirst($user->role) }}</span>
             @if (! $user->is_active)
                 <span class="tag tag-muted" style="font-size: 10.5px">Tài khoản bị khóa</span>
             @endif
         </div>
+        @if ($user->location)
+            <span class="meta" style="display: inline-flex; align-items: center; gap: 4px"><x-icon name="globe" size="13" /> {{ $user->location }}</span>
+        @endif
         @if ($user->bio)
             <p style="margin: 0; max-width: 620px; font-size: 13.5px; line-height: 1.6; text-align: justify">{{ $user->bio }}</p>
         @endif
         @if ($user->achievements)
-            <p class="muted-i" style="margin: 0; max-width: 620px">🏆 {{ $user->achievements }}</p>
+            <p class="meta" style="margin: 0; max-width: 620px; display: flex; gap: 6px; align-items: flex-start"><x-icon name="award" size="14" style="color: var(--color-accent); margin-top: 1px" /> <span>{{ $user->achievements }}</span></p>
         @endif
         <div style="display: flex; gap: var(--space-8); padding-top: var(--space-2); flex-wrap: wrap">
             @foreach ($stats as $st)
@@ -46,14 +46,14 @@
                 <form method="POST" action="{{ route('follows.toggle', $user) }}">
                     @csrf
                     <button type="submit" class="btn {{ $isFollowing ? 'btn-secondary' : 'btn-primary' }} btn-sm" style="width: 100%">
-                        {{ $isFollowing ? 'Đang theo dõi ✓' : 'Theo dõi · Follow' }}
+                        @if ($isFollowing)<x-icon name="check" size="14" /> Đang theo dõi @else <x-icon name="user-plus" size="14" /> Theo dõi @endif
                     </button>
                 </form>
                 @if (in_array($user->role, ['creator', 'mentor']) && in_array(auth()->user()->role, ['creator', 'mentor']))
-                    <a class="btn btn-secondary btn-sm" href="{{ route('messages.show', $user) }}">Nhắn tin · Message</a>
+                    <a class="btn btn-secondary btn-sm" href="{{ route('messages.show', $user) }}"><x-icon name="message" size="14" /> Nhắn tin</a>
                 @endif
             @else
-                <a class="btn btn-primary btn-sm" href="{{ route('profile.edit') }}">Sửa hồ sơ · Edit</a>
+                <a class="btn btn-primary btn-sm" href="{{ route('profile.edit') }}"><x-icon name="pencil" size="14" /> Sửa hồ sơ</a>
                 @if ($user->isCreator())
                     <a class="btn btn-secondary btn-sm" href="{{ route('videos.mine') }}">Video của tôi</a>
                 @endif
@@ -69,7 +69,7 @@
     <h3 style="font-size: 20px; margin: 0">
         Video của {{ $user->name }}
         @if ($ownProfile)
-            <span class="muted-i" style="font-size: 12px">(bạn thấy cả video chưa duyệt / riêng tư)</span>
+            <span class="muted-i" style="font-size: 12px">(bạn thấy cả video chưa duyệt và riêng tư)</span>
         @endif
     </h3>
     <div class="grid-4">
@@ -79,7 +79,7 @@
                     @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)))
                         <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}" loading="lazy">
                     @else
-                        <span class="slot-note">[ thumbnail ]</span>
+                        <span class="thumb-ph" aria-hidden="true"></span>
                     @endif
                 </div>
                 <div class="video-card-body">

@@ -1,7 +1,8 @@
 # TalentStage — Hệ thống thiết kế UI
 
-Nguồn: artifact mockup `claude.ai/code/artifact/b4e21537-e823-414b-a2fa-bb9b026085fe` (10 màn hình, bản **Public Sans**).
-Toàn bộ tokens/components đã port sang **`public/css/talentstage.css`**; tương tác nhỏ (drawer, flash, panel mở/đóng) trong **`public/js/talentstage.js`**; fonts tự host trong **`public/fonts/`** (Public Sans variable + italic 400, có subset tiếng Việt — khai báo ở `public/css/fonts.css`).
+Nguồn gốc: artifact mockup `claude.ai/code/artifact/b4e21537-e823-414b-a2fa-bb9b026085fe` (bản Public Sans) — lấy **màu sắc, typography, khoảng cách, thành phần**. Phần khung trang (sidebar, header, footer, tiêu đề trang) đã được dựng lại theo hướng **website người dùng thật**: không còn nhóm đánh số 01–05, tag FR, nhãn song ngữ hay chú thích "[ thumbnail ]" của bản mockup.
+
+Mã nguồn: tokens/components trong **`public/css/talentstage.css`**; tương tác nhỏ trong **`public/js/talentstage.js`** (drawer, menu tài khoản, flash, panel mở/đóng, dropzone); icon SVG inline qua component **`<x-icon name="…" />`** (`resources/views/components/icon.blade.php`, nét Lucide); fonts tự host trong `public/fonts/` (`public/css/fonts.css`).
 
 ## 1. Ngôn ngữ thị giác
 
@@ -9,77 +10,68 @@ Toàn bộ tokens/components đã port sang **`public/css/talentstage.css`**; t�
 |---|---|
 | Nền / bề mặt | `#fbfaf8` (giấy ấm) / `#eae9e9` |
 | Mực chữ | `#201f1d` |
-| Accent | `#b68235` (vàng đồng) — ramp 100–900 |
+| Accent | `#b68235` (vàng đồng) — ramp 100–900; badge đếm dùng `accent-700` nền + chữ trắng |
 | Màu thể loại | `--c-music #6b4bb8` · `--c-dance #c2410c` · `--c-visual #1d6fa5` · `--c-acting #a83252` · `--c-food #b07417` · `--c-sport #2f7d5e` — gán qua `Category::colorVar()` → `style="--cat: var(--c-…)"` |
-| Trạng thái duyệt | duyệt = `--c-sport` (xanh) · chờ = `--c-food` (vàng) · từ chối = `--c-acting` (đỏ) — class `.tag-status[data-status]` |
-| Chữ | **Public Sans** cho cả heading lẫn body; heading weight 600, body 400 15px/1.55; `-webkit-font-smoothing: antialiased` |
-| Cỡ chữ | h1 42 · screen-title 40 · h2 32 · h3 25 · h4 20; kicker 10px tracked 0.22em uppercase; nhãn form 11px 0.18em; meta 11.5px; nút 12–14px |
+| Trạng thái duyệt | duyệt = `--c-sport` · chờ = `--c-food` · từ chối = `--c-acting` — `.tag-status[data-status]` |
+| Chữ | **Public Sans** (variable) cho toàn bộ; heading 600, wordmark 700; body 15px/1.55; `-webkit-font-smoothing: antialiased` |
+| Cỡ chữ | tiêu đề trang 30px (mobile 26) · h2 28–32 · h3 20 · nav 13.5 · meta 11.5 · kicker 10px tracked uppercase (chỉ dùng cho nhãn thẻ, không dùng làm mã FR) |
 | Spacing | 4.6 / 9.2 / 13.8 / 18.4 / 27.6 / 36.8px (`--space-1…8`) |
-| Bo góc / bóng | 2 / 4 / 7px; bóng mực nhạt `--shadow-sm/md/lg` (chỉ dùng khi hover/dialog) |
-| Nét đặc trưng | nhãn song ngữ "VN · EN", kicker uppercase tracked, số tabular, ghi chú nghiêng mờ, kẻ hairline, khung ảnh `.plate` (viền surface 6px + sepia), nền chéo `.hatch` cho placeholder, thẻ video có **viền trên 3px màu thể loại** + thumbnail tint 12% |
+| Bo góc / bóng | 2 / 4 / 7px; ô tìm kiếm & chip: pill 999px; bóng `--shadow-sm/md/lg` chỉ khi hover / menu / dialog |
+| Placeholder ảnh | **không** dùng chữ chú thích: thumbnail thiếu → `.thumb-ph` (vòng tròn tint thể loại + icon play); ô nhỏ `.hatch-mid` → gradient dịu + play mờ; hero/cover → `.ph-art` (gradient + icon mic mờ); avatar thiếu → chữ cái đầu trên nền `accent-100` |
+| Ngôn ngữ | Toàn bộ nhãn UI **tiếng Việt** (thời gian tương đối cũng tiếng Việt — `Carbon::setLocale('vi')` trong `AppServiceProvider`); tên vai trò Creator/Mentor/Admin giữ nguyên như thuật ngữ sản phẩm |
 
-## 2. Chuyển động (motion)
+## 2. Khung trang (`layouts/app.blade.php`)
 
-Một bộ token dùng chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-spring` (nảy nhẹ), `--dur-1…4` = 120 / 200 / 320 / 520ms.
+- **Sidebar 250px** (sticky, drawer trên mobile): logo mark vuông bo góc gradient vàng + wordmark **TalentStage** + tagline "Sân khấu tài năng trực tuyến"; nav dạng **icon + nhãn**, chia nhóm nhỏ:
+  - *(không nhãn)*: Trang chủ · Tìm kiếm · Bảng tin (đăng nhập) · Cuộc thi
+  - **Cộng đồng**: Nhóm · Tin nhắn (creator/mentor, badge chưa đọc) · Thông báo (badge chưa đọc)
+  - **Kênh của tôi** (creator): Đăng video · Video của tôi · Hồ sơ của tôi — user khác: **Tài khoản**: Hồ sơ của tôi
+  - **Quản trị** (admin): Tổng quan · Kiểm duyệt (badge số video chờ) · Người dùng · Danh mục · Cuộc thi
+  - Mục active: nền `accent-100`, viền trái vàng, chữ 600, icon vàng. Chân sidebar: thẻ user (avatar · tên · vai trò) + nút icon Đăng xuất; khách: Đăng nhập / Tạo tài khoản.
+- **Header** sticky (nền mờ blur): nút ☰ (mobile), ô tìm kiếm pill có icon, 4 chip thể loại `.cat-chip`, bên phải: nút **Đăng video** (creator), chuông thông báo `.icon-btn` + `.badge-dot`, **menu tài khoản** `details.menu > .ts-user` (Hồ sơ, Sửa hồ sơ, Video của tôi, Tin nhắn, Khu quản trị, Đăng xuất); khách: Đăng nhập / Đăng ký.
+- **Tiêu đề trang**: `screen-kicker` = breadcrumb (`.crumbs`, dùng block section để chứa link) → `screen-title` (30px/600) → `screen-sub` (mô tả 13.5px). Trang xem video và hồ sơ **không** dùng khối này — tiêu đề video / tên người dùng chính là h1 trong nội dung.
+- **Footer**: logo nhỏ + tagline · liên kết Khám phá / Cuộc thi / Nhóm / Sơ đồ trang · © năm.
 
-- **Vào trang**: mỗi khối con của `.ts-content` fade-rise 10px, so le 60ms; thẻ trong `.grid-4/.grid-2` so le thêm 40ms. Dùng `animation-fill-mode: backwards` để sau khi chạy xong hover vẫn hoạt động.
-- **Chuyển trang** (MPA View Transitions): `@view-transition { navigation: auto }` — sidebar/header giữ nguyên (`view-transition-name`), phần nội dung cross-fade 160/240ms. Trình duyệt cũ bỏ qua.
-- **Hover/press**: nút đổi nền/viền 200ms, nhấn co 0.985; thẻ link nổi viền + bóng; `.video-card` nhấc −2px + bóng md + ảnh zoom 1.04; nav item chữ trượt 2px; chip thể loại nhấc −1px; hàng rank số trượt.
-- **Focus**: `.input` viền accent + vòng 3px accent 16%; nhãn `.field` đổi màu theo focus-within.
-- **Tab gạch chân** `.line-tab::after` scaleX 0→1 từ trái; **sao chấm điểm** `.stars-hover` xem trước khi rê chuột, phóng 1.22 (spring).
-- **Panel mở/đóng** `.reveal` (grid-rows 0fr→1fr + opacity + visibility) — dùng `tsToggle(btn, selector)` trong phạm vi `[data-reveal-scope]`; **flash** đóng bằng `tsDismiss(btn)`; **drawer** mobile trượt + màn che `.ts-scrim`.
-- Tôn trọng `prefers-reduced-motion: reduce` (tắt toàn bộ animation/transition/view-transition).
+## 3. Chuyển động (motion)
 
-## 3. Component chính (class trong talentstage.css)
+Token chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-spring` (nảy nhẹ), `--dur-1…4` = 120 / 200 / 320 / 520ms.
 
-- Nút: `.btn` + `-primary` (viền vàng) / `-secondary` (viền mảnh) / `-ghost`, size `-sm` `-xs`; `.btn-like` (nảy khi bấm)
-- Form: `.field` + `.label-up` (nhãn uppercase 11px), `.input`, `.is-invalid` + `.err-msg`, `.seg` (segmented radio), `.radio`
-- Thẻ: `.card` (`-kicker/-title/-body/-meta`), `.tag` (`-accent/-outline/-neutral/-muted/-status`), `.cat-chip` (pill màu thể loại, `.active`)
-- Bảng: `.table`; hộp thoại `.dialog*`; flash: `.flash` / `.flash-error`; panel: `.reveal` + `.reveal-inner`
-- Đặc thù app: `.video-card` (+`.video-thumb` 16:10, `.video-card-cat` màu thể loại), `.hero-plate/.hero-box`, `.rank-row`+`.rank-num`, `.phase-strip`+`.phase.current`, `.bubble.me/.them`, `.stat`, `.line-tabs`, `.auth-tabs`, `.stars/.star[data-on]`, `.avatar` (`-lg/-xl`), `.kicker`, `.meta`, `.muted-i`, `.slot-note`, `.grid-4/.grid-2`
+- **Vào trang**: khối con của `.ts-content` fade-rise 10px so le 60ms; thẻ trong `.grid-4/.grid-2` so le thêm 40ms (`animation-fill-mode: backwards` để hover vẫn hoạt động).
+- **Chuyển trang** (MPA View Transitions): sidebar/header giữ nguyên, nội dung cross-fade.
+- **Hover/press**: nút, thẻ (`.video-card` nhấc −2px + ảnh zoom + play-icon phóng), nav (icon đổi màu, chữ trượt 2px), chip, logo mark xoay nhẹ, `.icon-btn`; **focus** ring vàng 3px; **tab gạch chân** trượt; **sao** xem trước khi rê; **menu tài khoản** scale-in; **panel** `.reveal`; **dropzone** đổi màu khi kéo tệp vào; **flash** đóng mờ; **drawer** + màn che.
+- Tôn trọng `prefers-reduced-motion`.
 
-## 4. Layout shell (`layouts/app.blade.php`)
+## 4. Component chính (class trong talentstage.css)
 
-- **Sidebar 268px** trái, sticky: brand + tagline uppercase; nav **4–5 nhóm đánh số** (01 Truy cập & nội dung → 05 Quản trị), mỗi mục = nhãn VN + phụ đề EN nghiêng + chip FR; mục active nền `accent-100` + viền trái vàng. Chân sidebar: thẻ user (avatar/chữ cái đầu, tên, vai trò) + Đăng xuất, hoặc nút Đăng ký/Đăng nhập cho khách; link Sitemap.
-- **Header** sticky: ô tìm kiếm (GET `/explore?q=`), 4 chip thể loại từ DB (`.cat-chip` màu riêng, đánh dấu chip đang lọc), nút "Đăng video · Upload" (chỉ Creator), chip user `.ts-user`.
-- **Tiêu đề màn hình** (pattern mọi trang): section `screen-kicker` ("FRx · Tên use case") / `screen-title` (600, 40px) / `screen-sub` (nghiêng, EN).
-- Mobile ≤1080px: sidebar thành drawer (nút ☰ → `tsToggleNav()`, màn che, Esc/bấm ngoài để đóng), lưới 4→2→1 cột.
+- Nút: `.btn` + `-primary` / `-secondary` / `-ghost`, size `-sm` `-xs`; nút icon `.icon-btn`; badge `.badge` / `.badge-dot`
+- Form: `.field` + `.label-up`, `.input`, `.is-invalid` + `.err-msg`, `.seg`, `.radio`, `.dropzone` (+ `-ico/-title/-hint/-name`, input `.visually-hidden`)
+- Thẻ: `.card` (`-kicker/-title/-body/-meta`), `.tag` (`-accent/-outline/-neutral/-muted/-status`), `.cat-chip` (`.active`)
+- Bảng `.table`; hộp thoại `.dialog*`; flash `.flash` / `.flash-error`; panel `.reveal` + `.reveal-inner`; menu `.menu` / `.menu-panel` / `.menu-item` / `.menu-head` / `.menu-sep`; breadcrumb `.crumbs` (+ `.sep`)
+- Đặc thù app: `.video-card` (+`.video-thumb`, `.thumb-ph`, `.video-card-cat`), `.hero-plate/.hero-box/.ph-art/.ph-art-ico`, `.player/.player-empty`, `.rank-row`+`.rank-num`, `.phase-strip`+`.phase.current`, `.bubble.me/.them`, `.stat`, `.line-tabs`, `.auth-tabs`, `.stars/.star[data-on]`, `.avatar` (`-lg/-xl`), `.kicker`, `.meta`, `.muted-i`, `.grid-4/.grid-2`
 
-## 5. Map mockup → trang thật (dùng khi code FR)
+## 5. Trang chính
 
-| Mockup | Trang thật | Trạng thái | Ghi chú chuyển đổi |
-|---|---|---|---|
-<<<<<<< HEAD
-| Discover | `/` (home) + `/explore` | ✅ xong | Hero plate + card nổi bật đè góc, trending 6 hàng rank vàng, lưới 4 cột thẻ màu thể loại; explore: ô lọc + sort + dãy `.cat-chip` |
-| Auth | `/login`, `/register` | ✅ xong | Tab heading 22px; mockup chọn "thể loại tài năng" → đổi thành chọn vai trò Creator/Mentor bằng `.seg` (DB yêu cầu role) |
-| Watch | `/videos/{id}` | ✅ xong | 1.9fr/1fr; player trái, sao chấm điểm `.stars-hover` (xem trước khi rê), chip thể loại, bình luận + form trả lời `.reveal`; cột phải: nhận xét mentor + "Xem tiếp" |
-| Profile | `/users/{id}`, `/profile/edit` | ✅ xong | Avatar `.plate` 168px, tên 34px, chip vai trò, 4 `.stat`; hành động cột phải; lưới video 4 cột + `.tag-status` cho video chưa duyệt |
-| Upload | `/videos/create` + `/my-videos` | ✅ xong | Form trái (khung kéo-thả `.plate` dashed) + bảng "Trạng thái duyệt" phải với `.tag-status`; **giới hạn 100MB** (mockup ghi 500MB — theo php.ini thực tế); privacy chỉ 2 mức public/private (DB enum) |
-| Moderation | `/admin/videos` | ✅ xong | Tab gạch chân trượt (Chờ duyệt/Đã duyệt/Từ chối), hàng đợi card ngang thumbnail 128×76 + nút Duyệt/Từ chối; panel "Từ chối kèm lý do" là `.reveal` mở ngay dưới hàng (không modal). Phần "Reported content/Suspend" để dạng khóa user (`is_active`) |
-| Contest | `/contests`, `/contests/{id}` | ✅ xong | `.phase-strip` 4 pha từ 3 mốc thời gian (pha hiện tại nền accent-100), leaderboard rank vàng, lưới bài dự thi (viền trên màu thể loại) + nút Bình chọn (1 phiếu/user) |
-| Groups | `/groups`, `/groups/{id}` | ✅ xong | 300px danh sách nhóm trái + bảng thảo luận phải; form đăng bài inline; người ngoài chỉ thấy mô tả + nút Join |
-| Mentorship | `/messages`, `/messages/{user}` | ✅ xong | 3 cột mockup → thu còn 2: threads trái (viền trái vàng khi active) + khung chat `.bubble` (me = accent-100, them = surface); phần sessions/feedback-mốc-thời-gian ngoài phạm vi DB |
-| Feed | `/feed` | ✅ xong | Card hoạt động: avatar + "ai · làm gì · khi nào", thumbnail 200×118 + tiêu đề (tên thể loại tô màu); cột phải "Gợi ý theo dõi" |
-=======
-| Discover | `/` (home) + `/explore` | Đã xong (home) | Hero plate + card nổi bật đè góc, trending 6 hàng rank vàng, lưới 4 cột; explore thêm ô lọc + sort |
-| Auth | `/login`, `/register` | Đã xong | Tab Cormorant; mockup chọn "thể loại tài năng" → đổi thành chọn vai trò Creator/Mentor bằng `.seg` (DB yêu cầu role) |
-| Watch | `/videos/{id}` | FR2/FR4 | 1.9fr/1fr; player trái, sao chấm điểm (glyph ★☆ vàng), bình luận dưới; cột phải: nhận xét mentor + "Xem tiếp" |
-| Profile | `/users/{id}`, `/profile/edit` | FR1 | Avatar `.plate` 168px, tên Cormorant 34px, chip thể loại, 4 `.stat`; hành động cột phải; lưới video 4 cột |
-| Upload | `/videos/create` + `/my-videos` | FR2 | Form trái (khung kéo-thả `.plate` dashed) + bảng "Trạng thái duyệt" phải; **giới hạn 100MB** (mockup ghi 500MB — theo php.ini thực tế); privacy chỉ 2 mức public/private (DB enum) |
-| Moderation | `/admin/videos` | FR8 | Tab gạch chân (Chờ duyệt/Đã xử lý), hàng đợi card ngang thumbnail 128×76 + nút Duyệt/Từ chối; panel "Từ chối kèm lý do" cố định bên phải (không dùng modal). Phần "Reported content/Suspend" để dạng khóa user (`is_active`) |
-| Contest | `/contests`, `/contests/{id}` | FR7 | `.phase-strip` 4 pha từ 3 mốc thời gian (pha hiện tại nền accent-100), leaderboard rank vàng, lưới bài dự thi + nút Bình chọn (1 phiếu/user) |
-| Groups | `/groups`, `/groups/{id}` | FR5 | 300px danh sách nhóm trái + bảng thảo luận phải; form đăng bài inline; người ngoài chỉ thấy mô tả + nút Join |
-| Mentorship | `/messages`, `/messages/{user}` | FR6 | 3 cột mockup → thu còn 2: threads trái (viền trái vàng khi active) + khung chat `.bubble` (me = accent-100, them = surface); phần sessions/feedback-mốc-thời-gian ngoài phạm vi DB |
-| Feed | `/feed` | FR4 (tùy chọn) | Card hoạt động: avatar + "ai · làm gì · khi nào", thumbnail 200×118 + tiêu đề; cột phải "Gợi ý theo dõi" + nhắc cuộc thi |
->>>>>>> 788dda2eae2480944e2f56f3b830320a2636d062
+| Trang | URL | Ghi chú |
+|---|---|---|
+| Trang chủ | `/` | Hero (`.ph-art` khi chưa có ảnh) + "Đang thịnh hành" + lưới video 4 cột + cuộc thi đang diễn ra |
+| Tìm kiếm | `/explore` | Ô tìm + sắp xếp + dãy `.cat-chip` lọc thể loại (giữ `q`/`sort`) |
+| Xem video | `/videos/{id}` | `.player` (empty-state icon), h1 tiêu đề, tác giả + Theo dõi, Thích, chấm sao, chip thể loại, bình luận + trả lời `.reveal`; cột phải: nhận xét mentor, quản lý, Xem tiếp |
+| Hồ sơ | `/users/{id}`, `/profile/edit` | h1 tên + tag vai trò + nơi ở + thành tích + 4 `.stat`; hành động cột phải; lưới video |
+| Đăng video | `/videos/create`, `/my-videos`, `/videos/{id}/edit` | `.dropzone` kéo thả + form; bảng trạng thái duyệt `.tag-status` |
+| Bảng tin / Thông báo | `/feed`, `/notifications` | Card hoạt động; gợi ý theo dõi |
+| Nhóm | `/groups`, `/groups/{id}`, `/groups/create` | Danh sách trái + bảng thảo luận phải |
+| Tin nhắn | `/messages`, `/messages/{user}` | Threads + khung chat `.bubble` |
+| Cuộc thi | `/contests`, `/contests/{id}` | Breadcrumb, `.phase-strip`, bảng xếp hạng, lưới bài dự thi + Bình chọn |
+| Đăng nhập / Đăng ký | `/login`, `/register` | Panel giới thiệu `auth/_cover` + form; tab Đăng nhập / Đăng ký |
+| Quản trị | `/admin/*` | Breadcrumb "Quản trị / …"; kiểm duyệt: tab gạch chân, hàng đợi, panel từ chối `.reveal` |
+| Sơ đồ trang | `/sitemap` | Trang yêu cầu của đề bài — vẫn liệt kê nhóm chức năng kèm mã FR |
 
 ## 6. Quy tắc khi dựng màn hình mới
 
-1. Mọi trang `@extends('layouts.app')` và khai báo 3 section tiêu đề màn hình.
-2. Nhãn hiển thị song ngữ "VN · EN" ở nút/heading chính; nội dung chạy thuần tiếng Việt.
-3. Số liệu luôn `.num`/`.meta` (tabular); hạng mục xếp hạng dùng `.rank-num`.
-4. Thumbnail/ảnh chưa có → `.hatch*` + `.slot-note "[ thumbnail ]"`, tuyệt đối không để ô trống trắng.
-5. Trạng thái (duyệt, contest, tin chưa đọc) thể hiện bằng `.tag` viền màu chữ tương ứng (`.tag-status[data-status]` cho duyệt), không dùng nền đặc.
-6. Thể loại luôn đi kèm màu: thẻ video đặt `style="--cat: {{ $video->category->colorVar() }}"`, chip dùng `.cat-chip`.
-7. Ẩn/hiện có chuyển động: dùng `.reveal` + `tsToggle()` thay vì `display: none` inline; hover/focus mới phải kèm `transition` dùng token `--dur-*`/`--ease-*`.
-8. Không thêm thư viện CSS/JS ngoài — toàn bộ là `talentstage.css` + `talentstage.js` vanilla.
+1. `@extends('layouts.app')`; khai báo `screen-title` + `screen-sub` (tiếng Việt, mô tả ngắn cho người dùng); trang con dùng `@section('screen-kicker')…@endsection` làm breadcrumb với link về trang cha.
+2. **Không** đưa mã yêu cầu (FR1…), nhãn song ngữ "VN · EN" hay ghi chú thiết kế vào giao diện — chỉ tiếng Việt tự nhiên (trừ tên vai trò).
+3. Nút hành động chính kèm icon `<x-icon>` 14–15px; nav/menu icon 16–18px.
+4. Ảnh chưa có → `.thumb-ph` / `.hatch-mid` / `.ph-art`, không để ô trống trắng, không dùng chữ chú thích.
+5. Số liệu `.num`/`.meta` (tabular); xếp hạng `.rank-num`; trạng thái `.tag-status[data-status]`; thể loại kèm màu (`--cat`, `.cat-chip`).
+6. Ẩn/hiện có chuyển động: `.reveal` + `tsToggle()`; hover/focus mới phải kèm `transition` dùng token `--dur-*`/`--ease-*`.
+7. Không thêm thư viện CSS/JS ngoài — toàn bộ là `talentstage.css` + `talentstage.js` vanilla.

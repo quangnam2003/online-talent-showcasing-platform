@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Thoi gian tuong doi ("2 tuan truoc") hien thi tieng Viet tren toan site
+        Carbon::setLocale('vi');
+
         // Chip the loai tren header (layout dung o moi trang)
         View::composer('layouts.app', function ($view) {
             try {

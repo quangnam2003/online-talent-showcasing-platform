@@ -2,9 +2,8 @@
 
 @section('title', 'Khám phá — TalentStage')
 
-@section('screen-kicker', 'FR3 · Talent discovery')
-@section('screen-title', 'Tìm kiếm & lọc')
-@section('screen-sub', 'Explore — search, filter by category, sort & trending')
+@section('screen-title', 'Tìm kiếm')
+@section('screen-sub', 'Tìm video theo tên, lọc theo thể loại và sắp xếp theo mức độ thịnh hành.')
 
 @section('content')
 {{-- ── Thanh loc ── --}}
@@ -14,12 +13,12 @@
         <input type="hidden" name="category" value="{{ $categorySlug }}">
     @endif
     <select class="input" name="sort" style="width: auto" onchange="this.form.submit()">
-        <option value="trending" @selected($sort === 'trending')>Thịnh hành · Trending</option>
-        <option value="new" @selected($sort === 'new')>Mới nhất · Newest</option>
-        <option value="views" @selected($sort === 'views')>Lượt xem · Most viewed</option>
-        <option value="rating" @selected($sort === 'rating')>Điểm đánh giá · Top rated</option>
+        <option value="trending" @selected($sort === 'trending')>Thịnh hành</option>
+        <option value="new" @selected($sort === 'new')>Mới nhất</option>
+        <option value="views" @selected($sort === 'views')>Nhiều lượt xem</option>
+        <option value="rating" @selected($sort === 'rating')>Đánh giá cao</option>
     </select>
-    <button class="btn btn-primary btn-sm">Tìm · Search</button>
+    <button class="btn btn-primary btn-sm"><x-icon name="search" size="14" /> Tìm</button>
     @if ($q || $categorySlug)
         <a class="btn btn-ghost btn-sm" href="{{ route('explore') }}">Xóa lọc</a>
     @endif
@@ -29,7 +28,7 @@
 <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center">
     <span class="label-up" style="margin-right: var(--space-1)">Thể loại</span>
     <a class="cat-chip {{ $categorySlug ? '' : 'active' }}" style="--cat: var(--color-neutral-700)"
-       href="{{ route('explore', array_filter(['q' => $q, 'sort' => $sort])) }}">Tất cả · All</a>
+       href="{{ route('explore', array_filter(['q' => $q, 'sort' => $sort])) }}">Tất cả</a>
     @foreach ($categories as $cat)
         <a class="cat-chip {{ $categorySlug === $cat->slug ? 'active' : '' }}" style="--cat: {{ $cat->colorVar() }}"
            href="{{ route('explore', array_filter(['q' => $q, 'sort' => $sort, 'category' => $cat->slug])) }}">{{ $cat->name }}</a>
@@ -51,7 +50,7 @@
                 @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)))
                     <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}" loading="lazy">
                 @else
-                    <span class="slot-note">[ thumbnail ]</span>
+                    <span class="thumb-ph" aria-hidden="true"></span>
                 @endif
             </div>
             <div class="video-card-body">

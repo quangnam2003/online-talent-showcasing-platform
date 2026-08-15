@@ -2,9 +2,8 @@
 
 @section('title', ($activeUser ? 'Chat với '.$activeUser->name : 'Tin nhắn').' — TalentStage')
 
-@section('screen-kicker', 'FR6 · Mentorship')
 @section('screen-title', 'Tin nhắn')
-@section('screen-sub', 'Direct messages — creator ↔ mentor')
+@section('screen-sub', 'Trao đổi trực tiếp giữa creator và mentor.')
 
 @section('content')
 @php $me = auth()->user(); @endphp
@@ -13,7 +12,7 @@
 
     {{-- ── Cot trai: hoi thoai + bat dau moi (mockup Mentorship) ── --}}
     <div style="display: flex; flex-direction: column; gap: var(--space-2)">
-        <div class="kicker" style="color: var(--color-neutral-500)">Hội thoại · Threads</div>
+        <div class="kicker" style="color: var(--color-neutral-500)">Hội thoại</div>
 
         @forelse ($threads as $t)
             <a class="card" href="{{ route('messages.show', $t->partner) }}"
@@ -33,7 +32,7 @@
         @endforelse
 
         <div class="card" style="padding: var(--space-3); gap: var(--space-2); margin-top: var(--space-2)">
-            <div class="card-kicker">Bắt đầu hội thoại · New</div>
+            <div class="card-kicker">Bắt đầu hội thoại mới</div>
             @foreach ($contacts as $contact)
                 <a href="{{ route('messages.show', $contact) }}" style="display: flex; align-items: center; gap: var(--space-2); font-size: 12.5px">
                     <span class="avatar" style="width: 24px; height: 24px; font-size: 11px">
@@ -83,8 +82,8 @@
 
             <form method="POST" action="{{ route('messages.store', $activeUser) }}" style="display: flex; gap: var(--space-2)">
                 @csrf
-                <input class="input" name="content" placeholder="Nhắn tin… / Message" required autofocus style="flex: 1" autocomplete="off">
-                <button class="btn btn-primary btn-sm">Gửi</button>
+                <input class="input" name="content" placeholder="Nhập tin nhắn…" required autofocus style="flex: 1" autocomplete="off">
+                <button class="btn btn-primary btn-sm"><x-icon name="send" size="14" /> Gửi</button>
             </form>
         </div>
     @endif

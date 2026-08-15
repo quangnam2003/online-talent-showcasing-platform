@@ -2,9 +2,9 @@
 
 @section('title', 'Dashboard — TalentStage Admin')
 
-@section('screen-kicker', 'Admin · Overview')
-@section('screen-title', 'Dashboard')
-@section('screen-sub', 'Tổng quan hệ thống TalentStage')
+@section('screen-kicker')<span>Quản trị</span><span class="sep">/</span><span>Tổng quan</span>@endsection
+@section('screen-title', 'Tổng quan')
+@section('screen-sub', 'Số liệu toàn hệ thống và những việc cần xử lý.')
 
 @section('content')
 {{-- ── Chi so tong ── --}}
@@ -29,7 +29,7 @@
         @empty
             <span class="muted-i">Không có video chờ duyệt 🎉</span>
         @endforelse
-        <a class="btn btn-primary btn-sm" style="align-self: flex-start" href="{{ route('admin.videos.index') }}">Vào hàng đợi kiểm duyệt →</a>
+        <a class="btn btn-primary btn-sm" style="align-self: flex-start" href="{{ route('admin.videos.index') }}">Vào hàng đợi kiểm duyệt <x-icon name="arrow-right" size="14" /></a>
     </div>
 
     {{-- Phan bo --}}

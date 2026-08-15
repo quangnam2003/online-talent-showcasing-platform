@@ -2,9 +2,8 @@
 
 @section('title', 'Bảng tin — TalentStage')
 
-@section('screen-kicker', 'FR4 · Personalised feed')
 @section('screen-title', 'Bảng tin')
-@section('screen-sub', 'Feed from creators you follow')
+@section('screen-sub', 'Video mới nhất từ những creator bạn đang theo dõi.')
 
 @section('content')
 <div class="feed-grid" style="display: grid; grid-template-columns: 1.7fr 1fr; gap: var(--space-6); align-items: start">
@@ -43,7 +42,7 @@
         @empty
             <div class="card" style="align-items: center; padding: var(--space-8); gap: var(--space-2)">
                 <span class="muted-i">Bảng tin trống — bạn chưa theo dõi ai, hoặc người bạn theo dõi chưa đăng video.</span>
-                <a class="btn btn-primary btn-sm" href="{{ route('explore') }}">Khám phá creator để theo dõi</a>
+                <a class="btn btn-primary btn-sm" href="{{ route('explore') }}"><x-icon name="compass" size="14" /> Khám phá creator để theo dõi</a>
             </div>
         @endforelse
 
@@ -52,7 +51,7 @@
 
     {{-- ── Goi y theo doi ── --}}
     <div class="card" style="padding: var(--space-4); gap: var(--space-2)">
-        <div class="card-kicker">Gợi ý theo dõi · Suggested</div>
+        <div class="card-kicker">Gợi ý theo dõi</div>
         @forelse ($suggested as $user)
             <div style="display: flex; align-items: center; gap: var(--space-2); padding-bottom: var(--space-1); border-bottom: 1px solid var(--color-divider)">
                 <span class="avatar" style="width: 30px; height: 30px">
@@ -68,7 +67,7 @@
                 </span>
                 <form method="POST" action="{{ route('follows.toggle', $user) }}">
                     @csrf
-                    <button class="btn btn-ghost btn-xs">Theo dõi</button>
+                    <button class="btn btn-ghost btn-xs"><x-icon name="user-plus" size="13" /> Theo dõi</button>
                 </form>
             </div>
         @empty

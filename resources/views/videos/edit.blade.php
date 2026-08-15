@@ -2,9 +2,8 @@
 
 @section('title', 'Sửa video — TalentStage')
 
-@section('screen-kicker', 'FR2 · Content')
+@section('screen-kicker')<a href="{{ route('videos.mine') }}">Video của tôi</a><span class="sep">/</span><span>{{ \Illuminate\Support\Str::limit($video->title, 40) }}</span>@endsection
 @section('screen-title', 'Sửa video')
-@section('screen-sub', $video->title)
 
 @section('content')
 <form method="POST" action="{{ route('videos.update', $video) }}" enctype="multipart/form-data"
@@ -13,14 +12,14 @@
     @method('PUT')
 
     <label class="field">
-        <span class="label-up">Tiêu đề · Title</span>
+        <span class="label-up">Tiêu đề</span>
         <input class="input @error('title') is-invalid @enderror" name="title" value="{{ old('title', $video->title) }}" required>
         @error('title') <span class="err-msg">{{ $message }}</span> @enderror
     </label>
 
     <div class="grid-2" style="gap: var(--space-4)">
         <label class="field">
-            <span class="label-up">Thể loại · Category</span>
+            <span class="label-up">Thể loại</span>
             <select class="input" name="category_id" required>
                 @foreach ($categories as $cat)
                     <option value="{{ $cat->id }}" @selected(old('category_id', $video->category_id) == $cat->id)>{{ $cat->name }}</option>
@@ -28,7 +27,7 @@
             </select>
         </label>
         <label class="field">
-            <span class="label-up">Quyền xem · Visibility</span>
+            <span class="label-up">Quyền xem</span>
             <select class="input" name="privacy">
                 <option value="public" @selected(old('privacy', $video->privacy) === 'public')>Công khai</option>
                 <option value="private" @selected(old('privacy', $video->privacy) === 'private')>Riêng tư — chỉ mình tôi</option>
@@ -37,12 +36,12 @@
     </div>
 
     <label class="field">
-        <span class="label-up">Mô tả · Description</span>
+        <span class="label-up">Mô tả</span>
         <textarea class="input" name="description" rows="4">{{ old('description', $video->description) }}</textarea>
     </label>
 
     <label class="field">
-        <span class="label-up">Đổi thumbnail (tùy chọn)</span>
+        <span class="label-up">Đổi ảnh bìa (tùy chọn)</span>
         <input class="input" type="file" name="thumbnail" accept="image/*" style="padding: 6px">
         @error('thumbnail') <span class="err-msg">{{ $message }}</span> @enderror
     </label>
@@ -54,7 +53,7 @@
     </label>
 
     <div style="display: flex; gap: var(--space-3); align-items: center">
-        <button type="submit" class="btn btn-primary btn-sm">Lưu thay đổi · Save</button>
+        <button type="submit" class="btn btn-primary btn-sm"><x-icon name="check" size="14" /> Lưu thay đổi</button>
         <a class="btn btn-ghost btn-sm" href="{{ route('videos.mine') }}">Hủy</a>
         <span class="muted-i">File video không thể thay đổi — muốn đổi hãy đăng video mới.</span>
     </div>

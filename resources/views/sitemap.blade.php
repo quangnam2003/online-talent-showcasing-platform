@@ -2,9 +2,8 @@
 
 @section('title', 'Sơ đồ trang — TalentStage')
 
-@section('screen-kicker', 'Sitemap · Toàn bộ màn hình')
 @section('screen-title', 'Sơ đồ trang')
-@section('screen-sub', 'Mỗi màn hình gắn với chức năng (FR) và vai trò được truy cập — nguồn: docs/SITEMAP.md')
+@section('screen-sub', 'Toàn bộ trang của TalentStage, nhóm theo chức năng, kèm vai trò được phép truy cập.')
 
 @section('content')
 @php
@@ -82,7 +81,6 @@
 </div>
 
 <p class="muted-i" style="text-align: center">
-    Toàn bộ màn hình đã hoạt động — trang cần quyền sẽ chuyển hướng đăng nhập hoặc báo 403 đúng vai trò.
-    Chi tiết: <code style="font-size: 11px">docs/SITEMAP.md</code>.
+    Trang yêu cầu đăng nhập sẽ tự chuyển hướng tới trang đăng nhập; trang không đúng vai trò sẽ báo lỗi 403.
 </p>
 @endsection

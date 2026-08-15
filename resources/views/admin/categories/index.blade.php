@@ -2,14 +2,14 @@
 
 @section('title', 'Danh mục — TalentStage Admin')
 
-@section('screen-kicker', 'Admin · Categories')
-@section('screen-title', 'Quản lý danh mục')
-@section('screen-sub', 'Thể loại tài năng — không thể xóa danh mục đang có video')
+@section('screen-kicker')<a href="{{ route('admin.dashboard') }}">Quản trị</a><span class="sep">/</span><span>Danh mục</span>@endsection
+@section('screen-title', 'Danh mục')
+@section('screen-sub', 'Các thể loại tài năng trên hệ thống — không thể xóa danh mục đang có video.')
 
 @section('content')
 <div style="display: flex; justify-content: space-between; align-items: center">
     <span class="meta">{{ $categories->count() }} danh mục</span>
-    <a class="btn btn-primary btn-sm" href="{{ route('admin.categories.create') }}">+ Thêm danh mục</a>
+    <a class="btn btn-primary btn-sm" href="{{ route('admin.categories.create') }}"><x-icon name="plus" size="14" /> Thêm danh mục</a>
 </div>
 
 <table class="table" style="font-size: 13px; max-width: 720px">

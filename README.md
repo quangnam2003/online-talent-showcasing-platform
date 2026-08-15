@@ -13,7 +13,7 @@ Nền tảng web trưng bày tài năng trực tuyến — nơi creator đăng v
 - **Thông báo** — duyệt video, người theo dõi mới, v.v.
 - **Quản trị** — dashboard admin: người dùng, danh mục, video chờ duyệt, cuộc thi
 
-Giao diện theo design system của mockup (nền giấy ấm, typography Public Sans, sidebar đánh số, mỗi thể loại một màu, chuyển động mượt) — xem [docs/UI-DESIGN.md](docs/UI-DESIGN.md).
+Giao diện web hoàn chỉnh (nền giấy ấm, typography Public Sans, sidebar icon + menu tài khoản, mỗi thể loại một màu, chuyển động mượt) — xem [docs/UI-DESIGN.md](docs/UI-DESIGN.md).
 
 ## Công nghệ
 
@@ -29,4 +29,4 @@ Mở trình duyệt: [http://localhost:8000](http://localhost:8000)
 
 - [GuildRun.md](GuildRun.md) — hướng dẫn cài đặt & chạy project
 - [docs/SITEMAP.md](docs/SITEMAP.md) — sơ đồ màn hình
-- [docs/UI-DESIGN.md](docs/UI-DESIGN.md) — hệ thống thiết kế Classical
+- [docs/UI-DESIGN.md](docs/UI-DESIGN.md) — hệ thống thiết kế UI (màu, chữ, khung trang, chuyển động)

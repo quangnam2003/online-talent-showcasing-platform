@@ -2,9 +2,8 @@
 
 @section('title', 'Cuộc thi — TalentStage')
 
-@section('screen-kicker', 'FR7 · Contest')
-@section('screen-title', 'Cuộc thi tài năng')
-@section('screen-sub', 'Contest — entries, voting, leaderboard')
+@section('screen-title', 'Cuộc thi')
+@section('screen-sub', 'Gửi bài dự thi, bình chọn cho tiết mục yêu thích và theo dõi bảng xếp hạng.')
 
 @section('content')
 @foreach ($groups as [$label, $contests])

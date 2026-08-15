@@ -2,9 +2,8 @@
 
 @section('title', 'Thông báo — TalentStage')
 
-@section('screen-kicker', 'System · Notifications')
 @section('screen-title', 'Thông báo')
-@section('screen-sub', 'Duyệt video, người theo dõi mới — mở trang này là tất cả được đánh dấu đã đọc')
+@section('screen-sub', 'Kết quả duyệt video, người theo dõi mới và cập nhật từ cộng đồng. Mở trang này sẽ đánh dấu tất cả là đã đọc.')
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 720px">

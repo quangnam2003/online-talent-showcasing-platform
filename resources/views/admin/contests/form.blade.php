@@ -2,9 +2,9 @@
 
 @section('title', ($contest ? 'Sửa' : 'Tạo').' cuộc thi — TalentStage Admin')
 
-@section('screen-kicker', 'Admin · FR7 Contest')
+@section('screen-kicker')<a href="{{ route('admin.dashboard') }}">Quản trị</a><span class="sep">/</span><a href="{{ route('admin.contests.index') }}">Cuộc thi</a><span class="sep">/</span><span>{{ $contest ? 'Sửa' : 'Tạo mới' }}</span>@endsection
 @section('screen-title', $contest ? 'Sửa cuộc thi' : 'Tạo cuộc thi')
-@section('screen-sub', 'Thứ tự bắt buộc: mở nộp bài < hạn nộp bài < kết thúc')
+@section('screen-sub', 'Ba mốc thời gian phải theo thứ tự: mở nhận bài → hạn nộp bài → kết thúc (công bố).')
 
 @section('content')
 <form method="POST"
@@ -14,14 +14,14 @@
     @if ($contest) @method('PUT') @endif
 
     <label class="field">
-        <span class="label-up">Tên cuộc thi · Title</span>
+        <span class="label-up">Tên cuộc thi</span>
         <input class="input @error('title') is-invalid @enderror" name="title"
                value="{{ old('title', $contest?->title) }}" placeholder="Tài năng Tháng Tám 2026" required autofocus>
         @error('title') <span class="err-msg">{{ $message }}</span> @enderror
     </label>
 
     <label class="field">
-        <span class="label-up">Mô tả · Description</span>
+        <span class="label-up">Mô tả</span>
         <textarea class="input" name="description" rows="3" placeholder="Thể lệ, giải thưởng…">{{ old('description', $contest?->description) }}</textarea>
     </label>
 
@@ -47,7 +47,7 @@
     </div>
 
     <div style="display: flex; gap: var(--space-3)">
-        <button type="submit" class="btn btn-primary btn-sm">{{ $contest ? 'Lưu · Save' : 'Tạo · Create' }}</button>
+        <button type="submit" class="btn btn-primary btn-sm">{{ $contest ? 'Lưu thay đổi' : 'Tạo cuộc thi' }}</button>
         <a class="btn btn-ghost btn-sm" href="{{ route('admin.contests.index') }}">Hủy</a>
     </div>
 </form>

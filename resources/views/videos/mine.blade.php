@@ -2,14 +2,13 @@
 
 @section('title', 'Video của tôi — TalentStage')
 
-@section('screen-kicker', 'FR2 · Content')
 @section('screen-title', 'Video của tôi')
-@section('screen-sub', 'My videos — trạng thái duyệt, sửa, xóa')
+@section('screen-sub', 'Theo dõi trạng thái duyệt, chỉnh sửa hoặc xóa video bạn đã đăng.')
 
 @section('content')
 <div style="display: flex; justify-content: space-between; align-items: center">
     <span class="meta">{{ $videos->count() }} video</span>
-    <a class="btn btn-primary btn-sm" href="{{ route('videos.create') }}">+ Đăng video mới</a>
+    <a class="btn btn-primary btn-sm" href="{{ route('videos.create') }}"><x-icon name="upload" size="14" /> Đăng video mới</a>
 </div>
 
 <table class="table" style="font-size: 13px">

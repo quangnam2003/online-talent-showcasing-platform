@@ -2,7 +2,7 @@
 
 @section('title', ($category ? 'Sửa' : 'Thêm').' danh mục — TalentStage Admin')
 
-@section('screen-kicker', 'Admin · Categories')
+@section('screen-kicker')<a href="{{ route('admin.dashboard') }}">Quản trị</a><span class="sep">/</span><a href="{{ route('admin.categories.index') }}">Danh mục</a><span class="sep">/</span><span>{{ $category ? 'Sửa' : 'Thêm mới' }}</span>@endsection
 @section('screen-title', $category ? 'Sửa danh mục' : 'Thêm danh mục')
 @section('screen-sub', $category ? $category->name : 'Danh mục mới cho video')
 
@@ -14,7 +14,7 @@
     @if ($category) @method('PUT') @endif
 
     <label class="field">
-        <span class="label-up">Tên danh mục · Name</span>
+        <span class="label-up">Tên danh mục</span>
         <input class="input @error('name') is-invalid @enderror" name="name"
                value="{{ old('name', $category?->name) }}" placeholder="Âm nhạc" required autofocus>
         @error('name') <span class="err-msg">{{ $message }}</span> @enderror
@@ -22,7 +22,7 @@
     </label>
 
     <div style="display: flex; gap: var(--space-3)">
-        <button type="submit" class="btn btn-primary btn-sm">{{ $category ? 'Lưu · Save' : 'Thêm · Create' }}</button>
+        <button type="submit" class="btn btn-primary btn-sm">{{ $category ? 'Lưu thay đổi' : 'Thêm danh mục' }}</button>
         <a class="btn btn-ghost btn-sm" href="{{ route('admin.categories.index') }}">Hủy</a>
     </div>
 </form>

@@ -22,6 +22,43 @@
     if (e.key === 'Escape' && body.classList.contains('nav-open')) body.classList.remove('nav-open');
   });
 
+  /* ── menu tha xuong (details.menu): dong khi bam ra ngoai / Esc / chon muc ── */
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('details.menu[open]').forEach(function (m) {
+      if (!m.contains(e.target) || e.target.closest('.menu-item')) m.removeAttribute('open');
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.querySelectorAll('details.menu[open]').forEach(function (m) { m.removeAttribute('open'); });
+  });
+
+  /* ── dropzone: keo tha tep vao <label class="dropzone"> chua input[type=file] ── */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.dropzone').forEach(function (zone) {
+      var input = zone.querySelector('input[type=file]');
+      var nameEl = zone.querySelector('.dropzone-name');
+      if (!input) return;
+      var show = function () {
+        var f = input.files && input.files[0];
+        zone.classList.toggle('has-file', !!f);
+        if (nameEl) nameEl.textContent = f ? (f.name + ' · ' + (f.size / 1048576).toFixed(1) + ' MB') : '';
+      };
+      input.addEventListener('change', show);
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add('is-drag'); });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove('is-drag'); });
+      });
+      zone.addEventListener('drop', function (e) {
+        if (e.dataTransfer && e.dataTransfer.files.length) {
+          try { input.files = e.dataTransfer.files; } catch (err) { return; }
+          show();
+        }
+      });
+    });
+  });
+
   /* ── flash: mo dan roi go khoi DOM ───────────────────────────────────── */
   window.tsDismiss = function (btn) {
     var el = btn.closest('.flash');
