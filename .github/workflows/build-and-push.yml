@@ -3,6 +3,16 @@ name: Build & Push Docker Image
 on:
   push:
     branches: ["main"]
+    # Bo qua build khi commit chi thay doi cac file khong nam trong Docker image
+    # (danh sach khop voi .dockerignore — sua file nao o day thi doi chieu lai file do)
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "tests/**"
+      - "docker-compose.yml"
+      - ".gitignore"
+      - ".vscode/**"
+      - ".idea/**"
   workflow_dispatch:
 
 env:
