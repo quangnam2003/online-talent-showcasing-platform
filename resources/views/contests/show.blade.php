@@ -84,10 +84,10 @@
     <h3 style="font-size: 20px; margin: 0">Bài dự thi · Contest entries <span class="meta num">({{ $entries->count() }})</span></h3>
     <div class="grid-4">
         @forelse ($entries as $entry)
-            <div class="card video-card" style="cursor: default">
-                <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb hatch-mid" style="display: flex">
+            <div class="card video-card" style="cursor: default; --cat: {{ $entry->video->category->colorVar() }}">
+                <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb" style="display: flex">
                     @if ($entry->video->thumbnail && file_exists(public_path('storage/'.$entry->video->thumbnail)))
-                        <img src="{{ asset('storage/'.$entry->video->thumbnail) }}" alt="">
+                        <img src="{{ asset('storage/'.$entry->video->thumbnail) }}" alt="" loading="lazy">
                     @else
                         <span class="slot-note">[ thumbnail ]</span>
                     @endif

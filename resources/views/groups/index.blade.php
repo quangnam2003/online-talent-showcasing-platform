@@ -43,7 +43,7 @@
         @else
             <div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-3); gap: var(--space-2); flex-wrap: wrap">
                 <div>
-                    <h3 style="font-weight: 400; font-size: 26px; margin: 0">{{ $activeGroup->name }}</h3>
+                    <h3 style="font-size: 26px; margin: 0">{{ $activeGroup->name }}</h3>
                     <span class="meta">
                         {{ number_format($activeGroup->members_count) }} thành viên
                         · Chủ nhóm: <a href="{{ route('users.show', $activeGroup->owner) }}">{{ $activeGroup->owner->name }}</a>

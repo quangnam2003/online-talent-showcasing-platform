@@ -74,10 +74,10 @@
     </h3>
     <div class="grid-4">
         @forelse ($videos as $video)
-            <a class="card video-card" href="{{ route('videos.show', $video) }}">
-                <div class="video-thumb hatch-mid">
+            <a class="card video-card" href="{{ route('videos.show', $video) }}" style="--cat: {{ $video->category->colorVar() }}">
+                <div class="video-thumb">
                     @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)))
-                        <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}">
+                        <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}" loading="lazy">
                     @else
                         <span class="slot-note">[ thumbnail ]</span>
                     @endif
@@ -87,7 +87,7 @@
                     <span class="video-card-title">{{ $video->title }}</span>
                     <span class="meta">{{ number_format($video->views) }} lượt xem · ♡ {{ number_format($video->likes_count) }}</span>
                     @if ($ownProfile && ($video->status !== 'approved' || $video->privacy === 'private'))
-                        <span class="tag tag-muted" style="font-size: 9.5px; align-self: flex-start">
+                        <span class="tag tag-status" data-status="{{ $video->status }}" style="align-self: flex-start">
                             {{ ['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'][$video->status] }}{{ $video->privacy === 'private' ? ' · Riêng tư' : '' }}
                         </span>
                     @endif

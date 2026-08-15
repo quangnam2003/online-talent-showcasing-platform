@@ -1,17 +1,30 @@
 /* ============================================================================
-   TalentStage — design system "Classical"
-   Port tu artifact UI mockup (claude.ai/code/artifact/b4e21537). Tokens va
-   components giu nguyen; phan layout .ts-* dung cho app that.
+   TalentStage — design system (port tu artifact UI mockup
+   claude.ai/code/artifact/b4e21537 — ban Public Sans).
+
+   Cau truc file:
+     1. Tokens: mau, chu, khoang cach, bo goc, bong, MOTION
+     2. Base + view transitions + reduced motion
+     3. Components: btn / input / card / tag / table / dialog / plate…
+     4. Layout shell: sidebar + header + content (.ts-*)
+     5. Pattern man hinh: video-card, rank-row, phase-strip, bubble, tabs, stars…
+     6. Responsive
+
+   Nguyen tac chuyen dong: moi thay doi trang thai (hover / focus / active /
+   mo-dong) deu co transition dung 1 bo easing chung; noi dung vao trang bang
+   fade-rise ngan, so le theo thu tu; ton trong prefers-reduced-motion.
    ========================================================================== */
 
 :root {
-  --color-bg: #f3f2f2;
+  /* ── mau nen / chu / nhan ─────────────────────────────────────────────── */
+  --color-bg: #fbfaf8;
   --color-surface: #eae9e9;
   --color-text: #201f1d;
   --color-accent: #b68235;
   --color-accent-2: #ac803e;
   --color-divider: color-mix(in srgb, #201f1d 16%, transparent);
 
+  /* thang sac do trung tinh (OKLCH, cung do sang giua cac vai tro) */
   --color-neutral-100: #f8f4f4;
   --color-neutral-200: #eae7e7;
   --color-neutral-300: #d7d3d3;
@@ -32,12 +45,26 @@
   --color-accent-800: #5a3b0a;
   --color-accent-900: #3a270d;
 
-  --color-danger: #9c3a2d; /* bo sung cho validation — cung tong dat nung */
+  --color-accent-2-100: #fff3e4;
+  --color-accent-2-800: #573d14;
 
-  --font-heading: "Cormorant Garamond", Georgia, serif;
+  --color-danger: #9c3a2d; /* validation — cung tong dat nung */
+
+  /* mau the loai — moi category mot sac, dung cho chip, vien tren the video,
+     nhan the loai va tint thumbnail (mockup: --c-*) */
+  --c-music:  #6b4bb8;
+  --c-dance:  #c2410c;
+  --c-visual: #1d6fa5;
+  --c-acting: #a83252;
+  --c-food:   #b07417;
+  --c-sport:  #2f7d5e;
+
+  /* ── chu ──────────────────────────────────────────────────────────────── */
+  --font-heading: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-heading-weight: 600;
-  --font-body: "Lora", Georgia, serif;
+  --font-body: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
+  /* ── khoang cach / goc / bong ─────────────────────────────────────────── */
   --space-1: 4.6px;
   --space-2: 9.2px;
   --space-3: 13.8px;
@@ -52,14 +79,29 @@
   --shadow-sm: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
   --shadow-md: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
   --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+
+  /* ── MOTION — mot bo easing/duration dung chung toan app ──────────────── */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);   /* vao nhanh, dung em */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);  /* nay nhe — like / sao */
+  --dur-1: 120ms;  /* press, doi mau nhanh */
+  --dur-2: 200ms;  /* hover, focus */
+  --dur-3: 320ms;  /* mo/dong panel, drawer */
+  --dur-4: 520ms;  /* noi dung vao trang */
+  --rise: 10px;    /* bien do fade-rise */
 }
 
-/* ── base ─────────────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   2. BASE
+   ══════════════════════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--color-bg); color: var(--color-text);
   font-family: var(--font-body); font-size: 15px; line-height: 1.55; font-weight: 400;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
+p, span, div { text-wrap: pretty; }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
@@ -68,40 +110,93 @@ h1 { font-size: 42px; } h2 { font-size: 32px; } h3 { font-size: 25px; }
 h4 { font-size: 20px; } h5 { font-size: 16px; }
 h6 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
 p { margin: 0 0 var(--space-3); }
-a { color: var(--color-accent-700); text-decoration: none; text-underline-offset: 3px; }
+a {
+  color: var(--color-accent-700); text-decoration: none; text-underline-offset: 3px;
+  transition: color var(--dur-2) var(--ease-out), opacity var(--dur-2) var(--ease-out);
+}
 a:hover { color: var(--color-accent-600); text-decoration: underline; }
 img { display: block; max-width: 100%; }
 figure { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
 .text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 ::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-neutral-400); }
 
 .hr { height: 1px; border: 0; margin: var(--space-4) 0; background: var(--color-divider); }
+
+/* ── keyframes dung chung ─────────────────────────────────────────────── */
+@keyframes ts-rise {
+  from { opacity: 0; transform: translateY(var(--rise)); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes ts-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ts-pop  {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@keyframes ts-scale-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── chuyen trang muot (MPA View Transitions — Chrome/Safari moi; trinh
+      duyet khac bo qua). Sidebar + header giu nguyen, phan noi dung cross-
+      fade. ───────────────────────────────────────────────────────────────── */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: ts-vt-out 160ms var(--ease-out) both; }
+::view-transition-new(root) { animation: ts-vt-in 240ms var(--ease-out) both; }
+@keyframes ts-vt-out { to   { opacity: 0; } }
+@keyframes ts-vt-in  { from { opacity: 0; } }
+.ts-sidebar { view-transition-name: ts-sidebar; }
+.ts-header  { view-transition-name: ts-header; }
+
+/* ── ton trong nguoi dung tat hieu ung ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important; transition-duration: 0.01ms !important;
+  }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. COMPONENTS
+   ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── buttons ──────────────────────────────────────────────────────────── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  cursor: pointer; text-decoration: none;
+  cursor: pointer; text-decoration: none; white-space: nowrap;
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   font-size: 14px; line-height: 1.2; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
   padding: var(--space-2) calc(var(--space-3) * 1.2);
   border-radius: var(--radius-md);
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    border-color     var(--dur-2) var(--ease-out),
+    color            var(--dur-2) var(--ease-out),
+    box-shadow       var(--dur-2) var(--ease-out),
+    transform        var(--dur-1) var(--ease-out);
 }
 .btn:hover { text-decoration: none; }
+.btn:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); color: var(--color-accent); }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); color: var(--color-accent-700); border-color: var(--color-accent-600); }
 .btn-primary:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
 .btn-secondary { border-color: var(--color-divider); }
-.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text); }
+.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text); border-color: color-mix(in srgb, var(--color-text) 30%, transparent); }
 .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
 .btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
-.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent-700); }
 .btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
 .btn-icon { width: 36px; height: 36px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
@@ -113,19 +208,32 @@ figure { margin: 0; }
 .field > .label-up, .label-up {
   font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--color-neutral-600);
+  transition: color var(--dur-2) var(--ease-out);
 }
+.field:focus-within > .label-up { color: var(--color-accent-700); }
 .input {
   width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
   font-size: 13.5px; color: var(--color-text); caret-color: var(--color-accent);
   background: transparent;
   border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+  transition:
+    border-color     var(--dur-2) var(--ease-out),
+    box-shadow       var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out);
 }
+.input::placeholder { color: var(--color-neutral-500); transition: opacity var(--dur-2) var(--ease-out); }
 .input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
-.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+.input:focus-visible {
+  outline: none; border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 16%, transparent);
+  background: color-mix(in srgb, var(--color-bg) 70%, #fff);
+}
+.input:focus-visible::placeholder { opacity: 0.6; }
 textarea.input { min-height: 90px; resize: vertical; font-family: var(--font-body); }
 select.input { cursor: pointer; }
 .input.is-invalid { border-color: var(--color-danger); }
-.err-msg { font-size: 12px; color: var(--color-danger); }
+.input.is-invalid:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 16%, transparent); }
+.err-msg { font-size: 12px; color: var(--color-danger); animation: ts-rise var(--dur-3) var(--ease-out) backwards; }
 
 .radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
 .radio input, .seg-opt input {
@@ -134,12 +242,18 @@ select.input { cursor: pointer; }
 .radio .dot {
   width: 16px; height: 16px; flex: none; border-radius: 50%;
   border: 1.5px solid var(--color-divider);
+  transition:
+    border-color     var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out),
+    box-shadow       var(--dur-2) var(--ease-out),
+    transform        var(--dur-2) var(--ease-spring);
 }
 .radio:hover .dot { border-color: var(--color-accent); }
 .radio input:checked + .dot {
   border-color: var(--color-accent); background: var(--color-accent);
   box-shadow: inset 0 0 0 4px var(--color-bg);
 }
+.radio:active .dot { transform: scale(0.9); }
 .radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
 .seg {
@@ -149,17 +263,30 @@ select.input { cursor: pointer; }
 .seg-opt {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 12px; font-size: 13px; cursor: pointer;
+  transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 .seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
 .seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
 .seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 .seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 
-/* ── cards / tags / table / dialog ────────────────────────────────────── */
+/* ── cards ────────────────────────────────────────────────────────────── */
 .card {
   display: flex; flex-direction: column; gap: var(--space-2);
   padding: var(--space-3); border-radius: var(--radius-md);
   background: transparent; border: 1px solid var(--color-divider);
+  transition:
+    border-color     var(--dur-2) var(--ease-out),
+    box-shadow       var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out),
+    transform        var(--dur-2) var(--ease-out);
+}
+/* the la link (a.card) — noi len nhe khi hover, giu mau chu */
+a.card { text-decoration: none; color: inherit; }
+a.card:hover {
+  text-decoration: none; color: inherit;
+  border-color: color-mix(in srgb, var(--color-text) 30%, transparent);
+  box-shadow: var(--shadow-sm);
 }
 .card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
 .card-title {
@@ -175,17 +302,47 @@ select.input { cursor: pointer; }
 .elev-md { box-shadow: var(--shadow-md); }
 .elev-lg { box-shadow: var(--shadow-lg); }
 
+/* ── tags ─────────────────────────────────────────────────────────────── */
 .tag {
   display: inline-flex; align-items: center; font-size: 11px;
-  letter-spacing: 0.02em; padding: 3px 10px;
+  letter-spacing: 0.02em; padding: 3px 10px; white-space: nowrap;
   border-radius: calc(var(--radius-md) * 0.75);
+  transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
 }
 .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
-.tag-accent-2 { background: var(--color-accent-2-100, #fff3e4); color: var(--color-accent-2-800, #573d14); }
+.tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
 .tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
 .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
 .tag-muted { border: 1px solid var(--color-divider); color: var(--color-neutral-700); }
+a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent-700); text-decoration: none; }
 
+/* tag trang thai duyet — mau theo mockup: duyet = xanh, cho = vang, tu choi = do */
+.tag-status { --st: var(--color-neutral-500); font-size: 10px; border: 1px solid var(--st); color: var(--st); }
+.tag-status[data-status="approved"] { --st: var(--c-sport); }
+.tag-status[data-status="pending"]  { --st: var(--c-food); }
+.tag-status[data-status="rejected"] { --st: var(--c-acting); }
+
+/* chip the loai (header / bo loc / dang ky) — pill vien mau the loai */
+.cat-chip {
+  --cat: var(--color-accent);
+  display: inline-flex; align-items: center; font-size: 11px; padding: 3px 10px;
+  border-radius: 999px; border: 1px solid var(--cat); color: var(--cat); white-space: nowrap;
+  background: color-mix(in oklch, var(--cat) 8%, transparent); text-decoration: none; cursor: pointer;
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    color            var(--dur-2) var(--ease-out),
+    transform        var(--dur-2) var(--ease-out),
+    box-shadow       var(--dur-2) var(--ease-out);
+}
+.cat-chip:hover, .cat-chip.active {
+  color: var(--cat); text-decoration: none;
+  background: color-mix(in oklch, var(--cat) 18%, transparent);
+  transform: translateY(-1px);
+}
+.cat-chip:active { transform: translateY(0); }
+.cat-chip.active { box-shadow: inset 0 0 0 1px var(--cat); }
+
+/* ── table ────────────────────────────────────────────────────────────── */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th {
   text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
@@ -193,23 +350,27 @@ select.input { cursor: pointer; }
   padding: var(--space-2); border-bottom: 1px solid var(--color-divider);
 }
 .table td { padding: var(--space-2); border-bottom: 1px solid var(--color-divider); }
+.table tbody tr { transition: background-color var(--dur-2) var(--ease-out); }
 .table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
 
+/* ── dialog ───────────────────────────────────────────────────────────── */
 .dialog-backdrop {
   position: fixed; inset: 0; display: grid; place-items: center;
   padding: var(--space-4); z-index: 40;
   background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+  animation: ts-fade var(--dur-2) var(--ease-out) backwards;
 }
 .dialog {
   width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
   padding: var(--space-4); border-radius: var(--radius-lg);
-  background: var(--color-surface); box-shadow: var(--shadow-lg); border: 1px solid var(--color-divider);
+  background: var(--color-bg); box-shadow: var(--shadow-lg); border: 1px solid var(--color-divider);
+  animation: ts-scale-in var(--dur-3) var(--ease-out) backwards;
 }
 .dialog-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 20px; }
 .dialog-body { font-size: 14px; opacity: 0.85; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
 
-/* ── hoa van: khung anh & nen gach cheo (placeholder thumbnail) ───────── */
+/* ── khung anh & nen gach cheo (placeholder) ─────────────────────────── */
 .plate {
   filter: sepia(0.22) saturate(0.82) contrast(1.05); box-sizing: border-box;
   border: 6px solid var(--color-surface); outline: 1px solid var(--color-divider);
@@ -233,14 +394,31 @@ select.input { cursor: pointer; }
   width: 32px; height: 32px; flex: none; border-radius: 50%;
   border: 1px solid var(--color-divider); overflow: hidden;
   display: inline-flex; align-items: center; justify-content: center;
-  font-family: var(--font-heading); font-size: 14px; color: var(--color-accent-800);
+  font-family: var(--font-heading); font-weight: 600; font-size: 14px; color: var(--color-accent-800);
   background: repeating-linear-gradient(135deg, var(--color-neutral-200) 0 4px, var(--color-neutral-100) 4px 8px);
+  transition: border-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 .avatar-lg { width: 38px; height: 38px; font-size: 16px; }
 .avatar-xl { width: 168px; height: 168px; border-radius: 0; font-size: 48px; }
+a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 14%, transparent); }
 
-/* ══ LAYOUT SHELL — sidebar trai + header + noi dung ══════════════════ */
+/* ── panel mo/dong muot (thay cho display:none) — dung grid-rows 0fr→1fr
+      + JS tsToggle() trong talentstage.js ──────────────────────────────── */
+.reveal {
+  display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden;
+  transition:
+    grid-template-rows var(--dur-3) var(--ease-out),
+    opacity            var(--dur-2) var(--ease-out),
+    visibility 0s linear var(--dur-3);
+}
+.reveal > * { min-height: 0; overflow: hidden; }
+.reveal-inner { padding: 4px; margin: -4px; } /* cho vong focus cua input khong bi cat */
+.reveal.is-open { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. LAYOUT SHELL — sidebar trai + header + noi dung
+   ══════════════════════════════════════════════════════════════════════════ */
 .ts-shell { display: flex; min-height: 100vh; align-items: stretch; background: var(--color-bg); }
 
 .ts-sidebar {
@@ -248,11 +426,12 @@ select.input { cursor: pointer; }
   padding: var(--space-6) var(--space-4);
   display: flex; flex-direction: column; gap: var(--space-6);
   position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--color-bg);
+  scrollbar-width: thin;
 }
 .ts-brand { display: flex; flex-direction: column; gap: var(--space-1); }
 .ts-brand-name {
-  font-family: var(--font-heading); font-size: 25px; letter-spacing: 0.02em;
-  color: var(--color-text); text-decoration: none;
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 25px; letter-spacing: 0.02em; color: var(--color-text); text-decoration: none;
 }
 .ts-brand-name:hover { color: var(--color-accent-700); text-decoration: none; }
 .ts-brand-sub {
@@ -271,10 +450,16 @@ select.input { cursor: pointer; }
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2);
   padding: 7px var(--space-2); border-radius: var(--radius-md);
   border-left: 2px solid transparent; text-decoration: none; cursor: pointer;
+  transition:
+    background-color var(--dur-2) var(--ease-out),
+    border-color     var(--dur-2) var(--ease-out);
 }
+.ts-nav-item > span:first-child { transition: transform var(--dur-2) var(--ease-out); }
 .ts-nav-item:hover { background: var(--color-accent-100); text-decoration: none; }
+.ts-nav-item:hover > span:first-child { transform: translateX(2px); }
 .ts-nav-item.active { background: var(--color-accent-100); border-left-color: var(--color-accent); }
-.ts-nav-vi { display: block; font-size: 13.5px; color: var(--color-text); }
+.ts-nav-vi { display: block; font-size: 13.5px; color: var(--color-text); transition: color var(--dur-2) var(--ease-out); }
+.ts-nav-item:hover .ts-nav-vi { color: var(--color-accent-800); }
 .ts-nav-en { display: block; font-size: 10.5px; color: var(--color-neutral-600); font-style: italic; }
 .ts-nav-item .tag { font-size: 9px; padding: 1px 5px; font-variant-numeric: tabular-nums; flex: none; }
 
@@ -291,10 +476,22 @@ select.input { cursor: pointer; }
   position: sticky; top: 0; background: var(--color-bg); z-index: 5;
 }
 .ts-header .search { flex: 1; min-width: 200px; max-width: 520px; }
-.ts-header-tags { display: flex; gap: var(--space-1); flex-shrink: 1; overflow: hidden; }
+.ts-header .search .input { font-size: 13.5px; }
+.ts-header-tags { display: flex; gap: 6px; flex-shrink: 1; overflow: hidden; padding: 3px 0; margin: -3px 0; } /* dem 3px de chip nhac len khi hover khong bi cat */
 .ts-header-right { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); }
+.ts-user { display: flex; align-items: center; gap: var(--space-2); text-decoration: none; color: inherit; }
+.ts-user:hover { text-decoration: none; color: inherit; }
+.ts-user-name { font-size: 12.5px; }
 
-.ts-content { padding: var(--space-8); display: flex; flex-direction: column; gap: var(--space-6); }
+.ts-content { flex: 1; padding: var(--space-8); display: flex; flex-direction: column; gap: var(--space-6); } /* flex:1 → footer luon o day */
+
+/* noi dung vao trang: fade-rise so le theo thu tu khoi (backwards: sau khi
+   chay xong khong ghi de transform → hover van hoat dong) */
+.ts-content > * { animation: ts-rise var(--dur-4) var(--ease-out) backwards; }
+.ts-content > :nth-child(2) { animation-delay: 60ms; }
+.ts-content > :nth-child(3) { animation-delay: 120ms; }
+.ts-content > :nth-child(4) { animation-delay: 180ms; }
+.ts-content > :nth-child(n + 5) { animation-delay: 240ms; }
 
 /* tieu de man hinh: kicker / ten / phu de + chip use case */
 .screen-head {
@@ -302,40 +499,91 @@ select.input { cursor: pointer; }
   border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-3);
 }
 .screen-head-txt { display: flex; flex-direction: column; gap: var(--space-1); }
-.screen-title { font-family: var(--font-heading); font-weight: 400; font-size: 40px; line-height: 1.1; margin: 0; }
+.screen-title { font-family: var(--font-heading); font-weight: 600; font-size: 40px; line-height: 1.1; margin: 0; letter-spacing: -0.015em; }
 .screen-sub { font-size: 13px; color: var(--color-neutral-600); font-style: italic; }
 .screen-cases { max-width: 420px; display: flex; flex-wrap: wrap; gap: var(--space-1); justify-content: flex-end; }
 .screen-cases .tag { font-size: 10px; }
 
-/* flash message */
+/* flash message — vao bang rise (thua huong tu .ts-content > *), dong bang
+   .is-leaving (JS tsDismiss) */
 .flash {
   display: flex; align-items: baseline; gap: var(--space-2);
   border: 1px solid var(--color-divider); border-left: 2px solid var(--color-accent);
   background: var(--color-accent-100); color: var(--color-accent-900);
   padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);
   font-size: 13.5px;
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
 }
+.flash.is-leaving { opacity: 0; transform: translateY(-4px); pointer-events: none; }
 .flash-error { border-left-color: var(--color-danger); background: #f7e9e6; color: #5c221a; }
 .flash button {
   all: unset; cursor: pointer; font-size: 15px; line-height: 1;
   color: inherit; opacity: 0.6; padding: 0 4px; margin-left: auto;
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
 }
-.flash button:hover { opacity: 1; }
+.flash button:hover { opacity: 1; transform: rotate(90deg); }
 
-/* ── luoi video & the video (Discover / Profile / Contest) ────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   5. PATTERN MAN HINH
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── luoi video & the video (Discover / Explore / Profile / Contest) ──── */
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+/* the trong luoi vao so le */
+.grid-4 > *, .grid-2 > * { animation: ts-rise var(--dur-4) var(--ease-out) backwards; }
+.grid-4 > :nth-child(1), .grid-2 > :nth-child(1) { animation-delay: 80ms; }
+.grid-4 > :nth-child(2), .grid-2 > :nth-child(2) { animation-delay: 120ms; }
+.grid-4 > :nth-child(3), .grid-2 > :nth-child(3) { animation-delay: 160ms; }
+.grid-4 > :nth-child(4), .grid-2 > :nth-child(4) { animation-delay: 200ms; }
+.grid-4 > :nth-child(5), .grid-2 > :nth-child(5) { animation-delay: 240ms; }
+.grid-4 > :nth-child(6), .grid-2 > :nth-child(6) { animation-delay: 280ms; }
+.grid-4 > :nth-child(7), .grid-2 > :nth-child(7) { animation-delay: 320ms; }
+.grid-4 > :nth-child(n + 8), .grid-2 > :nth-child(n + 8) { animation-delay: 360ms; }
 
-.video-card { padding: 0; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; text-decoration: none; color: inherit; }
-.video-card:hover { text-decoration: none; color: inherit; box-shadow: var(--shadow-sm); }
+.video-card {
+  --cat: var(--color-accent);                    /* Blade dat --cat theo the loai */
+  padding: 0; overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  text-decoration: none; color: inherit;
+  border-top: 3px solid var(--cat);
+}
+.video-card:hover {
+  text-decoration: none; color: inherit;
+  transform: translateY(-2px); box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--color-text) 30%, transparent);
+  border-top-color: var(--cat);
+}
+.video-card:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
 .video-thumb {
   aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center;
   border-bottom: 1px solid var(--color-divider); position: relative; overflow: hidden;
+  background: color-mix(in oklch, var(--cat) 12%, var(--color-bg));
 }
-.video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.video-card .video-thumb.hatch-mid { background: color-mix(in oklch, var(--cat) 12%, var(--color-bg)); }
+.video-thumb .slot-note { color: var(--cat); opacity: 0.85; }
+.video-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform var(--dur-4) var(--ease-out);
+}
+.video-card:hover .video-thumb img { transform: scale(1.04); }
 .video-card-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
-.video-card-cat { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-accent-700); }
-.video-card-title { font-family: var(--font-heading); font-weight: 600; font-size: 17px; line-height: 1.25; }
+.video-card-cat { font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: var(--cat); }
+.video-card-title {
+  font-family: var(--font-heading); font-weight: 600; font-size: 17px; line-height: 1.25;
+  transition: color var(--dur-2) var(--ease-out);
+}
+.video-card:hover .video-card-title { color: var(--color-accent-800); }
+
+/* hero (Discover) */
+.hero-plate { position: relative; overflow: hidden; }
+.hero-plate > img { transition: transform 1.4s var(--ease-out); }
+.hero-plate:hover > img { transform: scale(1.025); }
+.hero-box {
+  position: relative; background: var(--color-bg); border: 1px solid var(--color-divider);
+  padding: var(--space-4); max-width: 460px;
+  transition: box-shadow var(--dur-3) var(--ease-out);
+}
+.hero-plate:hover .hero-box { box-shadow: var(--shadow-md); }
 
 /* hang xep hang (trending / leaderboard) */
 .rank-row {
@@ -344,18 +592,21 @@ select.input { cursor: pointer; }
   text-decoration: none; color: inherit;
 }
 .rank-row:hover { text-decoration: none; color: inherit; }
+.rank-title { transition: color var(--dur-2) var(--ease-out); }
 .rank-row:hover .rank-title { color: var(--color-accent-700); }
 .rank-num {
   font-family: var(--font-heading); font-size: 22px; color: var(--color-accent);
   font-variant-numeric: tabular-nums; width: 28px; flex: none;
+  transition: transform var(--dur-2) var(--ease-out);
 }
+.rank-row:hover .rank-num { transform: translateX(2px); }
 
 /* dai trang thai cuoc thi (state machine FR7) */
 .phase-strip {
   display: flex; border: 1px solid var(--color-divider);
   border-radius: var(--radius-md); overflow: hidden; max-width: 720px;
 }
-.phase { flex: 1; padding: var(--space-2) var(--space-3); border-right: 1px solid var(--color-divider); }
+.phase { flex: 1; padding: var(--space-2) var(--space-3); border-right: 1px solid var(--color-divider); transition: background-color var(--dur-3) var(--ease-out); }
 .phase:last-child { border-right: 0; }
 .phase.current { background: var(--color-accent-100); }
 .phase-k { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-neutral-600); }
@@ -367,29 +618,66 @@ select.input { cursor: pointer; }
   max-width: 76%; border: 1px solid var(--color-divider);
   border-radius: var(--radius-md); padding: var(--space-2) var(--space-3);
   font-size: 13px; line-height: 1.55;
+  animation: ts-rise var(--dur-3) var(--ease-out) backwards;
 }
 .bubble .at { font-size: 10.5px; color: var(--color-neutral-600); margin-top: 4px; font-variant-numeric: tabular-nums; }
 .bubble.me { align-self: flex-end; background: var(--color-accent-100); }
 .bubble.them { align-self: flex-start; background: var(--color-surface); }
 
-/* chi so profile */
+/* chi so profile / dashboard */
 .stat { display: flex; flex-direction: column; }
 .stat-n { font-family: var(--font-heading); font-size: 26px; font-variant-numeric: tabular-nums; }
 .stat-k { font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-neutral-600); }
 
-/* tab gach chan (moderation / auth) */
+/* tab gach chan (moderation) — gach chan truot ra tu trai */
 .line-tabs { display: flex; gap: var(--space-4); align-items: center; }
 .line-tab {
-  font-size: 12.5px; padding-bottom: var(--space-1); text-decoration: none;
-  border-bottom: 2px solid transparent; color: var(--color-neutral-600); cursor: pointer;
+  position: relative; font-size: 12.5px; padding-bottom: var(--space-1); text-decoration: none;
+  color: var(--color-neutral-600); cursor: pointer;
+  transition: color var(--dur-2) var(--ease-out);
+}
+.line-tab::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--color-accent); transform: scaleX(0); transform-origin: left center;
+  transition: transform var(--dur-3) var(--ease-out);
 }
 .line-tab:hover { color: var(--color-text); text-decoration: none; }
-.line-tab.active { border-bottom-color: var(--color-accent); color: var(--color-text); }
+.line-tab:hover::after { transform: scaleX(0.4); }
+.line-tab.active { color: var(--color-text); }
+.line-tab.active::after { transform: scaleX(1); }
 
+/* tab dang nhap / dang ky */
 .auth-tabs { display: flex; gap: var(--space-4); border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-2); }
-.auth-tab { font-family: var(--font-heading); font-size: 22px; color: var(--color-neutral-500); text-decoration: none; }
+.auth-tab {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 22px;
+  color: var(--color-neutral-500); text-decoration: none;
+  transition: color var(--dur-2) var(--ease-out);
+}
 .auth-tab:hover { color: var(--color-neutral-700); text-decoration: none; }
 .auth-tab.active { color: var(--color-text); }
+
+/* cham sao (Watch) — hover xem truoc: cac sao ben trai sang len */
+.stars { display: inline-flex; gap: var(--space-1); }
+.stars form { display: inline-flex; }
+.star {
+  all: unset; cursor: pointer; font-size: 20px; line-height: 1;
+  color: var(--color-neutral-400);
+  transition: color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring);
+}
+.star::before { content: "☆"; }
+.star[data-on]::before { content: "★"; }
+.star[data-on] { color: var(--color-accent); }
+.star:not(button) { cursor: default; }
+button.star:hover { transform: scale(1.22); }
+button.star:active { transform: scale(0.95); }
+.stars-hover:hover .star { color: var(--color-accent); }
+.stars-hover:hover .star::before { content: "★"; }
+.stars-hover > :hover ~ * .star, .stars-hover > :hover ~ .star { color: var(--color-neutral-400); }
+.stars-hover > :hover ~ * .star::before, .stars-hover > :hover ~ .star::before { content: "☆"; }
+button.star:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 3px; }
+
+/* nut thich — nay nhe khi bam */
+.btn-like:active { animation: ts-pop var(--dur-3) var(--ease-spring); }
 
 /* footer nho */
 .ts-footer {
@@ -398,21 +686,35 @@ select.input { cursor: pointer; }
   display: flex; align-items: baseline; gap: var(--space-4); flex-wrap: wrap;
 }
 
-/* ── mobile: sidebar thanh drawer ─────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   6. RESPONSIVE — sidebar thanh drawer + man che
+   ══════════════════════════════════════════════════════════════════════════ */
 .ts-menu-btn { display: none; }
+.ts-scrim { display: none; }
 @media (max-width: 1080px) {
   .ts-sidebar {
     position: fixed; left: 0; top: 0; z-index: 30; height: 100vh;
-    transform: translateX(-100%); transition: transform 0.18s ease;
-    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%); box-shadow: none;
+    transition: transform var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out);
   }
-  body.nav-open .ts-sidebar { transform: translateX(0); }
+  body.nav-open .ts-sidebar { transform: translateX(0); box-shadow: var(--shadow-lg); }
+  .ts-scrim {
+    display: block; position: fixed; inset: 0; z-index: 25;
+    background: color-mix(in srgb, var(--color-neutral-900) 38%, transparent);
+    opacity: 0; pointer-events: none;
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+  body.nav-open .ts-scrim { opacity: 1; pointer-events: auto; }
+  body.nav-open { overflow: hidden; }
   .ts-menu-btn {
     display: inline-flex; align-items: center; justify-content: center;
     width: 36px; height: 36px; flex: none; cursor: pointer;
     border: 1px solid var(--color-divider); border-radius: var(--radius-md);
     background: transparent; font-size: 16px; color: var(--color-text);
+    transition: background-color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), transform var(--dur-1) var(--ease-out);
   }
+  .ts-menu-btn:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+  .ts-menu-btn:active { transform: scale(0.94); }
   .ts-header { padding: var(--space-2) var(--space-3); }
   .ts-content { padding: var(--space-4); }
   .ts-footer { padding: var(--space-3) var(--space-4); }
@@ -424,4 +726,5 @@ select.input { cursor: pointer; }
 }
 @media (max-width: 560px) {
   .grid-4, .grid-2 { grid-template-columns: 1fr; }
+  .ts-user-name { display: none; }
 }

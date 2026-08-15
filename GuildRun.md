@@ -141,7 +141,7 @@ php artisan serve
 
 Mở lần lượt và đối chiếu:
 
-- [ ] `http://localhost:8000` — trang chủ kiểu "Classical": nền giấy, chữ Cormorant Garamond, **sidebar trái** có các nhóm nav đánh số 01→04, hero + "Đang thịnh hành" + lưới video
+- [ ] `http://localhost:8000` — trang chủ: nền giấy ấm, chữ Public Sans, **sidebar trái** có các nhóm nav đánh số 01→04, hero + "Đang thịnh hành" + lưới video (viền trên màu theo thể loại, nội dung fade-in so le khi vào trang)
 - [ ] `http://localhost:8000/sitemap` — sơ đồ 10 nhóm màn hình (yêu cầu đề bài, có link ở chân sidebar + footer)
 - [ ] `http://localhost:8000/login` — đăng nhập `admin@talentstage.test / Admin@123` → sidebar hiện thêm nhóm **05 · Quản trị**
 - [ ] Đăng xuất → đăng nhập `creator1@talentstage.test` → header hiện nút **"Đăng video · Upload"**

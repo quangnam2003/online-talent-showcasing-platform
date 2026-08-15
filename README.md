@@ -13,7 +13,7 @@ Nền tảng web trưng bày tài năng trực tuyến — nơi creator đăng v
 - **Thông báo** — duyệt video, người theo dõi mới, v.v.
 - **Quản trị** — dashboard admin: người dùng, danh mục, video chờ duyệt, cuộc thi
 
-Giao diện theo phong cách Classical (nền giấy, typography Cormorant Garamond, sidebar đánh số).
+Giao diện theo design system của mockup (nền giấy ấm, typography Public Sans, sidebar đánh số, mỗi thể loại một màu, chuyển động mượt) — xem [docs/UI-DESIGN.md](docs/UI-DESIGN.md).
 
 ## Công nghệ
 

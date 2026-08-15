@@ -36,7 +36,7 @@
                         @if ($video->description)
                             <span style="font-size: 12.5px; color: var(--color-neutral-700); line-height: 1.55">{{ \Illuminate\Support\Str::limit($video->description, 120) }}</span>
                         @endif
-                        <span class="meta">{{ $video->category->name }} · {{ number_format($video->views) }} lượt xem · ♡ {{ number_format($video->likes_count) }}</span>
+                        <span class="meta"><span style="color: {{ $video->category->colorVar() }}; font-weight: 600">{{ $video->category->name }}</span> · {{ number_format($video->views) }} lượt xem · ♡ {{ number_format($video->likes_count) }}</span>
                     </div>
                 </a>
             </div>

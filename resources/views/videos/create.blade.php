@@ -81,13 +81,12 @@
             <tbody>
                 @forelse ($myUploads as $up)
                     @php
-                        $c = ['pending' => 'var(--color-neutral-500)', 'approved' => 'var(--color-accent-700)', 'rejected' => 'var(--color-neutral-800)'][$up->status];
                         $t = ['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'][$up->status];
                     @endphp
                     <tr>
                         <td><a href="{{ route('videos.show', $up) }}">{{ \Illuminate\Support\Str::limit($up->title, 32) }}</a></td>
                         <td class="num" style="color: var(--color-neutral-600)">{{ $up->created_at->format('d/m H:i') }}</td>
-                        <td><span class="tag" style="font-size: 10px; border: 1px solid {{ $c }}; color: {{ $c }}">{{ $t }}</span></td>
+                        <td><span class="tag tag-status" data-status="{{ $up->status }}">{{ $t }}</span></td>
                     </tr>
                 @empty
                     <tr><td colspan="3" class="muted-i">Bạn chưa đăng video nào.</td></tr>

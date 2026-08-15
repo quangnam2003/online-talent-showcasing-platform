@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'TalentStage — Sân khấu tài năng trực tuyến')</title>
+    {{-- preload 2 subset Public Sans hay dung nhat de tranh nhay chu khi vao trang --}}
+    <link rel="preload" href="{{ asset('fonts/public-sans-vf-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/public-sans-vf-vietnamese.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('css/talentstage.css') }}">
+    <script src="{{ asset('js/talentstage.js') }}" defer></script>
 </head>
 <body>
 <div class="ts-shell">
+    <div class="ts-scrim" aria-hidden="true"></div>
 
     {{-- ═══ SIDEBAR — 4 nhom nav danh so, giong mockup ═══ --}}
     <aside class="ts-sidebar">
@@ -116,16 +121,18 @@
     <main class="ts-main">
 
         <header class="ts-header">
-            <button class="ts-menu-btn" type="button" onclick="document.body.classList.toggle('nav-open')" aria-label="Mở menu">☰</button>
+            <button class="ts-menu-btn" type="button" onclick="tsToggleNav()" aria-label="Mở menu">☰</button>
 
             <form class="search" method="GET" action="{{ url('/explore') }}">
                 <input class="input" type="search" name="q" value="{{ request('q') }}"
                        placeholder="Tìm tài năng, thể loại, creator… / Search talent">
             </form>
 
+            {{-- chip the loai: moi the loai mot sac (--cat), chip dang chon duoc danh dau --}}
             <div class="ts-header-tags">
                 @foreach ($navCategories ?? [] as $cat)
-                    <a class="tag tag-outline" style="font-size: 10.5px"
+                    <a class="cat-chip {{ request('category') === $cat->slug ? 'active' : '' }}"
+                       style="--cat: {{ $cat->colorVar() }}"
                        href="{{ url('/explore?category='.$cat->slug) }}">{{ $cat->name }}</a>
                 @endforeach
             </div>
@@ -135,7 +142,7 @@
                     <a class="btn btn-primary btn-sm" href="{{ url('/videos/create') }}">Đăng video · Upload</a>
                 @endif
                 @auth
-                    <a href="{{ url('/users/'.$me->id) }}" style="display: flex; align-items: center; gap: var(--space-2); text-decoration: none; color: inherit">
+                    <a class="ts-user" href="{{ url('/users/'.$me->id) }}">
                         <span class="avatar">
                             @if ($me->avatar)
                                 <img src="{{ asset('storage/'.$me->avatar) }}" alt="{{ $me->name }}">
@@ -143,7 +150,7 @@
                                 {{ mb_substr($me->name, 0, 1) }}
                             @endif
                         </span>
-                        <span style="display: flex; flex-direction: column">
+                        <span class="ts-user-name" style="display: flex; flex-direction: column">
                             <span style="font-size: 12.5px">{{ $me->name }}</span>
                             <span class="muted-i" style="font-size: 10px">{{ ucfirst($me->role) }}</span>
                         </span>
@@ -158,15 +165,15 @@
 
             {{-- flash --}}
             @if (session('success'))
-                <div class="flash">
+                <div class="flash" role="status">
                     <span>{{ session('success') }}</span>
-                    <button type="button" onclick="this.closest('.flash').remove()" aria-label="Đóng">×</button>
+                    <button type="button" onclick="tsDismiss(this)" aria-label="Đóng">×</button>
                 </div>
             @endif
             @if (session('error'))
-                <div class="flash flash-error">
+                <div class="flash flash-error" role="alert">
                     <span>{{ session('error') }}</span>
-                    <button type="button" onclick="this.closest('.flash').remove()" aria-label="Đóng">×</button>
+                    <button type="button" onclick="tsDismiss(this)" aria-label="Đóng">×</button>
                 </div>
             @endif
 
@@ -197,15 +204,7 @@
     </main>
 </div>
 
-{{-- dong drawer khi bam ra ngoai (mobile) --}}
-<script>
-document.addEventListener('click', function (e) {
-    if (document.body.classList.contains('nav-open')
-        && !e.target.closest('.ts-sidebar') && !e.target.closest('.ts-menu-btn')) {
-        document.body.classList.remove('nav-open');
-    }
-});
-</script>
+{{-- tuong tac giao dien (drawer, flash, panel mo/dong) nam trong public/js/talentstage.js --}}
 @stack('scripts')
 </body>
 </html>

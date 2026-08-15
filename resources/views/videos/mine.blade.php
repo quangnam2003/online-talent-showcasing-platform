@@ -19,16 +19,15 @@
     <tbody>
         @forelse ($videos as $video)
             @php
-                $c = ['pending' => 'var(--color-neutral-500)', 'approved' => 'var(--color-accent-700)', 'rejected' => 'var(--color-neutral-800)'][$video->status];
                 $t = ['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'][$video->status];
             @endphp
             <tr>
                 <td><a href="{{ route('videos.show', $video) }}">{{ \Illuminate\Support\Str::limit($video->title, 40) }}</a></td>
-                <td>{{ $video->category->name }}</td>
+                <td><span style="color: {{ $video->category->colorVar() }}; font-weight: 600; font-size: 12px">{{ $video->category->name }}</span></td>
                 <td class="muted-i">{{ $video->privacy === 'public' ? 'Công khai' : 'Riêng tư' }}</td>
                 <td class="num">{{ number_format($video->views) }}</td>
                 <td class="num">{{ number_format($video->likes_count) }}</td>
-                <td><span class="tag" style="font-size: 10px; border: 1px solid {{ $c }}; color: {{ $c }}">{{ $t }}</span></td>
+                <td><span class="tag tag-status" data-status="{{ $video->status }}">{{ $t }}</span></td>
                 <td class="num" style="color: var(--color-neutral-600)">{{ $video->created_at->format('d/m H:i') }}</td>
                 <td>
                     <div style="display: flex; gap: var(--space-1); justify-content: flex-end">

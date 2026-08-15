@@ -7,7 +7,7 @@
 @section('content')
 {{-- ── Hero + Trending (bo cuc 1.6fr / 1fr nhu mockup) ── --}}
 <section style="display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--space-6); align-items: stretch" class="grid-hero">
-    <div class="plate hatch" style="position: relative; min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; padding: var(--space-6)">
+    <div class="plate hatch hero-plate" style="min-height: 300px; display: flex; flex-direction: column; justify-content: flex-end; padding: var(--space-6)">
         @if ($featured)
             @if ($featured->thumbnail && file_exists(public_path('storage/'.$featured->thumbnail)))
                 <img src="{{ asset('storage/'.$featured->thumbnail) }}" alt=""
@@ -15,20 +15,20 @@
             @else
                 <span class="slot-note" style="position: absolute; top: var(--space-4); left: var(--space-4)">[ hero — ảnh sân khấu tài năng nổi bật ]</span>
             @endif
-            <div style="position: relative; background: var(--color-bg); border: 1px solid var(--color-divider); padding: var(--space-4); max-width: 460px">
+            <div class="hero-box">
                 <div class="kicker">Nổi bật · Featured</div>
-                <h2 style="font-weight: 400; font-size: 30px; margin: var(--space-1) 0 var(--space-2)">{{ $featured->title }}</h2>
-                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; text-align: justify; color: var(--color-neutral-800)">
+                <h2 style="font-size: 30px; margin: var(--space-1) 0 var(--space-2)">{{ $featured->title }}</h2>
+                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; line-height: 1.55; color: var(--color-neutral-800)">
                     {{ \Illuminate\Support\Str::limit($featured->description ?? 'Tiết mục của '.$featured->user->name.' trong thể loại '.$featured->category->name.'.', 150) }}
                 </p>
                 <a class="btn btn-primary btn-sm" href="{{ url('/videos/'.$featured->id) }}">Xem ngay · Watch</a>
             </div>
         @else
             <span class="slot-note" style="position: absolute; top: var(--space-4); left: var(--space-4)">[ hero — ảnh sân khấu tài năng nổi bật ]</span>
-            <div style="position: relative; background: var(--color-bg); border: 1px solid var(--color-divider); padding: var(--space-4); max-width: 460px">
+            <div class="hero-box">
                 <div class="kicker">Sân khấu đang chờ · Stage awaits</div>
-                <h2 style="font-weight: 400; font-size: 30px; margin: var(--space-1) 0 var(--space-2)">Tiết mục đầu tiên là của bạn</h2>
-                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; text-align: justify; color: var(--color-neutral-800)">
+                <h2 style="font-size: 30px; margin: var(--space-1) 0 var(--space-2)">Tiết mục đầu tiên là của bạn</h2>
+                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; line-height: 1.55; color: var(--color-neutral-800)">
                     Chưa có video nào được duyệt. Đăng ký làm creator, tải video lên và trở thành gương mặt nổi bật đầu tiên của TalentStage.
                 </p>
                 @guest
@@ -64,10 +64,10 @@
     </div>
     <div class="grid-4">
         @forelse ($videos as $video)
-            <a class="card video-card" href="{{ url('/videos/'.$video->id) }}">
-                <div class="video-thumb hatch-mid">
+            <a class="card video-card" href="{{ url('/videos/'.$video->id) }}" style="--cat: {{ $video->category->colorVar() }}">
+                <div class="video-thumb">
                     @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)))
-                        <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}">
+                        <img src="{{ asset('storage/'.$video->thumbnail) }}" alt="{{ $video->title }}" loading="lazy">
                     @else
                         <span class="slot-note">[ thumbnail ]</span>
                     @endif
@@ -92,9 +92,9 @@
         <h3 style="font-size: 20px; margin: 0">Cuộc thi · Contest</h3>
         <div class="grid-2" style="grid-template-columns: repeat(3, 1fr)">
             @foreach ($contests as $contest)
-                <a class="card" href="{{ url('/contests/'.$contest->id) }}" style="text-decoration: none; color: inherit; gap: var(--space-1)">
+                <a class="card" href="{{ url('/contests/'.$contest->id) }}" style="gap: var(--space-1)">
                     <div class="card-kicker">{{ $contest->statusLabel() }}</div>
-                    <span class="card-title" style="font-size: 19px; font-weight: 400">{{ $contest->title }}</span>
+                    <span class="card-title" style="font-size: 19px">{{ $contest->title }}</span>
                     <span class="meta">
                         Nhận bài {{ $contest->start_at->format('d/m') }} — {{ $contest->submission_deadline->format('d/m') }}
                         · Công bố {{ $contest->end_at->format('d/m') }}

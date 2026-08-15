@@ -37,7 +37,7 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: var(--space-2)">
-            <h2 style="font-weight: 400; font-size: 28px; margin: 0">{{ $video->title }}</h2>
+            <h2 style="font-size: 28px; margin: 0">{{ $video->title }}</h2>
 
             {{-- hang: tac gia + follow + like/share --}}
             <div class="watch-actions" style="display: flex; align-items: center; gap: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-divider); flex-wrap: wrap">
@@ -69,7 +69,7 @@
                         <form method="POST" action="{{ route('reactions.store', $video) }}">
                             @csrf
                             <input type="hidden" name="action" value="like">
-                            <button class="btn btn-ghost btn-sm num">
+                            <button class="btn btn-ghost btn-sm num btn-like" aria-pressed="{{ $myReaction?->liked ? 'true' : 'false' }}">
                                 {{ $myReaction?->liked ? '♥' : '♡' }} Thích {{ number_format($video->likes_count) }}
                             </button>
                         </form>
@@ -83,26 +83,25 @@
             {{-- hang: cham sao --}}
             <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap">
                 <span class="label-up" style="font-size: 12px">Chấm điểm tài năng</span>
-                <div style="display: flex; gap: var(--space-1)">
+                {{-- .stars-hover: re chuot xem truoc so sao se cham; .star[data-on] = sao dang sang --}}
+                <div class="stars @auth stars-hover @endauth" role="group" aria-label="Chấm điểm">
                     @for ($n = 1; $n <= 5; $n++)
                         @auth
-                            <form method="POST" action="{{ route('reactions.store', $video) }}" style="display: inline">
+                            <form method="POST" action="{{ route('reactions.store', $video) }}">
                                 @csrf
                                 <input type="hidden" name="action" value="rate">
                                 <input type="hidden" name="stars" value="{{ $n }}">
-                                <button style="all: unset; cursor: pointer; font-size: 20px; line-height: 1; color: {{ $n <= ($myReaction?->stars ?? 0) ? 'var(--color-accent)' : 'var(--color-neutral-400)' }}">
-                                    {{ $n <= ($myReaction?->stars ?? 0) ? '★' : '☆' }}
-                                </button>
+                                <button class="star" @if ($n <= ($myReaction?->stars ?? 0)) data-on @endif
+                                        aria-label="Chấm {{ $n }} sao" title="{{ $n }} sao"></button>
                             </form>
                         @else
-                            <span style="font-size: 20px; line-height: 1; color: {{ $n <= round($video->avg_rating) ? 'var(--color-accent)' : 'var(--color-neutral-400)' }}">
-                                {{ $n <= round($video->avg_rating) ? '★' : '☆' }}
-                            </span>
+                            <span class="star" @if ($n <= round($video->avg_rating)) data-on @endif aria-hidden="true"></span>
                         @endauth
                     @endfor
                 </div>
                 <span class="meta">{{ number_format($video->avg_rating, 1) }} / 5</span>
-                <span class="tag tag-outline" style="font-size: 10px; margin-left: auto">{{ $video->category->name }}</span>
+                <a class="cat-chip" style="--cat: {{ $video->category->colorVar() }}; margin-left: auto"
+                   href="{{ url('/explore?category='.$video->category->slug) }}">{{ $video->category->name }}</a>
             </div>
 
             @if ($video->description)
@@ -137,7 +136,7 @@
                             {{ mb_substr($comment->user->name, 0, 1) }}
                         @endif
                     </span>
-                    <div style="display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1">
+                    <div style="display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1" data-reveal-scope>
                         <span style="font-size: 12.5px">
                             <a href="{{ route('users.show', $comment->user) }}">{{ $comment->user->name }}</a>
                             @if ($comment->user->isMentor()) <span class="tag tag-accent" style="font-size: 9px">Mentor</span> @endif
@@ -149,7 +148,7 @@
                             @auth
                                 @if ($video->allow_comments)
                                     <button type="button" class="btn btn-ghost btn-xs" style="padding-left: 0"
-                                            onclick="const f = this.closest('div').parentElement.querySelector('.reply-form'); f.style.display = f.style.display === 'none' ? 'flex' : 'none'">
+                                            aria-expanded="false" onclick="tsToggle(this, '.reply-form')">
                                         Trả lời · Reply
                                     </button>
                                 @endif
@@ -163,11 +162,14 @@
                         </div>
 
                         @auth
-                            <form method="POST" action="{{ route('comments.store', $video) }}" class="reply-form" style="display: none; gap: var(--space-2)">
+                            {{-- panel tra loi: .reveal mo/dong muot (grid-rows 0fr → 1fr) --}}
+                            <form method="POST" action="{{ route('comments.store', $video) }}" class="reveal reply-form" style="margin-top: calc(var(--space-1) * -1)">
                                 @csrf
                                 <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                                <input class="input" name="content" placeholder="Trả lời {{ $comment->user->name }}…" required style="flex: 1; font-size: 12.5px; min-height: 32px">
-                                <button class="btn btn-primary btn-xs">Gửi</button>
+                                <div class="reveal-inner" style="display: flex; gap: var(--space-2); padding-top: calc(4px + var(--space-1))">
+                                    <input class="input" name="content" placeholder="Trả lời {{ $comment->user->name }}…" required style="flex: 1; font-size: 12.5px; min-height: 32px">
+                                    <button class="btn btn-primary btn-xs">Gửi</button>
+                                </div>
                             </form>
                         @endauth
 
