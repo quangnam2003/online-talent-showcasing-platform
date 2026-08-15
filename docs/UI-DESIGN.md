@@ -34,8 +34,8 @@ Toàn bộ tokens/components đã port sang **`public/css/talentstage.css`**; fo
 
 | Mockup | Trang thật | Trạng thái | Ghi chú chuyển đổi |
 |---|---|---|---|
-| Discover | `/` (home) + `/explore` | ✅ home xong | Hero plate + card nổi bật đè góc, trending 6 hàng rank vàng, lưới 4 cột; explore thêm ô lọc + sort |
-| Auth | `/login`, `/register` | ✅ xong | Tab Cormorant; mockup chọn "thể loại tài năng" → đổi thành chọn vai trò Creator/Mentor bằng `.seg` (DB yêu cầu role) |
+| Discover | `/` (home) + `/explore` | Đã xong (home) | Hero plate + card nổi bật đè góc, trending 6 hàng rank vàng, lưới 4 cột; explore thêm ô lọc + sort |
+| Auth | `/login`, `/register` | Đã xong | Tab Cormorant; mockup chọn "thể loại tài năng" → đổi thành chọn vai trò Creator/Mentor bằng `.seg` (DB yêu cầu role) |
 | Watch | `/videos/{id}` | FR2/FR4 | 1.9fr/1fr; player trái, sao chấm điểm (glyph ★☆ vàng), bình luận dưới; cột phải: nhận xét mentor + "Xem tiếp" |
 | Profile | `/users/{id}`, `/profile/edit` | FR1 | Avatar `.plate` 168px, tên Cormorant 34px, chip thể loại, 4 `.stat`; hành động cột phải; lưới video 4 cột |
 | Upload | `/videos/create` + `/my-videos` | FR2 | Form trái (khung kéo-thả `.plate` dashed) + bảng "Trạng thái duyệt" phải; **giới hạn 100MB** (mockup ghi 500MB — theo php.ini thực tế); privacy chỉ 2 mức public/private (DB enum) |
