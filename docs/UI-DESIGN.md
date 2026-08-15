@@ -49,6 +49,7 @@ Một bộ token dùng chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-s
 
 | Mockup | Trang thật | Trạng thái | Ghi chú chuyển đổi |
 |---|---|---|---|
+<<<<<<< HEAD
 | Discover | `/` (home) + `/explore` | ✅ xong | Hero plate + card nổi bật đè góc, trending 6 hàng rank vàng, lưới 4 cột thẻ màu thể loại; explore: ô lọc + sort + dãy `.cat-chip` |
 | Auth | `/login`, `/register` | ✅ xong | Tab heading 22px; mockup chọn "thể loại tài năng" → đổi thành chọn vai trò Creator/Mentor bằng `.seg` (DB yêu cầu role) |
 | Watch | `/videos/{id}` | ✅ xong | 1.9fr/1fr; player trái, sao chấm điểm `.stars-hover` (xem trước khi rê), chip thể loại, bình luận + form trả lời `.reveal`; cột phải: nhận xét mentor + "Xem tiếp" |
@@ -59,6 +60,18 @@ Một bộ token dùng chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-s
 | Groups | `/groups`, `/groups/{id}` | ✅ xong | 300px danh sách nhóm trái + bảng thảo luận phải; form đăng bài inline; người ngoài chỉ thấy mô tả + nút Join |
 | Mentorship | `/messages`, `/messages/{user}` | ✅ xong | 3 cột mockup → thu còn 2: threads trái (viền trái vàng khi active) + khung chat `.bubble` (me = accent-100, them = surface); phần sessions/feedback-mốc-thời-gian ngoài phạm vi DB |
 | Feed | `/feed` | ✅ xong | Card hoạt động: avatar + "ai · làm gì · khi nào", thumbnail 200×118 + tiêu đề (tên thể loại tô màu); cột phải "Gợi ý theo dõi" |
+=======
+| Discover | `/` (home) + `/explore` | Đã xong (home) | Hero plate + card nổi bật đè góc, trending 6 hàng rank vàng, lưới 4 cột; explore thêm ô lọc + sort |
+| Auth | `/login`, `/register` | Đã xong | Tab Cormorant; mockup chọn "thể loại tài năng" → đổi thành chọn vai trò Creator/Mentor bằng `.seg` (DB yêu cầu role) |
+| Watch | `/videos/{id}` | FR2/FR4 | 1.9fr/1fr; player trái, sao chấm điểm (glyph ★☆ vàng), bình luận dưới; cột phải: nhận xét mentor + "Xem tiếp" |
+| Profile | `/users/{id}`, `/profile/edit` | FR1 | Avatar `.plate` 168px, tên Cormorant 34px, chip thể loại, 4 `.stat`; hành động cột phải; lưới video 4 cột |
+| Upload | `/videos/create` + `/my-videos` | FR2 | Form trái (khung kéo-thả `.plate` dashed) + bảng "Trạng thái duyệt" phải; **giới hạn 100MB** (mockup ghi 500MB — theo php.ini thực tế); privacy chỉ 2 mức public/private (DB enum) |
+| Moderation | `/admin/videos` | FR8 | Tab gạch chân (Chờ duyệt/Đã xử lý), hàng đợi card ngang thumbnail 128×76 + nút Duyệt/Từ chối; panel "Từ chối kèm lý do" cố định bên phải (không dùng modal). Phần "Reported content/Suspend" để dạng khóa user (`is_active`) |
+| Contest | `/contests`, `/contests/{id}` | FR7 | `.phase-strip` 4 pha từ 3 mốc thời gian (pha hiện tại nền accent-100), leaderboard rank vàng, lưới bài dự thi + nút Bình chọn (1 phiếu/user) |
+| Groups | `/groups`, `/groups/{id}` | FR5 | 300px danh sách nhóm trái + bảng thảo luận phải; form đăng bài inline; người ngoài chỉ thấy mô tả + nút Join |
+| Mentorship | `/messages`, `/messages/{user}` | FR6 | 3 cột mockup → thu còn 2: threads trái (viền trái vàng khi active) + khung chat `.bubble` (me = accent-100, them = surface); phần sessions/feedback-mốc-thời-gian ngoài phạm vi DB |
+| Feed | `/feed` | FR4 (tùy chọn) | Card hoạt động: avatar + "ai · làm gì · khi nào", thumbnail 200×118 + tiêu đề; cột phải "Gợi ý theo dõi" + nhắc cuộc thi |
+>>>>>>> 788dda2eae2480944e2f56f3b830320a2636d062
 
 ## 6. Quy tắc khi dựng màn hình mới
 
