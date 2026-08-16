@@ -262,6 +262,58 @@
     });
   });
 
+  /* ── mat khau + nhap lai (form dang ky): kiem tra ngay khi go ───────────
+       [data-password-pair] chua input[data-pw] (minlength) va input[data-pw-confirm];
+       tich xanh khi du dai / khop, x do khi chua; chan submit va bao "nhap lai"
+       thay vi de server tra ve trang moi. */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-password-pair]').forEach(function (pair) {
+      var pw = pair.querySelector('[data-pw]');
+      var cf = pair.querySelector('[data-pw-confirm]');
+      if (!pw || !cf) return;
+      var pwWrap = pw.closest('.input-wrap'), cfWrap = cf.closest('.input-wrap');
+      var pwHint = pair.querySelector('[data-pw-hint]'), cfHint = pair.querySelector('[data-pw-confirm-hint]');
+      var min = parseInt(pw.getAttribute('minlength') || '8', 10) || 8;
+      var form = pair.closest('form');
+      var touchedCf = false;
+
+      function setState(wrap, hint, state, text) {
+        if (wrap) { wrap.classList.remove('is-ok', 'is-bad'); if (state) wrap.classList.add(state); }
+        if (hint) { hint.classList.remove('is-ok', 'is-bad'); if (state) hint.classList.add(state); if (text !== undefined) hint.textContent = text; }
+      }
+      function checkPw() {
+        var v = pw.value;
+        if (!v) { setState(pwWrap, pwHint, null, 'Ít nhất ' + min + ' ký tự.'); return false; }
+        if (v.length < min) { setState(pwWrap, pwHint, 'is-bad', 'Còn thiếu ' + (min - v.length) + ' ký tự (tối thiểu ' + min + ').'); return false; }
+        setState(pwWrap, pwHint, 'is-ok', 'Mật khẩu hợp lệ.'); return true;
+      }
+      function checkCf(force) {
+        var v = cf.value;
+        if (!v) { setState(cfWrap, cfHint, force ? 'is-bad' : null, force ? 'Vui lòng nhập lại mật khẩu.' : ''); cf.setCustomValidity(force ? 'Vui lòng nhập lại mật khẩu.' : ''); return false; }
+        if (v !== pw.value) {
+          if (touchedCf || force) setState(cfWrap, cfHint, 'is-bad', 'Mật khẩu chưa khớp — vui lòng nhập lại.');
+          cf.setCustomValidity('Mật khẩu chưa khớp — vui lòng nhập lại.');
+          return false;
+        }
+        setState(cfWrap, cfHint, 'is-ok', 'Mật khẩu khớp.'); cf.setCustomValidity(''); return true;
+      }
+      pw.addEventListener('input', function () { checkPw(); if (cf.value) checkCf(false); });
+      cf.addEventListener('input', function () { touchedCf = true; checkCf(false); });
+      cf.addEventListener('blur', function () { if (cf.value) { touchedCf = true; checkCf(true); } });
+      if (form) form.addEventListener('submit', function (e) {
+        var okPw = checkPw(), okCf = checkCf(true);
+        if (!okPw || !okCf) {
+          e.preventDefault();
+          var target = !okPw ? pw : cf;
+          target.focus({ preventScroll: false }); target.select && target.select();
+          var wrap = target.closest('.input-wrap'); if (wrap) { wrap.classList.remove('shake'); void wrap.offsetWidth; wrap.classList.add('shake'); }
+        }
+      });
+      // khoi phuc trang thai neu trinh duyet tu dien lai
+      if (pw.value) checkPw();
+    });
+  });
+
   /* ── flash: mo dan roi go khoi DOM ───────────────────────────────────── */
   window.tsDismiss = function (btn) {
     var el = btn.closest('.flash');

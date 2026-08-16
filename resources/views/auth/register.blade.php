@@ -50,15 +50,24 @@
                 @error('role') <span class="err-msg">{{ $message }}</span> @enderror
             </div>
 
-            <div class="grid-2" style="gap: var(--space-4)">
+            {{-- Mat khau + nhap lai: kiem tra ngay tren trinh duyet (tich xanh / x do), chan submit khi chua khop --}}
+            <div class="grid-2" style="gap: var(--space-4)" data-password-pair>
                 <label class="field">
                     <span class="label-up">Mật khẩu</span>
-                    <input class="input @error('password') is-invalid @enderror" type="password" name="password"
-                           placeholder="Ít nhất 8 ký tự" required>
+                    <span class="input-wrap">
+                        <input class="input @error('password') is-invalid @enderror" type="password" name="password"
+                               placeholder="Ít nhất 8 ký tự" required minlength="8" autocomplete="new-password" data-pw>
+                        <span class="input-check" aria-hidden="true"><x-icon name="check" size="13" class="ico-ok" /><x-icon name="x" size="13" class="ico-bad" /></span>
+                    </span>
+                    <span class="field-hint" data-pw-hint>Ít nhất 8 ký tự.</span>
                 </label>
                 <label class="field">
                     <span class="label-up">Nhập lại mật khẩu</span>
-                    <input class="input" type="password" name="password_confirmation" placeholder="Nhập lại mật khẩu" required>
+                    <span class="input-wrap">
+                        <input class="input" type="password" name="password_confirmation" placeholder="Nhập lại mật khẩu" required autocomplete="new-password" data-pw-confirm>
+                        <span class="input-check" aria-hidden="true"><x-icon name="check" size="13" class="ico-ok" /><x-icon name="x" size="13" class="ico-bad" /></span>
+                    </span>
+                    <span class="field-hint" data-pw-confirm-hint role="status" aria-live="polite"></span>
                 </label>
             </div>
             @error('password') <span class="err-msg" style="margin-top: calc(var(--space-2) * -1)">{{ $message }}</span> @enderror
