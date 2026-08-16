@@ -41,7 +41,9 @@ class RegisterController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
+        // Flash + hop thoai chao mung (layout hien dialog khi co session("welcome"))
         return redirect()->route('home')
-            ->with('success', 'Đăng ký thành công! Chào mừng bạn đến với TalentStage.');
+            ->with('success', 'Tạo tài khoản thành công! Chào mừng bạn đến với TalentStage.')
+            ->with('welcome', ['name' => $user->name, 'role' => $user->role]);
     }
 }

@@ -22,7 +22,7 @@
             <label class="field">
                 <span class="label-up">Họ tên</span>
                 <input class="input @error('name') is-invalid @enderror" type="text" name="name"
-                       value="{{ old('name') }}" placeholder="Nguyễn Hà Vi" required autofocus>
+                       value="{{ old('name') }}" placeholder="Nguyễn Quang Nam" required autofocus>
                 @error('name') <span class="err-msg">{{ $message }}</span> @enderror
             </label>
 

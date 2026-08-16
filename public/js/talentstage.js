@@ -314,6 +314,23 @@
     });
   });
 
+  /* ── hop thoai (.dialog-backdrop[data-dialog]): dong bang nut / Esc / bam nen ── */
+  window.tsCloseDialog = function (el) {
+    var box = el && el.closest ? el.closest('.dialog-backdrop') : el;
+    if (!box || box.classList.contains('is-leaving')) return;
+    box.classList.add('is-leaving');
+    setTimeout(function () { box.remove(); }, 240);
+  };
+  document.addEventListener('click', function (e) {
+    if (e.target.classList && e.target.classList.contains('dialog-backdrop')) window.tsCloseDialog(e.target);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.querySelectorAll('.dialog-backdrop[data-dialog]').forEach(window.tsCloseDialog);
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    var d = document.querySelector('.dialog-backdrop[data-dialog] .btn'); if (d) d.focus();
+  });
+
   /* ── flash: mo dan roi go khoi DOM ───────────────────────────────────── */
   window.tsDismiss = function (btn) {
     var el = btn.closest('.flash');

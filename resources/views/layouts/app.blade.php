@@ -265,6 +265,29 @@
     </main>
 </div>
 
+{{-- Hop thoai chao mung sau khi tao tai khoan thanh cong --}}
+@if (session('welcome'))
+    @php $w = session('welcome'); @endphp
+    <div class="dialog-backdrop" data-dialog>
+        <div class="dialog welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+            <span class="welcome-ico"><x-icon name="check" size="30" /></span>
+            <h2 id="welcomeTitle" class="dialog-title" style="font-size: 24px; margin: 0">Tạo tài khoản thành công!</h2>
+            <p class="dialog-body" style="margin: 0">
+                Chào mừng <strong>{{ $w['name'] }}</strong> đến với TalentStage. Bạn đã được đăng nhập với vai trò
+                <strong>{{ ucfirst($w['role']) }}</strong>{{ $w['role'] === 'creator' ? ' — hãy đăng tiết mục đầu tiên để bắt đầu.' : ' — hãy khám phá và kết nối với các creator.' }}
+            </p>
+            <div class="dialog-actions" style="justify-content: center; flex-wrap: wrap">
+                @if ($w['role'] === 'creator')
+                    <a class="btn btn-primary" href="{{ url('/videos/create') }}"><x-icon name="upload" size="15" /> Đăng tiết mục đầu tiên</a>
+                @else
+                    <a class="btn btn-primary" href="{{ url('/explore') }}"><x-icon name="compass" size="15" /> Khám phá tài năng</a>
+                @endif
+                <button type="button" class="btn btn-secondary" onclick="tsCloseDialog(this)">Để sau</button>
+            </div>
+        </div>
+    </div>
+@endif
+
 @stack('scripts')
 </body>
 </html>

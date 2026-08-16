@@ -398,6 +398,14 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
 .dialog-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 20px; }
 .dialog-body { font-size: 14px; opacity: 0.85; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+.dialog-backdrop.is-leaving { opacity: 0; transition: opacity var(--dur-2) var(--ease-out); }
+.dialog-backdrop.is-leaving .dialog { transform: translateY(6px) scale(0.98); opacity: 0; transition: transform var(--dur-2) var(--ease-out), opacity var(--dur-2) var(--ease-out); }
+.dialog.welcome { align-items: center; text-align: center; padding: var(--space-6); }
+.welcome-ico {
+  width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+  background: color-mix(in oklch, var(--c-sport) 16%, transparent); color: var(--c-sport);
+  animation: ts-pop var(--dur-4) var(--ease-spring) 120ms backwards;
+}
 
 /* ── khung anh & placeholder ─────────────────────────────────────────── */
 .plate {
