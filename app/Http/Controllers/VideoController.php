@@ -186,7 +186,31 @@ class VideoController extends Controller
 
         $data['allow_comments'] = $request->boolean('allow_comments');
 
-        $video->update($data);
+        $video->fill($data);
+
+        // FR8: video da duyet ma bi sua noi dung hien thi (tieu de / mo ta / anh bia / the loai)
+        // thi phai duyet lai — tranh chieu "dang noi dung sach de duoc duyet roi sua thanh vi pham".
+        // Doi privacy / allow_comments khong thay doi noi dung nen giu nguyen trang thai;
+        // admin sua truc tiep cung khong can duyet lai.
+        $needsReview = $video->status === 'approved'
+            && ! auth()->user()->isAdmin()
+            && $video->isDirty(['title', 'description', 'thumbnail', 'category_id']);
+
+        if ($needsReview) {
+            $video->status = 'pending';
+        }
+
+        $video->save();
+
+        if ($needsReview) {
+            Notification::send(
+                User::where('role', 'admin')->where('is_active', true)->get(),
+                new VideoSubmitted($video, edited: true)
+            );
+
+            return redirect()->route('videos.mine')
+                ->with('success', 'Đã cập nhật video "'.$video->title.'". Vì nội dung thay đổi, video chuyển về trạng thái chờ duyệt lại và sẽ hiển thị công khai sau khi được duyệt.');
+        }
 
         return redirect()->route('videos.mine')->with('success', 'Đã cập nhật video.');
     }
