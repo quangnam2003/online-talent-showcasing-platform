@@ -131,7 +131,7 @@
             @endif
 
             @if ($video->description)
-                <p style="margin: var(--space-2) 0 0; font-size: 13.5px; line-height: 1.6; text-align: justify; color: var(--color-neutral-800)">{{ $video->description }}</p>
+                <p style="margin: var(--space-2) 0 0; font-size: 17px; font-weight: 700; line-height: 1.6; text-align: justify; color: var(--color-neutral-800)">{{ $video->description }}</p>
             @endif
         </div>
 
