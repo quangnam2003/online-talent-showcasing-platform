@@ -49,7 +49,8 @@
                         @if ($isFollowing)<x-icon name="check" size="14" /> Đang theo dõi @else <x-icon name="user-plus" size="14" /> Theo dõi @endif
                     </button>
                 </form>
-                @if (in_array($user->role, ['creator', 'mentor']) && in_array(auth()->user()->role, ['creator', 'mentor']))
+                {{-- FR6: chi hien nut Nhan tin cho cap vai tro doi dien creator <-> mentor --}}
+                @if (($user->role === 'creator' && auth()->user()->role === 'mentor') || ($user->role === 'mentor' && auth()->user()->role === 'creator'))
                     <a class="btn btn-secondary btn-sm" href="{{ route('messages.show', $user) }}"><x-icon name="message" size="14" /> Nhắn tin</a>
                 @endif
             @else

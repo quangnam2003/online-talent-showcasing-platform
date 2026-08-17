@@ -60,11 +60,18 @@ class MessageController extends Controller
         return redirect()->route('messages.show', $user);
     }
 
-    // Chi nhan tin giua creator <-> mentor (va khong tu nhan tin chinh minh)
+    // FR6: chi nhan tin giua hai vai tro DOI DIEN creator <-> mentor
+    // (chan creator-creator, mentor-mentor, admin va tu nhan tin chinh minh)
     private function assertMessageable(User $user): void
     {
         abort_if($user->id === auth()->id(), 404);
-        abort_unless(in_array($user->role, ['creator', 'mentor'], true), 404);
+        abort_unless($this->isMessageablePair(auth()->user(), $user), 404);
+    }
+
+    private function isMessageablePair(User $a, User $b): bool
+    {
+        return ($a->role === 'creator' && $b->role === 'mentor')
+            || ($a->role === 'mentor' && $b->role === 'creator');
     }
 
     // Gom hoi thoai: moi doi tac 1 dong voi tin moi nhat + so tin chua doc
@@ -86,17 +93,23 @@ class MessageController extends Controller
                     'unread' => $messages->where('receiver_id', $me->id)->whereNull('read_at')->count(),
                 ];
             })
-            ->filter(fn ($t) => $t->partner !== null)
+            // Loai hoi thoai sai dac ta FR6 (du lieu cu giua hai nguoi cung vai tro) —
+            // neu hien se dan toi trang 404 vi assertMessageable da chan
+            ->filter(fn ($t) => $t->partner !== null && $this->isMessageablePair($me, $t->partner))
             ->sortByDesc(fn ($t) => $t->last->created_at)
             ->values();
     }
 
-    // Nguoi co the bat dau hoi thoai moi
+    // Nguoi co the bat dau hoi thoai moi — chi vai tro doi dien (FR6)
     private function contacts()
     {
-        return User::whereIn('role', ['creator', 'mentor'])
-            ->whereKeyNot(auth()->id())
-            ->orderBy('role')
+        $me = auth()->user();
+
+        if (! in_array($me->role, ['creator', 'mentor'], true)) {
+            return collect(); // admin khong nhan tin
+        }
+
+        return User::where('role', $me->role === 'creator' ? 'mentor' : 'creator')
             ->orderBy('name')
             ->get();
     }
