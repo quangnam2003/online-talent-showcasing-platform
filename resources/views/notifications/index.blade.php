@@ -20,6 +20,7 @@
                 'like' => ['heart', 'accent'],
                 'rate' => ['star', 'accent'],
                 'comment_reaction' => ['sparkles', 'accent'],
+                'vote' => ['trophy', 'accent'],
             ][$n->data['kind'] ?? ''] ?? ['bell', 'muted'];
         @endphp
         <a class="card noti {{ $n->read_at === null ? 'is-unread' : '' }}" href="{{ url($n->data['url'] ?? '/') }}"

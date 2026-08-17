@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContestEntry;
 use App\Models\Vote;
+use App\Notifications\NewVote;
 use Illuminate\Http\RedirectResponse;
 
 class VoteController extends Controller
@@ -33,6 +34,9 @@ class VoteController extends Controller
 
         // Counter cache cho leaderboard (forceFill vi khong nam trong $fillable)
         $entry->forceFill(['votes_count' => $entry->votes()->count()])->save();
+
+        // Bao cho chu bai du thi (nguoi vote khong the la chinh chu — da chan o tren)
+        $entry->user->notify(new NewVote($me, $entry));
 
         return back()->with('success', 'Đã bình chọn cho "'.$entry->video->title.'".');
     }
