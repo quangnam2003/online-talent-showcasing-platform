@@ -195,6 +195,17 @@ class VideoController extends Controller
     {
         $this->authorizeOwner($video);
 
+        // Soft delete khong keo theo cascadeOnDelete cua contest_entries — neu xoa video
+        // dang du thi, entry mo coi se lam trang cuoc thi loi 500. Chan xoa khi video
+        // con nam trong cuoc thi chua ket thuc.
+        $inActiveContest = $video->contestEntries()
+            ->whereHas('contest', fn ($q) => $q->where('end_at', '>', now()))
+            ->exists();
+
+        if ($inActiveContest) {
+            return back()->with('error', 'Video "'.$video->title.'" đang là bài dự thi của một cuộc thi chưa kết thúc nên không thể xóa. Bạn có thể xóa sau khi cuộc thi kết thúc.');
+        }
+
         $video->delete(); // soft delete
 
         return redirect()->route('videos.mine')->with('success', 'Đã xóa video "'.$video->title.'".');

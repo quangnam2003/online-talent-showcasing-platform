@@ -48,14 +48,17 @@ class CommentController extends Controller
     public function destroy(Comment $comment): RedirectResponse
     {
         $me = auth()->user();
+
+        // Video co the da bi soft-delete — lay ca ban ghi da xoa de khong bi null
+        $video = $comment->video()->withTrashed()->first();
+
         abort_unless(
-            $me->id === $comment->user_id || $me->isAdmin() || $me->id === $comment->video->user_id,
+            $me->id === $comment->user_id || $me->isAdmin() || ($video && $me->id === $video->user_id),
             403
         );
 
-        $video = $comment->video;
         $comment->delete(); // cascade xoa ca replies (FK cascadeOnDelete)
-        $video->refreshCounters();
+        $video?->refreshCounters();
 
         return back()->with('success', 'Đã xóa bình luận.');
     }

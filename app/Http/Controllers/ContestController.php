@@ -28,7 +28,10 @@ class ContestController extends Controller
     {
         $me = auth()->user();
 
+        // whereHas('video') loai entry ma video da bi soft-delete (du lieu cu truoc khi
+        // chan xoa video dang du thi) — tranh $entry->video null lam view loi 500
         $entries = $contest->entries()
+            ->whereHas('video')
             ->with(['video.category', 'user'])
             ->orderByDesc('votes_count')
             ->orderBy('created_at')
