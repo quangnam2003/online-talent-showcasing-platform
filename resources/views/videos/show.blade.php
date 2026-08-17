@@ -82,7 +82,7 @@
                 @endauth
 
                 <div style="margin-left: auto; display: flex; gap: var(--space-2); align-items: center">
-                    @auth
+                    @if ($me && $me->id !== $video->user_id)
                         <form method="POST" action="{{ route('reactions.store', $video) }}">
                             @csrf
                             <input type="hidden" name="action" value="like">
@@ -91,8 +91,9 @@
                             </button>
                         </form>
                     @else
+                        {{-- Khach hoac chu video: chi xem so lieu, khong bam duoc --}}
                         <span class="btn btn-ghost btn-sm num" style="cursor: default"><x-icon name="heart" size="15" /> Thích {{ number_format($video->likes_count) }}</span>
-                    @endauth
+                    @endif
                     <span class="meta" style="display: inline-flex; align-items: center; gap: 4px"><x-icon name="eye" size="14" /> <span class="num">{{ number_format($video->views) }}</span> lượt xem</span>
                     @if ($video->durationLabel())
                         <span class="meta" style="display: inline-flex; align-items: center; gap: 4px"><x-icon name="clock" size="14" /> <span class="num">{{ $video->durationLabel() }}</span></span>
@@ -104,9 +105,9 @@
             <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap">
                 <span class="label-up" style="font-size: 11px">Chấm điểm</span>
                 {{-- .stars-hover: re chuot xem truoc so sao se cham; .star[data-on] = sao dang sang --}}
-                <div class="stars @auth stars-hover @endauth" role="group" aria-label="Chấm điểm">
+                <div class="stars {{ $me && $me->id !== $video->user_id ? 'stars-hover' : '' }}" role="group" aria-label="Chấm điểm">
                     @for ($n = 1; $n <= 5; $n++)
-                        @auth
+                        @if ($me && $me->id !== $video->user_id)
                             <form method="POST" action="{{ route('reactions.store', $video) }}">
                                 @csrf
                                 <input type="hidden" name="action" value="rate">
@@ -115,8 +116,9 @@
                                         aria-label="Chấm {{ $n }} sao" title="{{ $n }} sao"></button>
                             </form>
                         @else
+                            {{-- Khach hoac chu video: sao tinh, hien diem trung binh --}}
                             <span class="star" @if ($n <= round($video->avg_rating)) data-on @endif aria-hidden="true"></span>
-                        @endauth
+                        @endif
                     @endfor
                 </div>
                 <a class="cat-chip" style="--cat: {{ $video->category->colorVar() }}; margin-left: auto"

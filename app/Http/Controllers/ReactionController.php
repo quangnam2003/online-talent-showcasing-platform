@@ -14,6 +14,12 @@ class ReactionController extends Controller
     {
         abort_unless($video->isViewableBy(auth()->user()), 404);
 
+        // Chu video khong tu like / tu cham sao — tranh tu keo avg_rating, likes_count,
+        // trending_score lam lech muc "Đánh giá cao" / "Thịnh hành" o Explore
+        if (auth()->id() === $video->user_id) {
+            return back()->with('error', 'Bạn không thể tự thích hay chấm điểm video của chính mình.');
+        }
+
         $data = $request->validate([
             'action' => ['required', 'in:like,rate'],
             'stars' => ['required_if:action,rate', 'nullable', 'integer', 'between:1,5'],
