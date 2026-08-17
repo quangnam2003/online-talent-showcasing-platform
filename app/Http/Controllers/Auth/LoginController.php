@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,15 +26,19 @@ class LoginController extends Controller
             'password.required' => 'Vui lòng nhập mật khẩu.',
         ]);
 
-        // Tai khoan bi admin khoa thi bao ro rang thay vi "sai mat khau"
-        $user = User::where('email', $credentials['email'])->first();
-        if ($user && ! $user->is_active) {
-            return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Tài khoản của bạn đã bị khóa.']);
-        }
-
+        // Chi kiem tra "bi khoa" SAU khi mat khau dung — neu bao truoc, ke xau chi can email
+        // (mat khau bat ky) la do duoc tai khoan nao ton tai va bi khoa (user enumeration).
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            if (! Auth::user()->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['email' => 'Tài khoản của bạn đã bị khóa.']);
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended(route('home'))
