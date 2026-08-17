@@ -357,3 +357,111 @@
     }
   };
 })();
+
+/* ── thong bao gan thoi gian thuc: polling nhe /notifications/poll ────────
+     - Moi 8s hoi server (tam dung khi tab an, hoi ngay khi quay lai)
+     - Cap nhat so chua doc tren chuong + sidebar
+     - Thong bao moi (tao sau luc mo trang) → hien toast goc duoi phai, bam de mo */
+(function () {
+  var bell = document.getElementById('ts-bell');
+  if (!bell || !bell.dataset.notiPoll) return;
+
+  var url = bell.dataset.notiPoll;
+  var since = bell.dataset.notiSince;
+  var seen = {};
+  var INTERVAL = 8000;
+  var timer = null;
+  var busy = false;
+
+  var readUrl = bell.dataset.notiRead || '';
+  var csrf = (document.querySelector('meta[name="csrf-token"]') || {}).content || '';
+  function markRead(id) {
+    if (!readUrl || !id) return;
+    try {
+      // keepalive: request van gui du trang dang chuyen huong
+      fetch(readUrl, {
+        method: 'POST', keepalive: true, credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ id: id })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  var badges = document.querySelectorAll('[data-noti-badge]');
+  function setUnread(n) {
+    badges.forEach(function (b) {
+      var cap = b.dataset.notiBadge === 'dot' ? 9 : 99;
+      b.textContent = n > cap ? cap + '+' : String(n);
+      b.hidden = !(n > 0);
+    });
+    bell.setAttribute('aria-label', n > 0 ? 'Thông báo (' + n + ' chưa đọc)' : 'Thông báo');
+  }
+
+  var host = document.getElementById('ts-toasts');
+  function toast(item) {
+    if (!host) return;
+    var a = document.createElement('a');
+    a.className = 'ts-toast';
+    a.href = item.url || '#';
+    a.setAttribute('role', 'status');
+    a.innerHTML =
+      '<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>' +
+      '<span class="ts-toast-msg"></span>' +
+      '<button type="button" class="ts-toast-x" aria-label="Đóng">×</button>';
+    a.querySelector('.ts-toast-msg').textContent = item.message || 'Bạn có thông báo mới';
+    var close = function (e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      a.classList.add('is-leaving');
+      setTimeout(function () { a.remove(); }, 260);
+    };
+    a.querySelector('.ts-toast-x').addEventListener('click', close);
+    // Bam toast: danh dau da doc roi di toi noi dung. Neu dich la CHINH trang dang mo
+    // (chi khac #hash) thi phai tai lai — noi dung moi (binh luan vua them…) chua co trong DOM.
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var href = a.href;
+      markRead(item.id);
+      var target = document.createElement('a'); target.href = href;
+      var samePage = target.pathname === location.pathname && target.search === location.search;
+      if (samePage) {
+        location.replace(href);   // cap nhat hash de trinh duyet cuon dung cho sau khi tai lai
+        location.reload();
+      } else {
+        location.assign(href);
+      }
+    });
+    host.appendChild(a);
+    requestAnimationFrame(function () { a.classList.add('is-in'); });
+    setTimeout(close, 7000);
+    // toi da 4 toast cung luc
+    while (host.children.length > 4) host.firstElementChild.remove();
+  }
+
+  function poll() {
+    if (busy || document.hidden) return;
+    busy = true;
+    fetch(url + '?since=' + encodeURIComponent(since), {
+      headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    })
+      .then(function (r) { if (r.status === 401 || r.status === 403 || r.status === 419) { stop(); return null; } return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        setUnread(data.unread || 0);
+        (data.items || []).slice().reverse().forEach(function (item) {
+          if (seen[item.id]) return;
+          seen[item.id] = true;
+          toast(item);
+        });
+        if (data.now) since = data.now;
+      })
+      .catch(function () { /* mang chap chon: bo qua, thu lai lan sau */ })
+      .finally(function () { busy = false; });
+  }
+
+  function start() { if (!timer) timer = setInterval(poll, INTERVAL); }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
+  start();
+})();

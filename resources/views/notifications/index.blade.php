@@ -16,6 +16,7 @@
                 'follower' => ['user-plus', 'accent'],
                 'submitted' => ['upload', 'accent'],
                 'comment' => ['message', 'accent'],
+                'reply' => ['message', 'accent'],
                 'like' => ['heart', 'accent'],
                 'rate' => ['star', 'accent'],
                 'comment_reaction' => ['sparkles', 'accent'],

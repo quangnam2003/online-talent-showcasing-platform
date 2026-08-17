@@ -27,6 +27,7 @@ class CommentController extends Controller
         ]);
 
         // Tra loi chi 1 cap: parent phai la binh luan goc cua chinh video nay
+        $parent = null;
         if (! empty($data['parent_id'])) {
             $parent = Comment::find($data['parent_id']);
             if (! $parent || $parent->video_id !== $video->id || $parent->parent_id !== null) {
@@ -34,18 +35,27 @@ class CommentController extends Controller
             }
         }
 
-        Comment::create([
+        $comment = Comment::create([
             'user_id' => auth()->id(),
             'video_id' => $video->id,
-            'parent_id' => $data['parent_id'] ?? null,
+            'parent_id' => $parent?->id,
             'content' => $data['content'],
         ]);
 
         $video->refreshCounters();
 
-        // Bao cho chu video co binh luan moi (tru khi chinh chu tu binh luan)
-        if ($video->user_id !== auth()->id()) {
-            $video->user->notify(new VideoInteraction(auth()->user(), $video, 'comment'));
+        $me = auth()->user();
+
+        // Tra loi → bao cho nguoi viet binh luan goc (tru khi tu tra loi chinh minh)
+        $repliedTo = ($parent && $parent->user_id !== $me->id) ? $parent->user_id : null;
+        if ($repliedTo) {
+            $parent->user->notify(new VideoInteraction($me, $video, 'reply', null, $comment));
+        }
+
+        // Bao cho chu video co binh luan moi (tru khi chinh chu tu binh luan,
+        // hoac chu video chinh la nguoi vua duoc bao "tra loi" o tren — tranh bao doi)
+        if ($video->user_id !== $me->id && $video->user_id !== $repliedTo) {
+            $video->user->notify(new VideoInteraction($me, $video, 'comment', null, $comment));
         }
 
         return back()->with('success', 'Đã đăng bình luận.');

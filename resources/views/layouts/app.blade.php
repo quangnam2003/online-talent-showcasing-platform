@@ -9,8 +9,8 @@
     <link rel="preload" href="{{ asset('fonts/public-sans-vf-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/public-sans-vf-vietnamese.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/fonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/talentstage.css') }}">
-    <script src="{{ asset('js/talentstage.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/talentstage.css') }}?v={{ @filemtime(public_path('css/talentstage.css')) ?: 1 }}">
+    <script src="{{ asset('js/talentstage.js') }}?v={{ @filemtime(public_path('js/talentstage.js')) ?: 1 }}" defer></script>
 </head>
 <body>
 @php
@@ -59,6 +59,8 @@
     }
 @endphp
 <div class="ts-shell">
+    {{-- toast thong bao gan thoi gian thuc (JS tsNotiPoll dien vao) --}}
+    <div class="ts-toasts" id="ts-toasts" aria-live="polite" aria-atomic="false"></div>
     <div class="ts-scrim" aria-hidden="true"></div>
 
     {{-- ═══ SIDEBAR ═══ --}}
@@ -90,7 +92,9 @@
                                 <a class="ts-nav-item {{ $active ? 'active' : '' }}" href="{{ $url }}" @if ($active) aria-current="page" @endif>
                                     <x-icon :name="$icon" size="18" />
                                     <span class="ts-nav-txt">{{ $label }}</span>
-                                    @if ($badge > 0)
+                                    @if ($label === 'Thông báo')
+                                        <span class="badge" data-noti-badge="nav" @if ($badge <= 0) hidden @endif>{{ $badge > 99 ? '99+' : $badge }}</span>
+                                    @elseif ($badge > 0)
                                         <span class="badge">{{ $badge > 99 ? '99+' : $badge }}</span>
                                     @endif
                                 </a>
@@ -153,9 +157,10 @@
                     <a class="btn btn-primary btn-sm" href="{{ url('/videos/create') }}"><x-icon name="upload" size="15" /> Đăng tiết mục</a>
                 @endif
                 @auth
-                    <a class="icon-btn" href="{{ url('/notifications') }}" aria-label="Thông báo{{ $unreadNoti ? " ($unreadNoti chưa đọc)" : '' }}" title="Thông báo">
+                    <a class="icon-btn" id="ts-bell" href="{{ url('/notifications') }}" aria-label="Thông báo{{ $unreadNoti ? " ($unreadNoti chưa đọc)" : '' }}" title="Thông báo"
+                       data-noti-poll="{{ route('notifications.poll') }}" data-noti-read="{{ route('notifications.read') }}" data-noti-since="{{ now()->toIso8601String() }}">
                         <x-icon name="bell" size="18" />
-                        @if ($unreadNoti > 0)<span class="badge badge-dot">{{ $unreadNoti > 9 ? '9+' : $unreadNoti }}</span>@endif
+                        <span class="badge badge-dot" data-noti-badge="dot" @if ($unreadNoti <= 0) hidden @endif>{{ $unreadNoti > 9 ? '9+' : $unreadNoti }}</span>
                     </a>
                     <details class="menu ts-user-menu">
                         <summary class="ts-user" aria-label="Menu tài khoản">

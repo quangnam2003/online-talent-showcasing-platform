@@ -40,9 +40,21 @@
         @if ($me)
             <div style="display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap">
                 @if ($canReact)
-                    <button type="button" class="btn btn-ghost btn-xs" style="padding-left: 0" aria-expanded="false" onclick="tsToggle(this, '.react-picker')">
-                        {{ $mine ? ($types[$mine] ?? '') : '' }} Cảm xúc
-                    </button>
+                    {{-- Re chuot vao .react-wrap → bang emoji noi len (CSS :hover/:focus-within); click de mo tren cam ung --}}
+                    <div class="react-wrap">
+                        <button type="button" class="btn btn-ghost btn-xs {{ $mine ? 'is-reacted' : '' }}" style="padding-left: 0" aria-expanded="false" aria-haspopup="true" onclick="tsToggle(this, '.react-picker')">
+                            {{ $mine ? ($types[$mine] ?? '') : '' }} Cảm xúc
+                        </button>
+                        <div class="react-picker" role="group" aria-label="Chọn cảm xúc">
+                            @foreach ($types as $type => $emoji)
+                                <form method="POST" action="{{ route('comments.react', $comment) }}">
+                                    @csrf
+                                    <input type="hidden" name="type" value="{{ $type }}">
+                                    <button class="react-emoji {{ $mine === $type ? 'is-on' : '' }}" title="{{ $mine === $type ? 'Bỏ cảm xúc' : ucfirst($type) }}" aria-pressed="{{ $mine === $type ? 'true' : 'false' }}" aria-label="{{ ucfirst($type) }}">{{ $emoji }}</button>
+                                </form>
+                            @endforeach
+                        </div>
+                    </div>
                 @endif
                 @if (! $isReply && $video->allow_comments)
                     <button type="button" class="btn btn-ghost btn-xs" aria-expanded="false" onclick="tsToggle(this, '.reply-form')">Trả lời</button>
@@ -57,21 +69,6 @@
                     </form>
                 @endif
             </div>
-
-            {{-- Bang chon cam xuc --}}
-            @if ($canReact)
-                <div class="reveal react-picker">
-                    <div class="reveal-inner" style="display: flex; gap: 4px; flex-wrap: wrap">
-                        @foreach ($types as $type => $emoji)
-                            <form method="POST" action="{{ route('comments.react', $comment) }}">
-                                @csrf
-                                <input type="hidden" name="type" value="{{ $type }}">
-                                <button class="btn {{ $mine === $type ? 'btn-secondary' : 'btn-ghost' }} btn-xs" style="font-size: 16px; padding: 3px 8px; line-height: 1" title="{{ $mine === $type ? 'Bỏ cảm xúc' : ucfirst($type) }}" aria-pressed="{{ $mine === $type ? 'true' : 'false' }}">{{ $emoji }}</button>
-                            </form>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
 
             {{-- Form sua (chi chinh chu) --}}
             @if ($canEdit)

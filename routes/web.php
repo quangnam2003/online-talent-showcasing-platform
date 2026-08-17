@@ -106,6 +106,8 @@ Route::middleware('auth')->group(function () {
 
 /* ---------- Thong bao ---------- */
 Route::get('/notifications', [NotificationController::class, 'index'])->middleware('auth')->name('notifications.index');
+Route::get('/notifications/poll', [NotificationController::class, 'poll'])->middleware('auth')->name('notifications.poll');
+Route::post('/notifications/read', [NotificationController::class, 'read'])->middleware('auth')->name('notifications.read');
 
 /* ---------- Khu quan tri (FR8 + quan ly) ---------- */
 Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {

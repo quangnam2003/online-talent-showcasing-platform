@@ -62,6 +62,35 @@ class VideoInteractionNotificationTest extends TestCase
         Notification::assertNothingSent();
     }
 
+    public function test_reply_notifies_parent_author_and_video_owner_once_each(): void
+    {
+        $commenter = User::factory()->create();
+        $parent = \App\Models\Comment::create([
+            'user_id' => $commenter->id, 'video_id' => $this->video->id, 'content' => 'Bình luận gốc',
+        ]);
+
+        // Nguoi thu 3 tra loi → nguoi viet binh luan goc nhan 'reply', chu video nhan 'comment'
+        $this->actingAs($this->viewer)
+            ->post(route('comments.store', $this->video), ['content' => 'Trả lời', 'parent_id' => $parent->id]);
+
+        Notification::assertSentTo($commenter, VideoInteraction::class, fn ($n) => $n->type === 'reply');
+        Notification::assertSentTo($this->owner, VideoInteraction::class, fn ($n) => $n->type === 'comment');
+    }
+
+    public function test_reply_to_video_owner_comment_notifies_owner_only_once(): void
+    {
+        $parent = \App\Models\Comment::create([
+            'user_id' => $this->owner->id, 'video_id' => $this->video->id, 'content' => 'Chủ video bình luận',
+        ]);
+
+        $this->actingAs($this->viewer)
+            ->post(route('comments.store', $this->video), ['content' => 'Trả lời chủ', 'parent_id' => $parent->id]);
+
+        // Chu video vua la nguoi viet binh luan goc → chi 1 thong bao ('reply'), khong bao doi
+        Notification::assertSentToTimes($this->owner, VideoInteraction::class, 1);
+        Notification::assertSentTo($this->owner, VideoInteraction::class, fn ($n) => $n->type === 'reply');
+    }
+
     public function test_owner_notified_on_like_but_not_on_unlike(): void
     {
         $this->actingAs($this->viewer)->post(route('reactions.store', $this->video), ['action' => 'like']);
