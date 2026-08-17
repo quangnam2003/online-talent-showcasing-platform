@@ -123,6 +123,9 @@ class VideoController extends Controller
             ? $video->reactions()->where('user_id', $me->id)->first()
             : null;
 
+        // Tong so luot cham sao — hien canh diem trung binh "x,x / 5"
+        $ratingsCount = $video->reactions()->whereNotNull('stars')->count();
+
         $isFollowing = $me ? $me->isFollowing($video->user) : false;
 
         $upNext = Video::visible()
@@ -133,7 +136,7 @@ class VideoController extends Controller
             ->get();
 
         return view('videos.show', compact(
-            'video', 'comments', 'mentorComment', 'myReaction', 'isFollowing', 'upNext'
+            'video', 'comments', 'mentorComment', 'myReaction', 'isFollowing', 'upNext', 'ratingsCount'
         ));
     }
 

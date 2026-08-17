@@ -54,7 +54,7 @@
         @endif
 
         <div style="display: flex; flex-direction: column; gap: var(--space-2)">
-            <h1 style="font-size: 26px; margin: 0; line-height: 1.2">{{ $video->title }}</h1>
+            <h1 style="font-size: 32px; font-weight: 700; margin: 0; line-height: 1.2">{{ $video->title }}</h1>
 
             {{-- hang: tac gia + follow + like/share --}}
             <div class="watch-actions" style="display: flex; align-items: center; gap: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-divider); flex-wrap: wrap">
@@ -119,10 +119,16 @@
                         @endauth
                     @endfor
                 </div>
-                <span class="meta">{{ number_format($video->avg_rating, 1) }} / 5</span>
                 <a class="cat-chip" style="--cat: {{ $video->category->colorVar() }}; margin-left: auto"
                    href="{{ url('/explore?category='.$video->category->slug) }}">{{ $video->category->name }}</a>
             </div>
+
+            {{-- dong rieng duoi hang cham sao: diem trung binh + tong luot danh gia --}}
+            @if ($ratingsCount > 0)
+                <span class="meta">Trung bình <span class="num">{{ number_format($video->avg_rating, 1) }}</span> / 5 · <span class="num">{{ number_format($ratingsCount) }}</span> lượt đánh giá</span>
+            @else
+                <span class="meta">Chưa có lượt đánh giá</span>
+            @endif
 
             @if ($video->description)
                 <p style="margin: var(--space-2) 0 0; font-size: 13.5px; line-height: 1.6; text-align: justify; color: var(--color-neutral-800)">{{ $video->description }}</p>
