@@ -211,11 +211,11 @@ class VideoController extends Controller
                 new VideoSubmitted($video, edited: true)
             );
 
-            return redirect()->route('videos.mine')
+            return redirect()->to($this->afterManageUrl())
                 ->with('success', 'Đã cập nhật video "'.$video->title.'". Vì nội dung thay đổi, video chuyển về trạng thái chờ duyệt lại và sẽ hiển thị công khai sau khi được duyệt.');
         }
 
-        return redirect()->route('videos.mine')->with('success', 'Đã cập nhật video.');
+        return redirect()->to($this->afterManageUrl())->with('success', 'Đã cập nhật video.');
     }
 
     public function destroy(Video $video): RedirectResponse
@@ -235,7 +235,14 @@ class VideoController extends Controller
 
         $video->delete(); // soft delete
 
-        return redirect()->route('videos.mine')->with('success', 'Đã xóa video "'.$video->title.'".');
+        return redirect()->to($this->afterManageUrl())->with('success', 'Đã xóa video "'.$video->title.'".');
+    }
+
+    // Trang quay ve sau khi sua/xoa: admin → danh sach quan tri (route /my-videos gan role:creator
+    // nen admin vao se bi 403 du thao tac da thanh cong); creator → "Video cua toi"
+    private function afterManageUrl(): string
+    {
+        return auth()->user()->isAdmin() ? route('admin.videos.index') : route('videos.mine');
     }
 
     private function authorizeOwner(Video $video): void

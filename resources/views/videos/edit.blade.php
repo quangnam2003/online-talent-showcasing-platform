@@ -2,7 +2,8 @@
 
 @section('title', 'Sửa video — TalentStage')
 
-@section('screen-kicker')<a href="{{ route('videos.mine') }}">Tiết mục của tôi</a><span class="sep">/</span><span>{{ \Illuminate\Support\Str::limit($video->title, 40) }}</span>@endsection
+@php $backUrl = auth()->user()->isAdmin() ? route('admin.videos.index') : route('videos.mine'); $backLabel = auth()->user()->isAdmin() ? 'Quản lý video' : 'Tiết mục của tôi'; @endphp
+@section('screen-kicker')<a href="{{ $backUrl }}">{{ $backLabel }}</a><span class="sep">/</span><span>{{ \Illuminate\Support\Str::limit($video->title, 40) }}</span>@endsection
 @section('screen-title', 'Sửa video')
 
 @section('content')
@@ -54,7 +55,7 @@
 
     <div style="display: flex; gap: var(--space-3); align-items: center">
         <button type="submit" class="btn btn-primary btn-sm"><x-icon name="check" size="14" /> Lưu thay đổi</button>
-        <a class="btn btn-ghost btn-sm" href="{{ route('videos.mine') }}">Hủy</a>
+        <a class="btn btn-ghost btn-sm" href="{{ $backUrl }}">Hủy</a>
         <span class="muted-i">File video không thể thay đổi — muốn đổi hãy đăng video mới.</span>
     </div>
 </form>

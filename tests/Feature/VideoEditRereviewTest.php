@@ -89,10 +89,44 @@ class VideoEditRereviewTest extends TestCase
 
         $this->actingAs($admin)
             ->put(route('videos.update', $video), $this->payload($video, ['title' => 'Admin sửa tiêu đề']))
-            ->assertRedirect(route('videos.mine'));
+            ->assertRedirect(route('admin.videos.index'));
 
         $this->assertSame('approved', $video->fresh()->status);
         Notification::assertNothingSent();
+    }
+
+    public function test_admin_is_redirected_to_admin_list_not_403_after_update_and_delete(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $owner = User::factory()->create();
+        $video = $this->makeVideo($owner);
+
+        // Sua: quay ve trang quan tri, khong phai /my-videos (role:creator → admin bi 403)
+        $this->actingAs($admin)
+            ->put(route('videos.update', $video), $this->payload($video, ['title' => 'Admin sửa']))
+            ->assertRedirect(route('admin.videos.index'))
+            ->assertSessionHas('success');
+        $this->assertSame('Admin sửa', $video->fresh()->title);
+
+        // Trang dich admin mo duoc binh thuong
+        $this->actingAs($admin)->get(route('admin.videos.index'))->assertOk();
+
+        // Xoa: cung vay
+        $this->actingAs($admin)
+            ->delete(route('videos.destroy', $video))
+            ->assertRedirect(route('admin.videos.index'))
+            ->assertSessionHas('success');
+        $this->assertSoftDeleted('videos', ['id' => $video->id]);
+    }
+
+    public function test_creator_still_redirected_to_my_videos_after_update(): void
+    {
+        $owner = User::factory()->create();
+        $video = $this->makeVideo($owner);
+
+        $this->actingAs($owner)
+            ->put(route('videos.update', $video), $this->payload($video, ['privacy' => 'private']))
+            ->assertRedirect(route('videos.mine'));
     }
 
     public function test_editing_pending_video_stays_pending_without_new_notification(): void
