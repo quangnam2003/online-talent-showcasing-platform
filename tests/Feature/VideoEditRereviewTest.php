@@ -50,8 +50,8 @@ class VideoEditRereviewTest extends TestCase
     {
         Notification::fake();
 
-        $admin = User::factory()->create(['role' => 'admin'])->fresh();
-        $owner = User::factory()->create()->fresh();
+        $admin = User::factory()->create(['role' => 'admin']);
+        $owner = User::factory()->create();
         $video = $this->makeVideo($owner);
 
         $this->actingAs($owner)
@@ -66,7 +66,7 @@ class VideoEditRereviewTest extends TestCase
     {
         Notification::fake();
 
-        $owner = User::factory()->create()->fresh();
+        $owner = User::factory()->create();
         $video = $this->makeVideo($owner);
 
         $this->actingAs($owner)
@@ -83,8 +83,8 @@ class VideoEditRereviewTest extends TestCase
     {
         Notification::fake();
 
-        $admin = User::factory()->create(['role' => 'admin'])->fresh();
-        $owner = User::factory()->create()->fresh();
+        $admin = User::factory()->create(['role' => 'admin']);
+        $owner = User::factory()->create();
         $video = $this->makeVideo($owner);
 
         $this->actingAs($admin)
@@ -99,7 +99,7 @@ class VideoEditRereviewTest extends TestCase
     {
         Notification::fake();
 
-        $owner = User::factory()->create()->fresh();
+        $owner = User::factory()->create();
         $video = $this->makeVideo($owner, 'pending');
 
         $this->actingAs($owner)

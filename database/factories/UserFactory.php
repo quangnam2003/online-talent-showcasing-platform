@@ -30,6 +30,11 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            // Khai bao tuong minh de model tu factory co du thuoc tinh ngay trong bo nho —
+            // neu chi dua vao default cua DB, actingAs() se thay is_active = null va
+            // middleware EnsureUserIsActive tuong user bi khoa.
+            'role' => 'creator',
+            'is_active' => true,
         ];
     }
 
