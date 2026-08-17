@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminVideoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommentReactionController;
 use App\Http\Controllers\ContestController;
 use App\Http\Controllers\ContestEntryController;
 use App\Http\Controllers\ExploreController;
@@ -70,7 +71,9 @@ Route::get('/explore', [ExploreController::class, 'index'])->name('explore');
 Route::middleware('auth')->group(function () {
     Route::post('/videos/{video}/reaction', [ReactionController::class, 'store'])->whereNumber('video')->name('reactions.store');
     Route::post('/videos/{video}/comments', [CommentController::class, 'store'])->whereNumber('video')->name('comments.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->whereNumber('comment')->name('comments.update');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->whereNumber('comment')->name('comments.destroy');
+    Route::post('/comments/{comment}/react', [CommentReactionController::class, 'store'])->whereNumber('comment')->name('comments.react');
     Route::post('/users/{user}/follow', [FollowController::class, 'toggle'])->whereNumber('user')->name('follows.toggle');
     Route::get('/feed', [FeedController::class, 'index'])->name('feed');
 });

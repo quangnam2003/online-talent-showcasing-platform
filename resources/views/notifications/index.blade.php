@@ -15,6 +15,10 @@
                 'rejected' => ['x', 'bad'],
                 'follower' => ['user-plus', 'accent'],
                 'submitted' => ['upload', 'accent'],
+                'comment' => ['message', 'accent'],
+                'like' => ['heart', 'accent'],
+                'rate' => ['star', 'accent'],
+                'comment_reaction' => ['sparkles', 'accent'],
             ][$n->data['kind'] ?? ''] ?? ['bell', 'muted'];
         @endphp
         <a class="card noti {{ $n->read_at === null ? 'is-unread' : '' }}" href="{{ url($n->data['url'] ?? '/') }}"

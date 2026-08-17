@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Video;
+use App\Notifications\VideoInteraction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -42,7 +43,28 @@ class CommentController extends Controller
 
         $video->refreshCounters();
 
+        // Bao cho chu video co binh luan moi (tru khi chinh chu tu binh luan)
+        if ($video->user_id !== auth()->id()) {
+            $video->user->notify(new VideoInteraction(auth()->user(), $video, 'comment'));
+        }
+
         return back()->with('success', 'Đã đăng bình luận.');
+    }
+
+    // Chi chinh chu binh luan moi duoc sua noi dung
+    public function update(Request $request, Comment $comment): RedirectResponse
+    {
+        abort_unless(auth()->id() === $comment->user_id, 403, 'Bạn chỉ có thể sửa bình luận của chính mình.');
+
+        $data = $request->validate([
+            'content' => ['required', 'string', 'max:2000'],
+        ], [
+            'content.required' => 'Vui lòng nhập nội dung bình luận.',
+        ]);
+
+        $comment->update(['content' => $data['content']]);
+
+        return back()->with('success', 'Đã cập nhật bình luận.');
     }
 
     public function destroy(Comment $comment): RedirectResponse

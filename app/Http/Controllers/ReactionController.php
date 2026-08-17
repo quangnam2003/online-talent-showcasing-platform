@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Reaction;
 use App\Models\Video;
+use App\Notifications\VideoInteraction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -32,12 +33,20 @@ class ReactionController extends Controller
 
         if ($data['action'] === 'like') {
             $reaction->liked = ! $reaction->liked;
+            // Chi bao khi vua tha tim (bo tim thi khong bao)
+            $notifyType = $reaction->liked ? 'like' : null;
         } else {
+            // Chi bao khi diem sao thay doi — cham lai cung so sao khong spam chu video
+            $notifyType = (int) $data['stars'] !== (int) $reaction->stars ? 'rate' : null;
             $reaction->stars = (int) $data['stars'];
         }
 
         $reaction->save();
         $video->refreshCounters();
+
+        if ($notifyType) {
+            $video->user->notify(new VideoInteraction(auth()->user(), $video, $notifyType, $reaction->stars));
+        }
 
         return back();
     }

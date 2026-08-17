@@ -156,72 +156,7 @@
             @endif
 
             @foreach ($comments as $comment)
-                <div style="display: flex; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-divider)">
-                    <span class="avatar">
-                        @if ($comment->user->avatar)
-                            <img src="{{ asset('storage/'.$comment->user->avatar) }}" alt="">
-                        @else
-                            {{ mb_substr($comment->user->name, 0, 1) }}
-                        @endif
-                    </span>
-                    <div style="display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1" data-reveal-scope>
-                        <span style="font-size: 12.5px">
-                            <a href="{{ route('users.show', $comment->user) }}">{{ $comment->user->name }}</a>
-                            @if ($comment->user->isMentor()) <span class="tag tag-accent" style="font-size: 9px">Mentor</span> @endif
-                            <span class="muted-i">· {{ $comment->created_at->diffForHumans() }}</span>
-                        </span>
-                        <span style="font-size: 13.5px; line-height: 1.55">{{ $comment->content }}</span>
-
-                        <div style="display: flex; gap: var(--space-3); align-items: center">
-                            @auth
-                                @if ($video->allow_comments)
-                                    <button type="button" class="btn btn-ghost btn-xs" style="padding-left: 0"
-                                            aria-expanded="false" onclick="tsToggle(this, '.reply-form')">
-                                        Trả lời
-                                    </button>
-                                @endif
-                                @if ($me->id === $comment->user_id || $me->isAdmin() || $me->id === $video->user_id)
-                                    <form method="POST" action="{{ route('comments.destroy', $comment) }}" onsubmit="return confirm('Xóa bình luận này?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-ghost btn-xs" style="color: var(--color-danger)">Xóa</button>
-                                    </form>
-                                @endif
-                            @endauth
-                        </div>
-
-                        @auth
-                            {{-- panel tra loi: .reveal mo/dong muot (grid-rows 0fr → 1fr) --}}
-                            <form method="POST" action="{{ route('comments.store', $video) }}" class="reveal reply-form" style="margin-top: calc(var(--space-1) * -1)">
-                                @csrf
-                                <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                                <div class="reveal-inner" style="display: flex; gap: var(--space-2); padding-top: calc(4px + var(--space-1))">
-                                    <input class="input" name="content" placeholder="Trả lời {{ $comment->user->name }}…" required style="flex: 1; font-size: 12.5px; min-height: 32px">
-                                    <button class="btn btn-primary btn-xs">Gửi</button>
-                                </div>
-                            </form>
-                        @endauth
-
-                        {{-- Tra loi 1 cap --}}
-                        @foreach ($comment->replies as $reply)
-                            <div style="display: flex; gap: var(--space-2); padding: var(--space-2) 0 0 var(--space-3); border-left: 2px solid var(--color-divider)">
-                                <span class="avatar" style="width: 24px; height: 24px; font-size: 11px">
-                                    @if ($reply->user->avatar)
-                                        <img src="{{ asset('storage/'.$reply->user->avatar) }}" alt="">
-                                    @else
-                                        {{ mb_substr($reply->user->name, 0, 1) }}
-                                    @endif
-                                </span>
-                                <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
-                                    <span style="font-size: 12px">
-                                        <a href="{{ route('users.show', $reply->user) }}">{{ $reply->user->name }}</a>
-                                        <span class="muted-i">· {{ $reply->created_at->diffForHumans() }}</span>
-                                    </span>
-                                    <span style="font-size: 13px; line-height: 1.5">{{ $reply->content }}</span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                @include('videos._comment', ['comment' => $comment, 'isReply' => false])
             @endforeach
         </div>
     </div>

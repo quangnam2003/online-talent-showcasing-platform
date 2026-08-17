@@ -108,7 +108,7 @@ class VideoController extends Controller
         $video->load(['user', 'category']);
 
         $comments = $video->rootComments()
-            ->with(['user', 'replies.user'])
+            ->with(['user', 'reactions', 'replies.user', 'replies.reactions'])
             ->latest()
             ->get();
 

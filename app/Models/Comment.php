@@ -30,4 +30,36 @@ class Comment extends Model
     {
         return $this->hasMany(Comment::class, 'parent_id');
     }
+
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(CommentReaction::class);
+    }
+
+    /* ---------- Tien ich cho view ---------- */
+
+    // Da bi sua sau khi dang? (hien nhan "đã chỉnh sửa")
+    public function isEdited(): bool
+    {
+        return $this->updated_at && $this->created_at && $this->updated_at->gt($this->created_at);
+    }
+
+    // Gom cam xuc theo loai, sap giam dan theo so luong: ['love' => 3, 'like' => 1]
+    public function reactionSummary(): array
+    {
+        return $this->reactions
+            ->countBy('type')
+            ->sortDesc()
+            ->all();
+    }
+
+    // Loai cam xuc nguoi dang xem da chon (null neu chua)
+    public function reactionOf(?User $user): ?string
+    {
+        if (! $user) {
+            return null;
+        }
+
+        return $this->reactions->firstWhere('user_id', $user->id)?->type;
+    }
 }
