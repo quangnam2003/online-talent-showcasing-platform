@@ -731,7 +731,7 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
   width: 250px; flex: 0 0 250px; border-right: 1px solid rgb(255 255 255 / .06);
   padding: var(--space-4) var(--space-3);
   display: flex; flex-direction: column; gap: var(--space-4);
-  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
   background: linear-gradient(175deg, #262118, var(--color-ink-2)); color: var(--color-ink-text);
   scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .18) transparent;
 }
@@ -783,7 +783,8 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
   margin-top: auto; display: flex; align-items: center; gap: var(--space-2);
   border-top: 1px solid rgb(255 255 255 / .08); padding-top: var(--space-3);
 }
-.ts-side-foot .btn { flex: 1; }
+.ts-side-foot .btn { flex: 1; min-width: 0; }
+.ts-side-foot:not(:has(.ts-me)) { flex-direction: column; align-items: stretch; } /* khach: Dang nhap / Tao tai khoan xep 2 hang, khong tran ngang */
 /* khach: nut phu trong sidebar toi = vien sang, chu kem */
 .ts-sidebar .btn-secondary { background: transparent; border-color: rgb(255 255 255 / .18); color: var(--color-ink-text); }
 .ts-sidebar .btn-secondary:hover { background: rgb(255 255 255 / .08); border-color: rgb(255 255 255 / .3); color: #fff; }
@@ -946,22 +947,51 @@ select.input { min-width: 0; max-width: 100%; }
 .hero-box p { color: rgb(244 239 230 / .82); }
 .hero-box .meta { color: rgb(244 239 230 / .72); }
 
-/* panel gioi thieu trang dang nhap / dang ky — cung "anh den san khau" nhu hero;
-   cao theo man hinh (toi thieu 460px) de cot form ben phai khong lung lo giua khoang trang */
-.auth-cover.ph-art {
-  min-height: max(460px, calc(100vh - 340px));
+/* ── Dang nhap / Dang ky: MOT the (card) can giua ca ngang lan doc trong vung noi dung ────
+   .auth-wrap  : khoi bao, width toi da 1040px, margin auto (flex child cua .ts-content → tu can giua doc)
+   .auth-card  : luoi 2 cot [cover toi "anh den san khau" | panel form nen sang], bo goc, bong, khong tran
+   .auth-panel : padding rong, noi dung (max 400px) can giua; input to hon, nut full-width
+   < 900px     : 1 cot — cover thu thanh dai thuong hieu mong (an list + icon), form full-width */
+.auth-wrap { width: min(100%, 1040px); margin: auto; }
+.auth-card {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch;
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--color-divider);
+  background: color-mix(in srgb, #fff 60%, var(--color-bg)); box-shadow: var(--shadow-lg);
+}
+.auth-card .auth-cover.ph-art {
+  min-height: 560px; border: 0; border-radius: 0; box-shadow: none;
   background:
     radial-gradient(90% 130% at 88% -20%, rgb(240 199 128 / .34), transparent 60%),
     radial-gradient(70% 110% at 8% 115%, rgb(107 75 184 / .32), transparent 55%),
     linear-gradient(140deg, #2a2320 10%, #3a2d22 55%, #201b17 100%);
-  border-color: rgb(255 255 255 / .06); color: var(--color-ink-text); box-shadow: var(--shadow-md);
+  color: var(--color-ink-text);
 }
 .auth-cover .ph-art-ico { color: var(--color-gold); opacity: 0.14; }
 .auth-cover .kicker { color: var(--color-gold); }
 .auth-cover h2 { color: #fff; }
 .auth-cover p { color: rgb(244 239 230 / .82); }
 .auth-cover .dropzone-ico { background: rgb(255 255 255 / .1); color: var(--color-gold); }
-@media (max-width: 1080px) { .auth-cover.ph-art { min-height: 0; } } /* mobile: cover xep tren form, khong keo dai */
+.auth-panel { display: flex; align-items: center; justify-content: center; padding: var(--space-8) 44px; min-width: 0; }
+.auth-panel-inner { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: var(--space-4); }
+.auth-panel .auth-tabs { margin-bottom: 0; }
+.auth-panel .auth-lead { margin: calc(var(--space-2) * -1) 0 0; font-size: 13.5px; color: var(--color-neutral-700); }
+.auth-panel form { display: flex; flex-direction: column; gap: var(--space-4); }
+.auth-panel .input { min-height: 42px; font-size: 14px; background: #fff; }
+.auth-panel .seg { display: flex; width: 100%; }
+.auth-panel .seg-opt { flex: 1; justify-content: center; text-align: center; padding: 9px 10px; }
+.auth-panel .btn-primary { width: 100%; min-height: 42px; font-size: 14px; }
+.auth-foot { text-align: center; font-size: 13px; color: var(--color-neutral-700); }
+.auth-foot a { font-weight: 600; }
+@media (max-width: 900px) {
+  .auth-card { grid-template-columns: 1fr; }
+  .auth-card .auth-cover.ph-art { min-height: 0; padding: var(--space-4) var(--space-6) !important; }
+  .auth-cover .ph-art-ico, .auth-cover ul, .auth-cover p { display: none !important; } /* ul co display inline */
+  .auth-cover h2 { font-size: 22px !important; }
+  .auth-panel { padding: var(--space-6) var(--space-4); }
+}
+@media (max-width: 480px) {
+  .auth-panel .grid-2 { grid-template-columns: 1fr; }
+}
 
 /* hang xep hang (trending / leaderboard) */
 .rank-row {
@@ -1025,14 +1055,17 @@ select.input { min-width: 0; max-width: 100%; }
 .line-tab.active::after { transform: scaleX(1); }
 
 /* tab dang nhap / dang ky */
-.auth-tabs { display: flex; gap: var(--space-4); border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-2); }
+.auth-tabs { display: flex; gap: var(--space-4); border-bottom: 1px solid var(--color-divider); }
 .auth-tab {
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 22px;
+  position: relative; padding-bottom: var(--space-2);
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 24px; line-height: 1.2;
   color: var(--color-neutral-500); text-decoration: none;
   transition: color var(--dur-2) var(--ease-out);
 }
+.auth-tab::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--color-accent); transform: scaleX(0); transform-origin: left; transition: transform var(--dur-3) var(--ease-out); }
 .auth-tab:hover { color: var(--color-neutral-700); text-decoration: none; }
 .auth-tab.active { color: var(--color-text); }
+.auth-tab.active::after { transform: scaleX(1); }
 
 /* cham sao (Watch) — hover xem truoc: cac sao ben trai sang len */
 .stars { display: inline-flex; gap: var(--space-1); }

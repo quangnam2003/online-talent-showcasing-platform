@@ -1,5 +1,5 @@
-{{-- Panel gioi thieu ben trai trang dang nhap / dang ky --}}
-<div class="ph-art auth-cover" style="display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-4); padding: var(--space-6)">
+{{-- Panel gioi thieu (nua trai the dang nhap / dang ky) — nen ink "anh den san khau", noi dung dan day --}}
+<div class="ph-art auth-cover" style="display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-4); padding: var(--space-8) var(--space-6) var(--space-6)">
     <x-icon name="mic" size="240" class="ph-art-ico" />
     <div style="position: relative; display: flex; flex-direction: column; gap: var(--space-2); max-width: 400px">
         <span class="kicker">TalentStage</span>

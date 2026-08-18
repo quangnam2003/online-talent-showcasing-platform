@@ -66,7 +66,7 @@ Token chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-spring` (nảy nh�
 | Nhóm | `/groups`, `/groups/{id}`, `/groups/create` | Danh sách trái + bảng thảo luận phải |
 | Tin nhắn | `/messages`, `/messages/{user}` | Threads + khung chat `.bubble` |
 | Cuộc thi | `/contests`, `/contests/{id}` | Breadcrumb, `.phase-strip`, bảng xếp hạng, lưới bài dự thi + Bình chọn |
-| Đăng nhập / Đăng ký | `/login`, `/register` | Panel giới thiệu `auth/_cover` + form; tab Đăng nhập / Đăng ký |
+| Đăng nhập / Đăng ký | `/login`, `/register` | **Không** dùng `screen-title`; một thẻ `.auth-wrap > .auth-card` căn giữa cả ngang lẫn dọc (max 1040px): nửa trái cover ink `auth/_cover` ("ánh đèn sân khấu"), nửa phải `.auth-panel` nền sáng, nội dung ≤400px, tab `.auth-tabs` làm tiêu đề + `.auth-lead`, input 42px, nút đặc full-width, `.auth-foot` link chuyển trang; <900px một cột, cover thu thành dải thương hiệu mỏng |
 | Quản trị | `/admin/*` | Breadcrumb "Quản trị / …"; kiểm duyệt: tab gạch chân, hàng đợi, panel từ chối `.reveal` |
 | Sơ đồ trang | `/sitemap` | Trang yêu cầu của đề bài — vẫn liệt kê nhóm chức năng kèm mã FR |
 
