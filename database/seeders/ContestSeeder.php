@@ -44,12 +44,12 @@ class ContestSeeder extends Seeder
             ['id' => 5, 'contest_id' => 2, 'video_id' => 8, 'user_id' => 5, 'created_at' => $now->copy()->subDays(3),  'updated_at' => $now],
         ]);
 
-        // ----- Votes: unique (user, entry). Contest 1: entry 1 thang voi 4 phieu -----
+        // ----- Votes: 1 phieu / user / cuoc thi (unique user_id+contest_id). Contest 1: entry 1 thang voi 4 phieu -----
+        $entryContest = [1 => 1, 2 => 1, 3 => 1, 4 => 2, 5 => 2];
         $votes = [
-            // [user_id, entry_id]
+            // [user_id, entry_id] — moi user chi xuat hien 1 lan trong moi cuoc thi
             [3, 1], [4, 1], [5, 1], [7, 1],
             [2, 2], [6, 2],
-            [6, 3],
             [3, 4], [6, 4],
             [4, 5],
         ];
@@ -59,6 +59,7 @@ class ContestSeeder extends Seeder
             $rows[] = [
                 'user_id'    => $userId,
                 'entry_id'   => $entryId,
+                'contest_id' => $entryContest[$entryId],
                 'created_at' => $now->copy()->subDays(rand(1, 20)),
                 'updated_at' => $now,
             ];

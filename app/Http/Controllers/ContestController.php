@@ -48,9 +48,7 @@ class ContestController extends Controller
 
         // 1 phieu / user / cuoc thi
         $myVote = $me
-            ? Vote::where('user_id', $me->id)
-                ->whereHas('entry', fn ($q) => $q->where('contest_id', $contest->id))
-                ->first()
+            ? Vote::where('user_id', $me->id)->where('contest_id', $contest->id)->first()
             : null;
 
         return view('contests.show', [

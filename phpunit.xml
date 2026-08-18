@@ -23,8 +23,12 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!--
+            Khong ep DB_CONNECTION/DB_DATABASE o day: cac test dung DatabaseTransactions
+            (khong migrate, tu rollback) va chay thang tren DB MySQL cau hinh trong .env
+            (hoac .env.testing neu co). Ep sang sqlite :memory: se lam moi test loi
+            "no such table" vi DB rong.
+        -->
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

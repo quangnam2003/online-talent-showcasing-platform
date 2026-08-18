@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContestEntry;
 use App\Models\Vote;
 use App\Notifications\NewVote;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 
 class VoteController extends Controller
@@ -23,14 +24,18 @@ class VoteController extends Controller
             return back()->with('error', 'Bạn không thể bình chọn cho bài của chính mình.');
         }
 
-        $already = Vote::where('user_id', $me->id)
-            ->whereHas('entry', fn ($q) => $q->where('contest_id', $contest->id))
-            ->exists();
+        $already = Vote::where('user_id', $me->id)->where('contest_id', $contest->id)->exists();
         if ($already) {
             return back()->with('error', 'Bạn đã dùng lượt bình chọn cho cuộc thi này.');
         }
 
-        Vote::create(['user_id' => $me->id, 'entry_id' => $entry->id]);
+        // Unique (user_id, contest_id) o DB la chot chan cuoi: 2 request song song (da tien trinh)
+        // cung qua duoc exists() o tren thi chi 1 ban ghi duoc tao, ban con lai roi vao catch.
+        try {
+            Vote::create(['user_id' => $me->id, 'entry_id' => $entry->id, 'contest_id' => $contest->id]);
+        } catch (UniqueConstraintViolationException) {
+            return back()->with('error', 'Bạn đã dùng lượt bình chọn cho cuộc thi này.');
+        }
 
         // Counter cache cho leaderboard (forceFill vi khong nam trong $fillable)
         $entry->forceFill(['votes_count' => $entry->votes()->count()])->save();

@@ -263,6 +263,7 @@ docker exec online-talent-app php artisan db:seed --force
 | Xóa cache view/config khi sửa không thấy đổi | `php artisan optimize:clear` |
 | Thử nhanh code với DB (REPL) | `php artisan tinker` |
 | Nạp lại autoload khi thêm class mới báo not found | `composer dump-autoload` |
+| Chạy bộ test tự động (`tests/Feature`) | `php artisan test` — test chạy thẳng trên DB MySQL trong `.env` (dùng `DatabaseTransactions`, tự rollback nên không để lại dữ liệu); cần DB đã `migrate`. Nếu vừa sửa `phpunit.xml`/`.env` thì `php artisan config:clear` trước |
 
 ---
 
