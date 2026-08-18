@@ -12,6 +12,7 @@
     <button class="btn btn-secondary btn-sm">Tìm</button>
 </form>
 
+<div class="table-wrap">
 <table class="table" style="font-size: 13px">
     <thead>
         <tr><th>#</th><th>Người dùng</th><th>Email</th><th>Vai trò</th><th>Video</th><th>Người theo dõi</th><th>Trạng thái</th><th></th></tr>
@@ -32,12 +33,12 @@
                         {{ $user->name }}
                     </a>
                 </td>
-                <td style="color: var(--color-neutral-600)">{{ $user->email }}</td>
+                <td style="color: var(--color-neutral-700)">{{ $user->email }}</td>
                 <td><span class="tag {{ $user->isAdmin() ? 'tag-accent' : ($user->isMentor() ? 'tag-outline' : 'tag-muted') }}" style="font-size: 9.5px">{{ ucfirst($user->role) }}</span></td>
                 <td class="num">{{ $user->videos_count }}</td>
                 <td class="num">{{ number_format($user->followers_count) }}</td>
                 <td>
-                    <span class="tag" style="font-size: 9.5px; border: 1px solid {{ $user->is_active ? 'var(--color-accent-700)' : 'var(--color-danger)' }}; color: {{ $user->is_active ? 'var(--color-accent-700)' : 'var(--color-danger)' }}">
+                    <span class="tag {{ $user->is_active ? 'tag-ok' : 'tag-bad' }}">
                         {{ $user->is_active ? 'Hoạt động' : 'Bị khóa' }}
                     </span>
                 </td>
@@ -58,6 +59,7 @@
         @endforeach
     </tbody>
 </table>
+</div>
 
 @include('partials.pager', ['p' => $users])
 @endsection

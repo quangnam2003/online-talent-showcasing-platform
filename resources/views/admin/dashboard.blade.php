@@ -36,6 +36,7 @@
     <div style="display: flex; flex-direction: column; gap: var(--space-4)">
         <div class="card" style="padding: var(--space-4); gap: var(--space-2)">
             <div class="card-kicker">Người dùng theo vai trò</div>
+            <div class="table-wrap">
             <table class="table" style="font-size: 13px">
                 <tbody>
                     @foreach (['admin' => 'Admin', 'creator' => 'Creator', 'mentor' => 'Mentor'] as $role => $label)
@@ -43,9 +44,11 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
         <div class="card" style="padding: var(--space-4); gap: var(--space-2)">
             <div class="card-kicker">Video theo trạng thái</div>
+            <div class="table-wrap">
             <table class="table" style="font-size: 13px">
                 <tbody>
                     @foreach (['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'] as $s => $label)
@@ -53,6 +56,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

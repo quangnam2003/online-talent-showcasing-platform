@@ -37,7 +37,7 @@
         <div class="card mod-row" style="gap: 0; padding: var(--space-3)" data-reveal-scope>
             {{-- hang chinh: thumbnail · thong tin · hanh dong --}}
             <div style="display: flex; gap: var(--space-4); align-items: center">
-                <a href="{{ route('videos.show', $video) }}" class="hatch-mid thumb-sm" style="width: 128px; height: 76px; flex: 0 0 128px; display: block">@include('partials.thumb', ['video' => $video, 'compact' => true])</a>
+                <a href="{{ route('videos.show', $video) }}" class="hatch-mid thumb-sm" style="width: 128px; height: 76px; flex: 0 0 128px; display: block; --cat: {{ $video->category->colorVar() }}">@include('partials.thumb', ['video' => $video, 'compact' => true])</a>
                 <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
                     <a href="{{ route('videos.show', $video) }}" style="font-family: var(--font-heading); font-weight: 600; font-size: 17px; color: inherit">{{ $video->title }}</a>
                     <span class="meta">

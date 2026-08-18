@@ -12,13 +12,14 @@
     <a class="btn btn-primary btn-sm" href="{{ route('admin.categories.create') }}"><x-icon name="plus" size="14" /> Thêm danh mục</a>
 </div>
 
+<div class="table-wrap">
 <table class="table" style="font-size: 13px; max-width: 720px">
     <thead><tr><th>Tên</th><th>Slug</th><th>Số video</th><th></th></tr></thead>
     <tbody>
         @foreach ($categories as $cat)
             <tr>
                 <td>{{ $cat->name }}</td>
-                <td style="color: var(--color-neutral-600)"><code style="font-size: 11px">{{ $cat->slug }}</code></td>
+                <td style="color: var(--color-neutral-700)"><code style="font-size: 11px">{{ $cat->slug }}</code></td>
                 <td class="num">{{ $cat->videos_count }}</td>
                 <td style="text-align: right">
                     <div style="display: inline-flex; gap: var(--space-1)">
@@ -34,4 +35,5 @@
         @endforeach
     </tbody>
 </table>
+</div>
 @endsection

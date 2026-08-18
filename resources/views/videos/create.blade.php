@@ -114,6 +114,7 @@
 
         <div style="display: flex; flex-direction: column; gap: var(--space-3)">
             <h3 style="font-size: 19px; margin: 0">Trạng thái duyệt gần đây</h3>
+            <div class="table-wrap">
             <table class="table" style="font-size: 12.5px">
                 <thead><tr><th>Tiết mục</th><th>Gửi lúc</th><th>Trạng thái</th></tr></thead>
                 <tbody>
@@ -124,11 +125,11 @@
                         <tr>
                             <td>
                                 <a href="{{ route('videos.show', $up) }}" style="display: inline-flex; align-items: center; gap: 6px">
-                                    @if ($up->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-600)" />@endif
+                                    @if ($up->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-700)" />@endif
                                     {{ \Illuminate\Support\Str::limit($up->title, 32) }}
                                 </a>
                             </td>
-                            <td class="num" style="color: var(--color-neutral-600)">{{ $up->created_at->format('d/m H:i') }}</td>
+                            <td class="num" style="color: var(--color-neutral-700)">{{ $up->created_at->format('d/m H:i') }}</td>
                             <td><span class="tag tag-status" data-status="{{ $up->status }}">{{ $t }}</span></td>
                         </tr>
                     @empty
@@ -136,6 +137,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
             <a class="btn btn-ghost btn-sm" style="align-self: flex-start; padding-left: 0" href="{{ route('videos.mine') }}">
                 Xem tất cả tiết mục của tôi <x-icon name="arrow-right" size="14" />
             </a>

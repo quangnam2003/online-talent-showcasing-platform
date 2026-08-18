@@ -37,7 +37,7 @@
                 </audio>
             </div>
         @else
-            <div class="player">
+            <div class="player" style="--cat: {{ $video->category->colorVar() }}">
                 @if ($hasFile)
                     <video controls preload="metadata"
                            @if ($video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail))) poster="{{ asset('storage/'.$video->thumbnail) }}" @endif>
@@ -187,7 +187,7 @@
         <div class="kicker" style="color: var(--color-neutral-500)">Xem tiếp</div>
         @forelse ($upNext as $next)
             <a class="card" href="{{ route('videos.show', $next) }}" style="flex-direction: row; gap: var(--space-3); padding: var(--space-2); align-items: center; text-decoration: none; color: inherit">
-                <div class="hatch-mid thumb-sm" style="width: 96px; height: 60px; flex: 0 0 96px">@include('partials.thumb', ['video' => $next, 'compact' => true])</div>
+                <div class="hatch-mid thumb-sm" style="width: 96px; height: 60px; flex: 0 0 96px; --cat: {{ $next->category->colorVar() }}">@include('partials.thumb', ['video' => $next, 'compact' => true])</div>
                 <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
                     <span style="font-size: 13px; line-height: 1.3">{{ $next->title }}</span>
                     <span class="meta">{{ $next->user->name }} · {{ number_format($next->views) }} lượt xem</span>

@@ -129,7 +129,7 @@ class VideoController extends Controller
         $isFollowing = $me ? $me->isFollowing($video->user) : false;
 
         $upNext = Video::visible()
-            ->with('user')
+            ->with(['user', 'category'])
             ->whereKeyNot($video->id)
             ->orderByDesc('trending_score')
             ->take(5)

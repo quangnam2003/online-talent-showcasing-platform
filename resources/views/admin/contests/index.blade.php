@@ -12,15 +12,16 @@
     <a class="btn btn-primary btn-sm" href="{{ route('admin.contests.create') }}"><x-icon name="plus" size="14" /> Tạo cuộc thi</a>
 </div>
 
+<div class="table-wrap">
 <table class="table" style="font-size: 13px">
     <thead><tr><th>Cuộc thi</th><th>Mở nộp</th><th>Hạn nộp</th><th>Kết thúc</th><th>Bài dự thi</th><th>Trạng thái</th><th></th></tr></thead>
     <tbody>
         @foreach ($contests as $contest)
             <tr>
                 <td><a href="{{ route('contests.show', $contest) }}">{{ $contest->title }}</a></td>
-                <td class="num" style="color: var(--color-neutral-600)">{{ $contest->start_at->format('d/m/Y H:i') }}</td>
-                <td class="num" style="color: var(--color-neutral-600)">{{ $contest->submission_deadline->format('d/m/Y H:i') }}</td>
-                <td class="num" style="color: var(--color-neutral-600)">{{ $contest->end_at->format('d/m/Y H:i') }}</td>
+                <td class="num" style="color: var(--color-neutral-700)">{{ $contest->start_at->format('d/m/Y H:i') }}</td>
+                <td class="num" style="color: var(--color-neutral-700)">{{ $contest->submission_deadline->format('d/m/Y H:i') }}</td>
+                <td class="num" style="color: var(--color-neutral-700)">{{ $contest->end_at->format('d/m/Y H:i') }}</td>
                 <td class="num">{{ $contest->entries_count }}</td>
                 <td><span class="tag tag-outline" style="font-size: 9.5px">{{ $contest->statusLabel() }}</span></td>
                 <td style="text-align: right">
@@ -37,4 +38,5 @@
         @endforeach
     </tbody>
 </table>
+</div>
 @endsection

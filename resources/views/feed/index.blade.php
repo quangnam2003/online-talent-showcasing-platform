@@ -25,7 +25,7 @@
                     <span class="meta" style="margin-left: auto">{{ $video->created_at->diffForHumans() }}</span>
                 </div>
                 <a href="{{ route('videos.show', $video) }}" style="display: flex; gap: var(--space-3); text-decoration: none; color: inherit" class="feed-item">
-                    <div class="hatch-mid thumb-sm" style="width: 200px; height: 118px; flex: 0 0 200px">@include('partials.thumb', ['video' => $video, 'compact' => true])</div>
+                    <div class="hatch-mid thumb-sm" style="width: 200px; height: 118px; flex: 0 0 200px; --cat: {{ $video->category->colorVar() }}">@include('partials.thumb', ['video' => $video, 'compact' => true])</div>
                     <div style="display: flex; flex-direction: column; gap: var(--space-1); min-width: 0">
                         <span style="font-family: var(--font-heading); font-weight: 600; font-size: 18px">{{ $video->title }}</span>
                         @if ($video->description)

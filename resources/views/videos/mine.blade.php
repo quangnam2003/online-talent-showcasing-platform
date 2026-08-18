@@ -11,6 +11,7 @@
     <a class="btn btn-primary btn-sm" href="{{ route('videos.create') }}"><x-icon name="upload" size="14" /> Đăng tiết mục mới</a>
 </div>
 
+<div class="table-wrap">
 <table class="table" style="font-size: 13px">
     <thead>
         <tr><th>Tiết mục</th><th>Thể loại</th><th>Quyền xem</th><th>Lượt xem</th><th>♡</th><th>Trạng thái</th><th>Gửi lúc</th><th></th></tr>
@@ -24,7 +25,7 @@
                 <td>
                     <div style="display: flex; align-items: center; gap: var(--space-2)">
                         <a href="{{ route('videos.show', $video) }}" class="hatch-mid thumb-sm" style="width: 72px; height: 42px; flex: 0 0 72px; display: block; --cat: {{ $video->category->colorVar() }}" title="{{ $video->thumbnail ? 'Có ảnh bìa' : 'Chưa có ảnh bìa' }}">@include('partials.thumb', ['video' => $video, 'compact' => true])</a>
-                        <a href="{{ route('videos.show', $video) }}" style="display: inline-flex; align-items: center; gap: 6px">@if ($video->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-600)" />@endif {{ \Illuminate\Support\Str::limit($video->title, 40) }}</a>
+                        <a href="{{ route('videos.show', $video) }}" style="display: inline-flex; align-items: center; gap: 6px">@if ($video->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-700)" />@endif {{ \Illuminate\Support\Str::limit($video->title, 40) }}</a>
                     </div>
                 </td>
                 <td><span style="color: {{ $video->category->colorVar() }}; font-weight: 600; font-size: 12px">{{ $video->category->name }}</span></td>
@@ -32,7 +33,7 @@
                 <td class="num">{{ number_format($video->views) }}</td>
                 <td class="num">{{ number_format($video->likes_count) }}</td>
                 <td><span class="tag tag-status" data-status="{{ $video->status }}">{{ $t }}</span></td>
-                <td class="num" style="color: var(--color-neutral-600)">{{ $video->created_at->format('d/m H:i') }}</td>
+                <td class="num" style="color: var(--color-neutral-700)">{{ $video->created_at->format('d/m H:i') }}</td>
                 <td>
                     <div style="display: flex; gap: var(--space-1); justify-content: flex-end">
                         <a class="btn btn-secondary btn-xs" href="{{ route('videos.edit', $video) }}">Sửa</a>
@@ -50,4 +51,5 @@
         @endforelse
     </tbody>
 </table>
+</div>
 @endsection

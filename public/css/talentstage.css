@@ -50,6 +50,17 @@
 
   --color-danger: #9c3a2d; /* validation — cung tong dat nung */
 
+  /* khung toi "san khau" (sidebar, hero) + vang sang lam diem nhan tren nen toi.
+     Quy uoc tuong phan (WCAG): vang 500 (#c28d41) chi dung cho nut dac chu trang / icon / vien;
+     chu nho tren nen kem dung accent-700; chu phu dung neutral-700 (khong dung 600). */
+  --color-ink: #241f18;
+  --color-ink-2: #1c1813;
+  --color-ink-text: #f4efe6;      /* chu chinh tren nen ink */
+  --color-ink-muted: #b6ad9c;     /* chu phu tren nen ink */
+  --color-ink-faint: #857b68;     /* nhan nhom / tagline tren nen ink */
+  --color-gold: #f0c780;          /* diem nhan / active tren nen ink */
+  --color-gold-2: #d8a353;        /* vach active, vien tren nen ink */
+
   /* mau the loai — moi category mot sac, dung cho chip, vien tren the video,
      nhan the loai va tint thumbnail (mockup: --c-*) */
   --c-music:  #6b4bb8;
@@ -190,14 +201,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); color: var(--color-accent-700); border-color: var(--color-accent-600); }
-.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
-.btn-secondary { border-color: var(--color-divider); }
-.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text); border-color: color-mix(in srgb, var(--color-text) 30%, transparent); }
-.btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
-.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent-700); }
+/* 3 cap ro rang: primary = nut DAC (gradient vang 500→600, chu trang) cho hanh dong chinh;
+   secondary = nen kem nhe cho hanh dong phu; ghost = chi chu (accent-700 de du tuong phan) */
+.btn-primary {
+  color: #fff; border-color: var(--color-accent-600);
+  background: linear-gradient(180deg, var(--color-accent-500), var(--color-accent-600));
+  box-shadow: 0 1px 2px rgb(125 84 17 / .35), inset 0 1px 0 rgb(255 255 255 / .25);
+  transition-property: filter, box-shadow, transform, border-color;
+}
+.btn-primary:hover { filter: brightness(1.07); color: #fff; border-color: var(--color-accent-700); }
+.btn-primary:active { filter: brightness(.96); box-shadow: inset 0 1px 2px rgb(0 0 0 / .18); }
+.btn-secondary {
+  background: color-mix(in srgb, var(--color-accent-100) 75%, var(--color-bg));
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent); color: var(--color-accent-800);
+}
+.btn-secondary:hover { background: var(--color-accent-100); color: var(--color-accent-900); border-color: color-mix(in srgb, var(--color-accent) 50%, transparent); }
+.btn-secondary:active { background: var(--color-accent-200); }
+.btn-ghost { color: var(--color-accent-700); padding-inline: var(--space-1); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent-800); }
 .btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
 .btn-icon { width: 36px; height: 36px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
@@ -208,7 +229,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .field > .label-up, .label-up {
   font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--color-neutral-600);
+  color: var(--color-neutral-700);
   transition: color var(--dur-2) var(--ease-out);
 }
 .field:focus-within > .label-up { color: var(--color-accent-700); }
@@ -255,7 +276,7 @@ select.input { cursor: pointer; }
 .input-wrap.is-ok .input:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklch, var(--c-sport) 16%, transparent); }
 .input-wrap.is-bad .input { border-color: var(--color-danger); }
 .input-wrap.is-bad .input:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 16%, transparent); }
-.field-hint { font-size: 12px; color: var(--color-neutral-600); min-height: 1.2em; transition: color var(--dur-2) var(--ease-out); }
+.field-hint { font-size: 12px; color: var(--color-neutral-700); min-height: 1.2em; transition: color var(--dur-2) var(--ease-out); }
 .field-hint.is-ok { color: var(--c-sport); }
 .field-hint.is-bad { color: var(--color-danger); font-weight: 600; }
 .input-wrap.shake { animation: ts-shake 0.4s var(--ease-out); }
@@ -295,7 +316,7 @@ select.input { cursor: pointer; }
   transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 .seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
-.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.seg-opt:has(input:checked) { color: var(--color-accent-700); background: color-mix(in srgb, var(--color-accent) 10%, transparent); box-shadow: inset 0 0 0 1px var(--color-accent); }
 .seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 .seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 
@@ -317,7 +338,7 @@ a.card:hover {
   border-color: color-mix(in srgb, var(--color-text) 30%, transparent);
   box-shadow: var(--shadow-sm);
 }
-.card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
+.card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent-700); }
 .card-title {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   font-size: 17px; line-height: 1.2;
@@ -341,22 +362,28 @@ a.card:hover {
 .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
 .tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
 .tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
-.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+.tag-outline { border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent); color: var(--color-accent-700); background: color-mix(in srgb, var(--color-accent) 8%, #fff); }
 .tag-muted { border: 1px solid var(--color-divider); color: var(--color-neutral-700); }
-a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); color: var(--color-accent-700); text-decoration: none; }
+a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 16%, #fff); color: var(--color-accent-800); text-decoration: none; }
 
-/* tag trang thai duyet — mau theo mockup: duyet = xanh, cho = vang, tu choi = do */
-.tag-status { --st: var(--color-neutral-500); font-size: 10px; border: 1px solid var(--st); color: var(--st); }
+/* tag trang thai duyet — nen mem (13% mau) + chu dam cung tong: duyet = xanh, cho = vang, tu choi = do */
+.tag-status, .tag-ok, .tag-bad {
+  --st: var(--color-neutral-500); font-size: 10px; font-weight: 600; border: 0;
+  background: color-mix(in srgb, var(--st) 13%, #fff); color: color-mix(in srgb, var(--st) 80%, #000);
+}
+.tag-ok  { --st: var(--c-sport); }       /* hoat dong / thanh cong */
+.tag-bad { --st: var(--color-danger); }  /* bi khoa / loi */
 .tag-status[data-status="approved"] { --st: var(--c-sport); }
 .tag-status[data-status="pending"]  { --st: var(--c-food); }
 .tag-status[data-status="rejected"] { --st: var(--c-acting); }
 
-/* chip the loai (header / bo loc / dang ky) — pill vien mau the loai */
+/* chip the loai (header / bo loc / dang ky) — pill NEN MEM mau the loai (13%) + chu dam cung mau,
+   de quet mat hon vien manh va dong bo voi thumbnail gradient */
 .cat-chip {
   --cat: var(--color-accent);
-  display: inline-flex; align-items: center; font-size: 11px; padding: 3px 10px;
-  border-radius: 999px; border: 1px solid var(--cat); color: var(--cat); white-space: nowrap;
-  background: color-mix(in oklch, var(--cat) 8%, transparent); text-decoration: none; cursor: pointer;
+  display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 4px 11px;
+  border-radius: 999px; border: 1px solid transparent; white-space: nowrap; text-decoration: none; cursor: pointer;
+  background: color-mix(in srgb, var(--cat) 13%, #fff); color: color-mix(in srgb, var(--cat) 78%, #000);
   transition:
     background-color var(--dur-2) var(--ease-out),
     color            var(--dur-2) var(--ease-out),
@@ -364,21 +391,37 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
     box-shadow       var(--dur-2) var(--ease-out);
 }
 .cat-chip:hover, .cat-chip.active {
-  color: var(--cat); text-decoration: none;
-  background: color-mix(in oklch, var(--cat) 18%, transparent);
+  color: color-mix(in srgb, var(--cat) 85%, #000); text-decoration: none;
+  background: color-mix(in srgb, var(--cat) 22%, #fff);
   transform: translateY(-1px);
 }
 .cat-chip:active { transform: translateY(0); }
-.cat-chip.active { box-shadow: inset 0 0 0 1px var(--cat); }
+.cat-chip.active { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cat) 70%, transparent); }
 
 /* ── table ────────────────────────────────────────────────────────────── */
+/* Bang luon boc trong .table-wrap: tren mobile bang cuon ngang GON TRONG KHUNG thay vi
+   day ca trang tran ngang (cot trang thai / nut Sua-Xoa khong bi khuat). O khong ngat chu
+   ("Cong khai" khong gay 2 dong) — noi dung o deu ngan; can xuong dong thi them class .wrap cho <td>. */
+.table-wrap {
+  overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; min-width: 0;
+  contain: inline-size; /* bang rong khong lam phinh cot luoi / the cha (min-content) → cuon trong khung */
+  /* bong mo 2 mep khi con noi dung cuon (goi y "keo ngang" tren mobile) — o bang trong suot nen thay duoc */
+  background:
+    linear-gradient(90deg, var(--color-bg) 40%, transparent) left / 28px 100% no-repeat local,
+    linear-gradient(270deg, var(--color-bg) 40%, transparent) right / 28px 100% no-repeat local,
+    linear-gradient(90deg, rgb(32 31 29 / .14), transparent) left / 12px 100% no-repeat scroll,
+    linear-gradient(270deg, rgb(32 31 29 / .14), transparent) right / 12px 100% no-repeat scroll;
+}
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th {
-  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
   color: color-mix(in srgb, var(--color-text) 60%, transparent);
   padding: var(--space-2); border-bottom: 1px solid var(--color-divider);
 }
-.table td { padding: var(--space-2); border-bottom: 1px solid var(--color-divider); }
+.table td { padding: var(--space-2); border-bottom: 1px solid var(--color-divider); white-space: nowrap; }
+/* base rule `p, span, div { text-wrap: pretty }` se bat lai wrap cho phan tu con → ep nowrap ca ben trong o */
+.table td :where(div, span, p, a) { text-wrap: nowrap; }
+.table td.wrap, .table td.wrap :where(div, span, p, a) { white-space: normal; text-wrap: pretty; }
 .table tbody tr { transition: background-color var(--dur-2) var(--ease-out); }
 .table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
 
@@ -415,26 +458,31 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
 /* o anh chua co du lieu: nen gradient diu + bieu tuong play mo (kieu nen tang video),
    khong dung chu chu thich "[ thumbnail ]" */
 :root { --ico-play: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4v16l14-8z'/%3E%3C/svg%3E"); }
+/* Nen thumbnail khi chua co anh: gradient 2 lop theo mau the loai (--cat: sang o goc → tram o duoi)
+   + quang sang goc phai tren, de luoi video "co mau" ma van he thong; anh that (img) phu len tren. */
 .hatch, .hatch-mid, .hatch-fine {
   position: relative; border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--color-neutral-200), var(--color-neutral-100));
+  background:
+    radial-gradient(120% 90% at 85% -10%, color-mix(in srgb, var(--cat, var(--color-accent)) 34%, transparent), transparent 55%),
+    linear-gradient(150deg, color-mix(in srgb, var(--cat, var(--color-accent)) 30%, #fff) 0%, color-mix(in srgb, var(--cat, var(--color-accent)) 62%, var(--color-ink)) 100%);
 }
 .hatch-mid:not(:has(img))::after, .hatch-fine:not(:has(img))::after {
   content: ""; position: absolute; inset: 0; margin: auto; width: 20px; height: 20px;
-  background: var(--color-neutral-400);
+  background: rgb(255 255 255 / .9); filter: drop-shadow(0 1px 3px rgb(0 0 0 / .3));
   -webkit-mask: var(--ico-play) center / contain no-repeat; mask: var(--ico-play) center / contain no-repeat;
 }
+/* nut play trang noi tren gradient */
 .thumb-ph {
-  width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
-  background: color-mix(in oklch, var(--cat, var(--color-accent)) 18%, transparent);
-  color: var(--cat, var(--color-accent));
-  transition: transform var(--dur-3) var(--ease-spring), background-color var(--dur-2) var(--ease-out);
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: rgb(255 255 255 / .92); box-shadow: 0 2px 10px rgb(0 0 0 / .28);
+  color: color-mix(in srgb, var(--cat, var(--color-accent)) 75%, #000);
+  transition: transform var(--dur-3) var(--ease-spring), background-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 .thumb-ph::before {
   content: ""; width: 18px; height: 18px; margin-left: 3px; background: currentColor;
   -webkit-mask: var(--ico-play) center / contain no-repeat; mask: var(--ico-play) center / contain no-repeat;
 }
-.video-card:hover .thumb-ph { transform: scale(1.1); background: color-mix(in oklch, var(--cat, var(--color-accent)) 26%, transparent); }
+.video-card:hover .thumb-ph { transform: scale(1.1); background: #fff; box-shadow: 0 4px 14px rgb(0 0 0 / .32); }
 .slot-note { font-family: ui-monospace, "SF Mono", monospace; font-size: 10.5px; color: var(--color-neutral-700); }
 
 /* panel trang tri (hero chua co anh, cover trang dang nhap) */
@@ -456,7 +504,16 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
   display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);
 }
 .player video { width: 100%; height: 100%; background: #000; display: block; }
-.player-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); color: var(--color-neutral-400); font-size: 13px; }
+/* chua co tep phat: gradient toi theo mau the loai (--cat dat o Blade) thay vi hop den phang */
+.player:has(.player-empty) {
+  --cat: var(--color-accent);
+  background:
+    radial-gradient(60% 80% at 80% 0%, color-mix(in oklch, var(--cat) 45%, transparent), transparent 70%),
+    radial-gradient(50% 60% at 0% 100%, color-mix(in oklch, var(--cat) 22%, transparent), transparent 70%),
+    linear-gradient(160deg, color-mix(in oklch, var(--cat) 30%, #141311), #141311 70%);
+}
+.player-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); color: color-mix(in oklch, var(--cat, var(--color-accent)) 55%, #fff); font-size: 13px; }
+.player-empty .icon { opacity: .85; }
 
 /* vung keo tha tep */
 .dropzone {
@@ -478,7 +535,7 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
 .dropzone.has-file .dropzone-ico { background: color-mix(in oklch, var(--c-sport) 16%, transparent); color: var(--c-sport); }
 .dropzone-title { font-size: 14px; font-weight: 600; }
 .dropzone-title u { text-decoration-color: var(--color-accent); text-underline-offset: 3px; color: var(--color-accent-700); }
-.dropzone-hint { font-size: 12px; color: var(--color-neutral-600); }
+.dropzone-hint { font-size: 12px; color: var(--color-neutral-700); }
 .dropzone-name { font-size: 12.5px; color: var(--c-sport); font-weight: 600; }
 
 /* the dinh kem sau khi chon tep (kieu "Your work" — xem truoc · ten · loai/dung luong/thoi luong · go) */
@@ -501,7 +558,7 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
 .attach-preview .icon { opacity: .9; }
 .attach-info { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
 .attach-name { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.attach-meta { font-size: 12px; color: var(--color-neutral-600); font-variant-numeric: tabular-nums; }
+.attach-meta { font-size: 12px; color: var(--color-neutral-700); font-variant-numeric: tabular-nums; }
 .attach-status { font-size: 12px; color: var(--color-neutral-700); font-variant-numeric: tabular-nums; min-height: 1em; }
 .attach-card.is-done .attach-status { color: var(--c-sport); font-weight: 600; }
 .attach-card.is-error .attach-status { color: var(--color-danger); font-weight: 600; }
@@ -580,8 +637,8 @@ a.tag-outline:hover { background: color-mix(in srgb, var(--color-accent) 10%, tr
   font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--color-accent-700); font-variant-numeric: tabular-nums;
 }
-.meta { font-size: 11.5px; color: var(--color-neutral-600); font-variant-numeric: tabular-nums; }
-.muted-i { font-size: 11.5px; color: var(--color-neutral-600); font-style: italic; }
+.meta { font-size: 11.5px; color: var(--color-neutral-700); font-variant-numeric: tabular-nums; }
+.muted-i { font-size: 11.5px; color: var(--color-neutral-700); font-style: italic; }
 .num { font-variant-numeric: tabular-nums; }
 
 /* ── avatar ──────────────────────────────────────────────────────────── */
@@ -630,7 +687,7 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 }
 .menu-head { display: flex; flex-direction: column; gap: 1px; padding: 8px 10px 8px; }
 .menu-head strong { font-size: 13.5px; font-weight: 600; }
-.menu-head span { font-size: 11.5px; color: var(--color-neutral-600); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-head span { font-size: 11.5px; color: var(--color-neutral-700); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .menu-item {
   display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px;
   border: 0; border-radius: var(--radius-md); background: transparent; color: var(--color-text);
@@ -644,7 +701,7 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 .menu-sep { height: 1px; background: var(--color-divider); margin: 4px 2px; }
 
 /* ── breadcrumb (screen-kicker) ──────────────────────────────────────── */
-.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--color-neutral-600); }
+.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--color-neutral-700); }
 .crumbs a { color: var(--color-neutral-700); text-decoration: none; }
 .crumbs a:hover { color: var(--color-accent-700); text-decoration: underline; }
 .crumbs .sep { color: var(--color-neutral-400); }
@@ -668,63 +725,77 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 .ts-shell { display: flex; min-height: 100vh; align-items: stretch; background: var(--color-bg); }
 
 /* ── sidebar ─────────────────────────────────────────────────────────── */
+/* Sidebar TOI mau ink ("khung san khau"): chu kem, muc active vang sang + vach trai vang.
+   Tao tang lop cho ca trang: khung toi – noi dung kem – diem nhan vang. */
 .ts-sidebar {
-  width: 250px; flex: 0 0 250px; border-right: 1px solid var(--color-divider);
+  width: 250px; flex: 0 0 250px; border-right: 1px solid rgb(255 255 255 / .06);
   padding: var(--space-4) var(--space-3);
   display: flex; flex-direction: column; gap: var(--space-4);
-  position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--color-bg);
-  scrollbar-width: thin;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  background: linear-gradient(175deg, #262118, var(--color-ink-2)); color: var(--color-ink-text);
+  scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .18) transparent;
 }
-/* logo: mark vuong bo goc + wordmark + tagline */
-.ts-logo { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--color-text); border-radius: var(--radius-md); }
-.ts-logo:hover { text-decoration: none; color: var(--color-text); }
+/* logo: mark vuong bo goc vang sang + wordmark kem + tagline */
+.ts-logo { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--color-ink-text); border-radius: var(--radius-md); }
+.ts-logo:hover { text-decoration: none; color: #fff; }
 .ts-logo-mark {
-  width: 36px; height: 36px; flex: none; border-radius: 10px; display: grid; place-items: center; color: #fff;
-  background: linear-gradient(140deg, var(--color-accent-500), var(--color-accent-700));
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent) 35%, transparent), inset 0 1px 0 rgba(255,255,255,.25);
+  width: 36px; height: 36px; flex: none; border-radius: 10px; display: grid; place-items: center; color: var(--color-ink);
+  background: linear-gradient(140deg, #e8c377, var(--color-accent-600));
+  box-shadow: 0 2px 10px rgb(0 0 0 / .4), inset 0 1px 0 rgba(255,255,255,.35);
   transition: transform var(--dur-3) var(--ease-spring);
 }
 .ts-logo:hover .ts-logo-mark { transform: rotate(-6deg) scale(1.04); }
 .ts-logo-mark-sm { width: 24px; height: 24px; border-radius: 7px; box-shadow: none; }
+/* logo mark nho o footer (nen kem) giu kieu cu: gradient vang dam + icon trang */
+.ts-footer .ts-logo-mark { color: #fff; background: linear-gradient(140deg, var(--color-accent-500), var(--color-accent-700)); }
 .ts-logo-txt { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 .ts-logo-name { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
-.ts-logo-sub { font-size: 11px; color: var(--color-neutral-600); }
+.ts-logo-sub { font-size: 11px; color: var(--color-ink-faint); }
 
 .ts-nav { display: flex; flex-direction: column; gap: var(--space-4); }
 .ts-nav-group { display: flex; flex-direction: column; gap: 4px; }
 .ts-nav-label {
-  font-size: 10.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--color-neutral-500); padding: 0 10px 2px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--color-ink-faint); padding: 0 10px 2px;
 }
 .ts-nav-items { display: flex; flex-direction: column; gap: 2px; }
 .ts-nav-item {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 10px; border-radius: var(--radius-md); border-left: 2px solid transparent;
-  color: var(--color-neutral-800); font-size: 13.5px; text-decoration: none; cursor: pointer;
+  color: var(--color-ink-muted); font-size: 13.5px; text-decoration: none; cursor: pointer;
   transition:
     background-color var(--dur-2) var(--ease-out),
     border-color     var(--dur-2) var(--ease-out),
     color            var(--dur-2) var(--ease-out);
 }
-.ts-nav-item .icon { color: var(--color-neutral-600); transition: color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
+.ts-nav-item .icon { color: color-mix(in srgb, var(--color-ink-muted) 80%, transparent); transition: color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
 .ts-nav-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: transform var(--dur-2) var(--ease-out); }
-.ts-nav-item:hover { background: var(--color-accent-100); color: var(--color-text); text-decoration: none; }
-.ts-nav-item:hover .icon { color: var(--color-accent-700); }
+.ts-nav-item:hover { background: rgb(255 255 255 / .06); color: var(--color-ink-text); text-decoration: none; }
+.ts-nav-item:hover .icon { color: var(--color-gold); }
 .ts-nav-item:hover .ts-nav-txt { transform: translateX(2px); }
-.ts-nav-item.active { background: var(--color-accent-100); border-left-color: var(--color-accent); color: var(--color-text); font-weight: 600; }
-.ts-nav-item.active .icon { color: var(--color-accent-700); }
+.ts-nav-item.active { background: rgb(226 173 102 / .14); border-left-color: var(--color-gold-2); color: var(--color-gold); font-weight: 600; }
+.ts-nav-item.active .icon { color: var(--color-gold); }
 .ts-nav-item .badge { margin-left: auto; }
+/* badge dem trong sidebar: vang sang tren nen toi (accent-700 se chim) */
+.ts-sidebar .badge { background: var(--color-gold); color: var(--color-ink); }
 
 .ts-side-foot {
   margin-top: auto; display: flex; align-items: center; gap: var(--space-2);
-  border-top: 1px solid var(--color-divider); padding-top: var(--space-3);
+  border-top: 1px solid rgb(255 255 255 / .08); padding-top: var(--space-3);
 }
 .ts-side-foot .btn { flex: 1; }
-.ts-me { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 6px 8px; border-radius: var(--radius-md); text-decoration: none; color: inherit; transition: background-color var(--dur-2) var(--ease-out); }
-.ts-me:hover { background: var(--color-accent-100); text-decoration: none; color: inherit; }
+/* khach: nut phu trong sidebar toi = vien sang, chu kem */
+.ts-sidebar .btn-secondary { background: transparent; border-color: rgb(255 255 255 / .18); color: var(--color-ink-text); }
+.ts-sidebar .btn-secondary:hover { background: rgb(255 255 255 / .08); border-color: rgb(255 255 255 / .3); color: #fff; }
+.ts-sidebar .icon-btn { color: var(--color-ink-muted); }
+.ts-sidebar .icon-btn:hover { background: rgb(255 255 255 / .08); color: var(--color-gold); }
+.ts-sidebar .avatar { border-color: rgb(255 255 255 / .16); }
+.ts-me { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 6px 8px; border-radius: var(--radius-md); text-decoration: none; color: var(--color-ink-text); transition: background-color var(--dur-2) var(--ease-out); }
+.ts-me:hover { background: rgb(255 255 255 / .06); text-decoration: none; color: #fff; }
 .ts-me-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
 .ts-me-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ts-me-role { font-size: 11px; color: var(--color-neutral-600); }
+.ts-me-role { font-size: 11px; color: var(--color-neutral-700); }
+.ts-sidebar .ts-me-role { color: var(--color-ink-faint); }
 
 /* ── main + header ───────────────────────────────────────────────────── */
 .ts-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -769,7 +840,7 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 }
 .screen-head-txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .screen-title { font-family: var(--font-heading); font-weight: 600; font-size: 30px; line-height: 1.15; margin: 0; letter-spacing: -0.015em; }
-.screen-sub { font-size: 13.5px; color: var(--color-neutral-600); margin: 0; max-width: 720px; }
+.screen-sub { font-size: 13.5px; color: var(--color-neutral-700); margin: 0; max-width: 720px; }
 .screen-side { display: flex; align-items: center; gap: var(--space-2); flex: none; }
 
 /* flash message — vao bang rise (thua huong tu .ts-content > *), dong bang
@@ -800,6 +871,9 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 /* ── luoi video & the video (Discover / Explore / Profile / Contest) ──── */
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+/* o luoi & field khong duoc phinh theo noi dung ben trong (select co option dai) → tran ngang tren mobile */
+.grid-2 > *, .grid-4 > *, .field { min-width: 0; }
+select.input { min-width: 0; max-width: 100%; }
 /* the trong luoi vao so le */
 .grid-4 > *, .grid-2 > * { animation: ts-rise var(--dur-4) var(--ease-out) backwards; }
 .grid-4 > :nth-child(1), .grid-2 > :nth-child(1) { animation-delay: 80ms; }
@@ -827,9 +901,11 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 .video-thumb {
   aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center;
   border-bottom: 1px solid var(--color-divider); position: relative; overflow: hidden;
-  background: color-mix(in oklch, var(--cat) 12%, var(--color-bg));
+  /* cung gradient 2 lop theo mau the loai nhu .hatch (xem "khung anh & placeholder") */
+  background:
+    radial-gradient(120% 90% at 85% -10%, color-mix(in srgb, var(--cat, var(--color-accent)) 34%, transparent), transparent 55%),
+    linear-gradient(150deg, color-mix(in srgb, var(--cat, var(--color-accent)) 30%, #fff) 0%, color-mix(in srgb, var(--cat, var(--color-accent)) 62%, var(--color-ink)) 100%);
 }
-.video-card .video-thumb.hatch-mid { background: color-mix(in oklch, var(--cat) 12%, var(--color-bg)); }
 .video-thumb .slot-note { color: var(--cat); opacity: 0.85; }
 .video-thumb img {
   width: 100%; height: 100%; object-fit: cover;
@@ -837,23 +913,55 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 }
 .video-card:hover .video-thumb img { transform: scale(1.04); }
 .video-card-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
-.video-card-cat { font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: var(--cat); }
+.video-card-cat { font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; color: color-mix(in srgb, var(--cat) 85%, #000); }
 .video-card-title {
   font-family: var(--font-heading); font-weight: 600; font-size: 17px; line-height: 1.25;
   transition: color var(--dur-2) var(--ease-out);
 }
 .video-card:hover .video-card-title { color: var(--color-accent-800); }
 
-/* hero (Discover) */
+/* hero (Discover) — "anh den san khau": nen ink + 2 quang sang (vang + tim music) nhu den roi,
+   chu trang noi bat; khi co anh bia that thi anh phu len, hop thong tin kinh toi van doc duoc */
 .hero-plate { position: relative; overflow: hidden; }
+.hero-plate.ph-art {
+  background:
+    radial-gradient(90% 130% at 88% -20%, rgb(240 199 128 / .38), transparent 60%),
+    radial-gradient(70% 110% at 8% 115%, rgb(107 75 184 / .35), transparent 55%),
+    linear-gradient(140deg, #2a2320 10%, #3a2d22 55%, #201b17 100%);
+  border-color: rgb(255 255 255 / .06); color: var(--color-ink-text);
+  box-shadow: var(--shadow-md);
+}
+.hero-plate .ph-art-ico { color: var(--color-gold); opacity: 0.14; }
 .hero-plate > img { transition: transform 1.4s var(--ease-out); }
 .hero-plate:hover > img { transform: scale(1.025); }
 .hero-box {
-  position: relative; background: var(--color-bg); border: 1px solid var(--color-divider);
-  padding: var(--space-4); max-width: 460px;
-  transition: box-shadow var(--dur-3) var(--ease-out);
+  position: relative; padding: var(--space-4); max-width: 460px; border-radius: var(--radius-lg);
+  background: rgb(20 16 12 / .58); border: 1px solid rgb(255 255 255 / .12); color: var(--color-ink-text);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  transition: box-shadow var(--dur-3) var(--ease-out), border-color var(--dur-3) var(--ease-out);
 }
-.hero-plate:hover .hero-box { box-shadow: var(--shadow-md); }
+.hero-plate:hover .hero-box { box-shadow: 0 10px 30px rgb(0 0 0 / .3); border-color: rgb(255 255 255 / .2); }
+.hero-box .kicker { color: var(--color-gold); }
+.hero-box h2 { color: #fff; }
+.hero-box p { color: rgb(244 239 230 / .82); }
+.hero-box .meta { color: rgb(244 239 230 / .72); }
+
+/* panel gioi thieu trang dang nhap / dang ky — cung "anh den san khau" nhu hero;
+   cao theo man hinh (toi thieu 460px) de cot form ben phai khong lung lo giua khoang trang */
+.auth-cover.ph-art {
+  min-height: max(460px, calc(100vh - 340px));
+  background:
+    radial-gradient(90% 130% at 88% -20%, rgb(240 199 128 / .34), transparent 60%),
+    radial-gradient(70% 110% at 8% 115%, rgb(107 75 184 / .32), transparent 55%),
+    linear-gradient(140deg, #2a2320 10%, #3a2d22 55%, #201b17 100%);
+  border-color: rgb(255 255 255 / .06); color: var(--color-ink-text); box-shadow: var(--shadow-md);
+}
+.auth-cover .ph-art-ico { color: var(--color-gold); opacity: 0.14; }
+.auth-cover .kicker { color: var(--color-gold); }
+.auth-cover h2 { color: #fff; }
+.auth-cover p { color: rgb(244 239 230 / .82); }
+.auth-cover .dropzone-ico { background: rgb(255 255 255 / .1); color: var(--color-gold); }
+@media (max-width: 1080px) { .auth-cover.ph-art { min-height: 0; } } /* mobile: cover xep tren form, khong keo dai */
 
 /* hang xep hang (trending / leaderboard) */
 .rank-row {
@@ -879,8 +987,8 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
 .phase { flex: 1; padding: var(--space-2) var(--space-3); border-right: 1px solid var(--color-divider); transition: background-color var(--dur-3) var(--ease-out); }
 .phase:last-child { border-right: 0; }
 .phase.current { background: var(--color-accent-100); }
-.phase-k { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-neutral-600); }
-.phase-v { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-neutral-600); }
+.phase-k { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-neutral-700); }
+.phase-v { font-size: 13px; font-variant-numeric: tabular-nums; color: var(--color-neutral-700); }
 .phase.current .phase-v { color: var(--color-accent-700); }
 
 /* bong bong chat (FR6) */
@@ -890,20 +998,20 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
   font-size: 13px; line-height: 1.55;
   animation: ts-rise var(--dur-3) var(--ease-out) backwards;
 }
-.bubble .at { font-size: 10.5px; color: var(--color-neutral-600); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.bubble .at { font-size: 10.5px; color: var(--color-neutral-700); margin-top: 4px; font-variant-numeric: tabular-nums; }
 .bubble.me { align-self: flex-end; background: var(--color-accent-100); }
 .bubble.them { align-self: flex-start; background: var(--color-surface); }
 
 /* chi so profile / dashboard */
 .stat { display: flex; flex-direction: column; }
 .stat-n { font-family: var(--font-heading); font-size: 26px; font-variant-numeric: tabular-nums; }
-.stat-k { font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-neutral-600); }
+.stat-k { font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-neutral-700); }
 
 /* tab gach chan (moderation) — gach chan truot ra tu trai */
 .line-tabs { display: flex; gap: var(--space-4); align-items: center; }
 .line-tab {
   position: relative; font-size: 12.5px; padding-bottom: var(--space-1); text-decoration: none;
-  color: var(--color-neutral-600); cursor: pointer;
+  color: var(--color-neutral-700); cursor: pointer;
   transition: color var(--dur-2) var(--ease-out);
 }
 .line-tab::after {
@@ -954,7 +1062,7 @@ button.star:focus-visible { outline: 2px solid var(--color-accent); outline-offs
   border-top: 1px solid var(--color-divider);
   padding: var(--space-4) var(--space-8);
   display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;
-  font-size: 12.5px; color: var(--color-neutral-600);
+  font-size: 12.5px; color: var(--color-neutral-700);
 }
 .ts-footer-brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--color-text); text-decoration: none; }
 .ts-footer-brand:hover { text-decoration: none; color: var(--color-accent-800); }
@@ -1006,7 +1114,10 @@ button.star:focus-visible { outline: 2px solid var(--color-accent); outline-offs
   .ts-user-name, .ts-user .chev { display: none; }
   .ts-user { padding: 3px; }
   .ts-header .search { min-width: 0; }
-  .ts-header-right .btn-primary { padding-inline: 10px; }
+  /* nut "Dang tiet muc" chi con icon de nhuong cho o tim kiem (chu an bang font-size 0, icon SVG giu kich thuoc) */
+  .ts-header-right .btn-primary:has(.icon) { font-size: 0; gap: 0; padding: 8px; }
+  .ts-header-right .btn-primary:has(.icon) .icon { margin: 0; }
+  .ts-header-right .btn-primary:not(:has(.icon)) { padding-inline: 10px; } /* khach: "Dang ky" van co chu */
   .ts-header-right > .btn-ghost { display: none; } /* khach: chi giu nut Dang ky, nhuong cho o tim kiem */
 }
 

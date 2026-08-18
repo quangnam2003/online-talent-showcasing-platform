@@ -18,7 +18,7 @@
             <div class="hero-box">
                 <div class="kicker"><x-icon name="sparkles" size="12" /> Nổi bật tuần này</div>
                 <h2 style="font-size: 28px; margin: var(--space-1) 0 var(--space-2)">{{ $featured->title }}</h2>
-                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; line-height: 1.55; color: var(--color-neutral-800)">
+                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; line-height: 1.55">
                     {{ \Illuminate\Support\Str::limit($featured->description ?? 'Tiết mục của '.$featured->user->name.' trong thể loại '.$featured->category->name.'.', 150) }}
                 </p>
                 <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap">
@@ -30,7 +30,7 @@
             <div class="hero-box">
                 <div class="kicker">Sân khấu đang chờ</div>
                 <h2 style="font-size: 28px; margin: var(--space-1) 0 var(--space-2)">Tiết mục đầu tiên là của bạn</h2>
-                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; line-height: 1.55; color: var(--color-neutral-800)">
+                <p style="margin: 0 0 var(--space-3); font-size: 13.5px; line-height: 1.55">
                     Chưa có video nào được duyệt. Đăng ký làm creator, tải video lên và trở thành gương mặt nổi bật đầu tiên của TalentStage.
                 </p>
                 @guest
