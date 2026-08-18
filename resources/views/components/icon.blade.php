@@ -34,6 +34,7 @@
         'plus'         => '<path d="M5 12h14"/><path d="M12 5v14"/>',
         'chevron-right'=> '<path d="m9 18 6-6-6-6"/>',
         'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
+        'chevrons-left'=> '<path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/>',
         'x'            => '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
         'menu'         => '<path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/>',
         'eye'          => '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',

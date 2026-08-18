@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{{ asset('css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('css/talentstage.css') }}?v={{ @filemtime(public_path('css/talentstage.css')) ?: 1 }}">
     <script src="{{ asset('js/talentstage.js') }}?v={{ @filemtime(public_path('js/talentstage.js')) ?: 1 }}" defer></script>
+    {{-- khoi phuc trang thai thu gon sidebar TRUOC khi ve trang (tranh nhay); logic bat/tat: tsToggleCollapse trong talentstage.js --}}
+    <script>try{if(localStorage.getItem('ts-nav')==='collapsed')document.documentElement.classList.add('nav-collapsed')}catch(e){}</script>
 </head>
 <body>
 @php
@@ -73,7 +75,7 @@
             </span>
         </a>
 
-        <nav class="ts-nav">
+        <nav class="ts-nav" id="ts-nav">
             @foreach ($navGroups as $group)
                 @if (count($group['items']))
                     <div class="ts-nav-group">
@@ -89,7 +91,7 @@
                                         ? request()->is('/')
                                         : request()->is(...explode('|', $pattern));
                                 @endphp
-                                <a class="ts-nav-item {{ $active ? 'active' : '' }}" href="{{ $url }}" @if ($active) aria-current="page" @endif>
+                                <a class="ts-nav-item {{ $active ? 'active' : '' }}" href="{{ $url }}" data-tip="{{ $label }}" @if ($active) aria-current="page" @endif>
                                     <x-icon :name="$icon" size="18" />
                                     <span class="ts-nav-txt">{{ $label }}</span>
                                     @if ($label === 'Thông báo')
@@ -107,7 +109,7 @@
 
         <div class="ts-side-foot">
             @auth
-                <a class="ts-me" href="{{ url('/users/'.$me->id) }}" title="Xem hồ sơ">
+                <a class="ts-me" href="{{ url('/users/'.$me->id) }}" title="{{ $me->name }} — xem hồ sơ">
                     <span class="avatar">
                         @if ($me->avatar)
                             <img src="{{ asset('storage/'.$me->avatar) }}" alt="{{ $me->name }}">
@@ -125,8 +127,8 @@
                     <button type="submit" class="icon-btn" title="Đăng xuất" aria-label="Đăng xuất"><x-icon name="log-out" size="17" /></button>
                 </form>
             @else
-                <a class="btn btn-primary btn-sm" href="{{ route('login') }}"><x-icon name="log-in" size="15" /> Đăng nhập</a>
-                <a class="btn btn-secondary btn-sm" href="{{ route('register') }}">Tạo tài khoản</a>
+                <a class="btn btn-primary btn-sm" href="{{ route('login') }}" title="Đăng nhập"><x-icon name="log-in" size="15" /> Đăng nhập</a>
+                <a class="btn btn-secondary btn-sm" href="{{ route('register') }}" title="Tạo tài khoản"><x-icon name="user-plus" size="15" /> Tạo tài khoản</a>
             @endauth
         </div>
     </aside>
@@ -135,7 +137,10 @@
     <main class="ts-main">
 
         <header class="ts-header">
-            <button class="ts-menu-btn" type="button" onclick="tsToggleNav()" aria-label="Mở menu"><x-icon name="menu" size="18" /></button>
+            {{-- MOT nut ☰ cho ca hai che do (JS tsMenu): man hinh nho → mo/dong drawer; desktop → thu gon sidebar
+                 thanh rail icon / mo rong lai (html.nav-collapsed, nho bang localStorage) --}}
+            <button class="ts-menu-btn" type="button" onclick="tsMenu()" aria-controls="ts-nav" aria-expanded="true"
+                    title="Thu gọn thanh bên" aria-label="Thu gọn thanh bên"><x-icon name="menu" size="18" /></button>
 
             <form class="search" method="GET" action="{{ url('/explore') }}" role="search">
                 <x-icon name="search" size="16" class="search-ico" />

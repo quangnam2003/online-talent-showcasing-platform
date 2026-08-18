@@ -14,6 +14,41 @@
   window.tsToggleNav = function () {
     body.classList.toggle('nav-open');
   };
+
+  /* ── thu gon / mo rong sidebar (desktop) ─────────────────────────────────
+       html.nav-collapsed duoc gan som trong <head> tu localStorage (khong nhay khi tai trang);
+       o day chi bat/tat, luu lai va dong bo aria + tooltip (title lay tu data-tip khi thu gon) */
+  var html = document.documentElement;
+  var desktopMq = window.matchMedia('(min-width: 1081px)');
+  function syncCollapse() {
+    var desktop = desktopMq.matches;
+    var on = desktop && html.classList.contains('nav-collapsed');
+    var btn = document.querySelector('.ts-menu-btn');
+    if (btn) {
+      if (desktop) {
+        btn.setAttribute('aria-expanded', on ? 'false' : 'true');
+        btn.title = on ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên';
+      } else {
+        btn.setAttribute('aria-expanded', body.classList.contains('nav-open') ? 'true' : 'false');
+        btn.title = 'Mở menu';
+      }
+      btn.setAttribute('aria-label', btn.title);
+    }
+    document.querySelectorAll('.ts-nav-item[data-tip]').forEach(function (a) {
+      if (on) a.title = a.getAttribute('data-tip'); else a.removeAttribute('title');
+    });
+  }
+  window.tsToggleCollapse = function () {
+    var on = html.classList.toggle('nav-collapsed');
+    try { localStorage.setItem('ts-nav', on ? 'collapsed' : 'open'); } catch (e) {}
+    syncCollapse();
+  };
+  /* nut ☰ duy nhat: man hinh nho → drawer; desktop → thu gon / mo rong */
+  window.tsMenu = function () {
+    if (desktopMq.matches) window.tsToggleCollapse(); else { window.tsToggleNav(); syncCollapse(); }
+  };
+  document.addEventListener('DOMContentLoaded', syncCollapse);
+  if (desktopMq.addEventListener) desktopMq.addEventListener('change', syncCollapse);
   document.addEventListener('click', function (e) {
     if (!body.classList.contains('nav-open')) return;
     if (e.target.closest('.ts-sidebar') || e.target.closest('.ts-menu-btn')) return;

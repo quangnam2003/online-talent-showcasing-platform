@@ -734,7 +734,18 @@ a:hover > .avatar { border-color: var(--color-accent); box-shadow: 0 0 0 3px col
   position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
   background: linear-gradient(175deg, #262118, var(--color-ink-2)); color: var(--color-ink-text);
   scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .18) transparent;
+  transition: width var(--dur-3) var(--ease-out), flex-basis var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
 }
+/* nut ☰ o dau header — LUON hien: desktop thu gon / mo rong sidebar, man hinh nho mo drawer (JS tsMenu) */
+.ts-menu-btn {
+  display: inline-flex; width: 36px; height: 36px; flex: none; align-items: center; justify-content: center; cursor: pointer;
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md); background: transparent; color: var(--color-neutral-700);
+  transition: background-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), transform var(--dur-1) var(--ease-out);
+}
+.ts-menu-btn:hover { background: var(--color-accent-100); color: var(--color-accent-800); border-color: color-mix(in srgb, var(--color-accent) 40%, transparent); }
+.ts-menu-btn:active { transform: scale(0.94); }
+.ts-menu-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+html.nav-collapsed .ts-menu-btn { background: var(--color-accent-100); color: var(--color-accent-800); } /* dang thu gon: nut sang de biet bam mo lai */
 /* logo: mark vuong bo goc vang sang + wordmark kem + tagline */
 .ts-logo { display: flex; align-items: center; gap: 10px; padding: 4px 6px; text-decoration: none; color: var(--color-ink-text); border-radius: var(--radius-md); }
 .ts-logo:hover { text-decoration: none; color: #fff; }
@@ -1104,10 +1115,33 @@ button.star:focus-visible { outline: 2px solid var(--color-accent); outline-offs
 .ts-footer-links a:hover { color: var(--color-accent-700); }
 .ts-footer-copy { flex: none; }
 
+/* ── Sidebar THU GON (rail chi icon, ~72px) — chi desktop; html.nav-collapsed do JS/localStorage dat ──
+     an chu (wordmark, nhan nhom, ten muc, ten user), muc nav can giua, badge dem thanh cham nho tren icon,
+     nhom cach nhau bang vach ke; tooltip = title (JS gan tu data-tip khi thu gon) */
+@media (min-width: 1081px) {
+  html.nav-collapsed .ts-sidebar { width: 72px; flex-basis: 72px; padding-inline: 10px; }
+  html.nav-collapsed .ts-logo { justify-content: center; padding: 4px 0; }
+  html.nav-collapsed .ts-logo-txt, html.nav-collapsed .ts-nav-txt, html.nav-collapsed .ts-nav-label,
+  html.nav-collapsed .ts-me-txt { display: none; }
+  html.nav-collapsed .ts-nav-group + .ts-nav-group { border-top: 1px solid rgb(255 255 255 / .08); padding-top: var(--space-2); }
+  html.nav-collapsed .ts-nav { gap: var(--space-2); }
+  html.nav-collapsed .ts-nav-item { position: relative; justify-content: center; padding: 10px 0; }
+  html.nav-collapsed .ts-nav-item .icon { margin-left: -2px; } /* bu vien trai 2px de icon nam giua */
+  html.nav-collapsed .ts-nav-item:hover .ts-nav-txt { transform: none; }
+  html.nav-collapsed .ts-nav-item .badge {
+    position: absolute; top: 3px; right: 6px; margin: 0; min-width: 15px; height: 15px; padding: 0 3px; font-size: 9px;
+    box-shadow: 0 0 0 2px var(--color-ink-2);
+  }
+  html.nav-collapsed .ts-side-foot { flex-direction: column; align-items: stretch; gap: 6px; }
+  html.nav-collapsed .ts-me { justify-content: center; padding: 4px; }
+  html.nav-collapsed .ts-side-foot form { display: flex; justify-content: center; }
+  html.nav-collapsed .ts-side-foot .btn { font-size: 0; gap: 0; padding: 8px; }   /* khach: chi icon */
+  html.nav-collapsed .ts-side-foot .btn .icon { margin: 0; }
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    6. RESPONSIVE — sidebar thanh drawer + man che
    ══════════════════════════════════════════════════════════════════════════ */
-.ts-menu-btn { display: none; }
 .ts-scrim { display: none; }
 @media (max-width: 1080px) {
   .ts-sidebar {
@@ -1124,15 +1158,7 @@ button.star:focus-visible { outline: 2px solid var(--color-accent); outline-offs
   }
   body.nav-open .ts-scrim { opacity: 1; pointer-events: auto; }
   body.nav-open { overflow: hidden; }
-  .ts-menu-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; flex: none; cursor: pointer;
-    border: 1px solid var(--color-divider); border-radius: var(--radius-md);
-    background: transparent; font-size: 16px; color: var(--color-text);
-    transition: background-color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), transform var(--dur-1) var(--ease-out);
-  }
-  .ts-menu-btn:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
-  .ts-menu-btn:active { transform: scale(0.94); }
+  html.nav-collapsed .ts-menu-btn { background: transparent; color: var(--color-neutral-700); } /* drawer: khong dung trang thai thu gon */
   .ts-header { padding: var(--space-2) var(--space-3); }
   .ts-content { padding: var(--space-4); }
   .ts-footer { padding: var(--space-3) var(--space-4); }

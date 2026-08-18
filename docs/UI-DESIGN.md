@@ -26,7 +26,7 @@ Mã nguồn: tokens/components trong **`public/css/talentstage.css`**; tương t
 
 ## 2. Khung trang (`layouts/app.blade.php`)
 
-- **Sidebar 250px** (sticky, drawer trên mobile) — **nền tối ink** (gradient `#262118 → #1c1813`, "khung sân khấu"): logo mark vuông bo góc gradient vàng sáng + wordmark **TalentStage** kem + tagline "Sân khấu tài năng trực tuyến"; nav dạng **icon + nhãn** chữ `ink-muted`, chia nhóm nhỏ (nhãn nhóm `ink-faint`):
+- **Sidebar 250px** (sticky; drawer trên mobile; desktop **thu gọn được** thành rail 72px chỉ icon bằng **cùng nút ☰** `.ts-menu-btn` ở đầu header (luôn hiển thị; JS `tsMenu()`: ≤1080px mở drawer, >1080px thu gọn/mở rộng; nút sáng nền `accent-100` khi đang thu gọn) — `html.nav-collapsed`, nhớ qua `localStorage['ts-nav']`, script trong `<head>` khôi phục trước khi vẽ để không nháy; khi thu gọn: ẩn chữ, badge thành chấm nhỏ trên icon, nhóm cách nhau bằng vạch, tooltip = `title` lấy từ `data-tip`) — **nền tối ink** (gradient `#262118 → #1c1813`, "khung sân khấu"): logo mark vuông bo góc gradient vàng sáng + wordmark **TalentStage** kem + tagline "Sân khấu tài năng trực tuyến"; nav dạng **icon + nhãn** chữ `ink-muted`, chia nhóm nhỏ (nhãn nhóm `ink-faint`):
   - *(không nhãn)*: Trang chủ · Tìm kiếm · Bảng tin (đăng nhập) · Cuộc thi
   - **Cộng đồng**: Nhóm · Tin nhắn (creator/mentor, badge chưa đọc) · Thông báo (badge chưa đọc)
   - **Kênh của tôi** (creator): Đăng tiết mục · Tiết mục của tôi · Hồ sơ của tôi — user khác: **Tài khoản**: Hồ sơ của tôi
