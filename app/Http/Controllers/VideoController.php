@@ -179,12 +179,17 @@ class VideoController extends Controller
         ]);
 
         if ($request->hasFile('thumbnail')) {
+            // thay anh bia: xoa tep cu, luu tep moi
             if ($video->thumbnail) {
                 Storage::disk('public')->delete($video->thumbnail);
             }
             $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+        } elseif ($request->boolean('remove_thumbnail') && $video->thumbnail) {
+            // bo anh bia hien tai (khong chon tep moi)
+            Storage::disk('public')->delete($video->thumbnail);
+            $data['thumbnail'] = null;
         } else {
-            unset($data['thumbnail']);
+            unset($data['thumbnail']); // khong dong vao anh bia hien tai
         }
 
         $data['allow_comments'] = $request->boolean('allow_comments');

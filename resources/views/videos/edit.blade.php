@@ -41,11 +41,32 @@
         <textarea class="input" name="description" rows="4">{{ old('description', $video->description) }}</textarea>
     </label>
 
-    <label class="field">
-        <span class="label-up">Đổi ảnh bìa (tùy chọn)</span>
-        <input class="input" type="file" name="thumbnail" accept="image/*" style="padding: 6px">
+    {{-- Anh bia: hien anh hien tai (neu co), chon tep moi de thay, hoac tich "Xoa anh bia" — JS: tsThumbField --}}
+    @php $hasThumb = $video->thumbnail && file_exists(public_path('storage/'.$video->thumbnail)); @endphp
+    <div class="field" data-thumb-field>
+        <span class="label-up">Ảnh bìa (tùy chọn)</span>
+        <div style="display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap">
+            <span class="hatch-mid thumb-sm" style="width: 128px; height: 76px; flex: none; display: block; --cat: {{ $video->category->colorVar() }}">
+                <img data-thumb-preview src="{{ $hasThumb ? asset('storage/'.$video->thumbnail) : '' }}" alt="" @unless ($hasThumb) hidden @endunless>
+            </span>
+            <div style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1; min-width: 220px">
+                <span class="meta" data-thumb-status
+                      data-msg-current="Ảnh bìa hiện tại — chọn tệp khác để thay."
+                      data-msg-none="Chưa có ảnh bìa — chọn ảnh để thêm (JPG, PNG, WEBP, tối đa 4 MB)."
+                      data-msg-new="Ảnh mới sẽ thay ảnh bìa hiện tại khi bạn lưu."
+                      data-msg-remove="Ảnh bìa sẽ bị xoá khi bạn lưu.">{{ $hasThumb ? 'Ảnh bìa hiện tại — chọn tệp khác để thay.' : 'Chưa có ảnh bìa — chọn ảnh để thêm (JPG, PNG, WEBP, tối đa 4 MB).' }}</span>
+                <input class="input @error('thumbnail') is-invalid @enderror" type="file" name="thumbnail" accept="image/*" style="padding: 6px" data-thumb-input>
+                @if ($hasThumb)
+                    <label class="radio" style="font-size: 13px">
+                        <input type="checkbox" name="remove_thumbnail" value="1" data-thumb-remove @checked(old('remove_thumbnail'))>
+                        <span class="dot" style="border-radius: 3px"></span>
+                        Xoá ảnh bìa hiện tại
+                    </label>
+                @endif
+            </div>
+        </div>
         @error('thumbnail') <span class="err-msg">{{ $message }}</span> @enderror
-    </label>
+    </div>
 
     <label class="radio">
         <input type="checkbox" name="allow_comments" value="1" @checked(old('allow_comments', $video->allow_comments))>

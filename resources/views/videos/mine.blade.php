@@ -21,7 +21,12 @@
                 $t = ['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'][$video->status];
             @endphp
             <tr>
-                <td><a href="{{ route('videos.show', $video) }}" style="display: inline-flex; align-items: center; gap: 6px">@if ($video->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-600)" />@endif {{ \Illuminate\Support\Str::limit($video->title, 40) }}</a></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: var(--space-2)">
+                        <a href="{{ route('videos.show', $video) }}" class="hatch-mid thumb-sm" style="width: 72px; height: 42px; flex: 0 0 72px; display: block; --cat: {{ $video->category->colorVar() }}" title="{{ $video->thumbnail ? 'Có ảnh bìa' : 'Chưa có ảnh bìa' }}">@include('partials.thumb', ['video' => $video, 'compact' => true])</a>
+                        <a href="{{ route('videos.show', $video) }}" style="display: inline-flex; align-items: center; gap: 6px">@if ($video->isAudio())<x-icon name="mic" size="13" style="color: var(--color-neutral-600)" />@endif {{ \Illuminate\Support\Str::limit($video->title, 40) }}</a>
+                    </div>
+                </td>
                 <td><span style="color: {{ $video->category->colorVar() }}; font-weight: 600; font-size: 12px">{{ $video->category->name }}</span></td>
                 <td class="muted-i">{{ $video->privacy === 'public' ? 'Công khai' : 'Riêng tư' }}</td>
                 <td class="num">{{ number_format($video->views) }}</td>

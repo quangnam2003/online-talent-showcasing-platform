@@ -520,3 +520,43 @@
   form.addEventListener('submit', function (e) { e.preventDefault(); clearTimeout(timer); refresh(); });
   if (clearBtn) clearBtn.addEventListener('click', function () { input.value = ''; syncClear(); clearTimeout(timer); refresh(); input.focus(); });
 })();
+
+/* ── Sua video: o anh bia (data-thumb-field) ─────────────────────────────
+     - chon tep moi -> xem truoc ngay, bo tich "Xoa anh bia"
+     - tich "Xoa anh bia" -> an anh hien tai (hien placeholder), bo tep da chon
+     - bo tich -> hien lai anh hien tai */
+(function () {
+  var field = document.querySelector('[data-thumb-field]');
+  if (!field) return;
+  var input = field.querySelector('[data-thumb-input]');
+  var img = field.querySelector('[data-thumb-preview]');
+  var status = field.querySelector('[data-thumb-status]');
+  var remove = field.querySelector('[data-thumb-remove]');
+  if (!input || !img) return;
+  var currentSrc = img.getAttribute('src') || '';
+  var objectUrl = null;
+
+  function say(key) { if (status) status.textContent = status.getAttribute('data-msg-' + key) || ''; }
+  function revoke() { if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; } }
+  function showCurrent() {
+    revoke();
+    if (currentSrc) { img.src = currentSrc; img.hidden = false; say('current'); }
+    else { img.removeAttribute('src'); img.hidden = true; say('none'); }
+  }
+
+  input.addEventListener('change', function () {
+    var f = input.files && input.files[0];
+    if (f && /^image\//.test(f.type)) {
+      revoke(); objectUrl = URL.createObjectURL(f);
+      img.src = objectUrl; img.hidden = false; say('new');
+      if (remove) remove.checked = false;
+    } else {
+      showCurrent();
+    }
+  });
+  if (remove) remove.addEventListener('change', function () {
+    if (remove.checked) { input.value = ''; revoke(); img.removeAttribute('src'); img.hidden = true; say('remove'); }
+    else showCurrent();
+  });
+  if (remove && remove.checked) { img.removeAttribute('src'); img.hidden = true; say('remove'); }
+})();
