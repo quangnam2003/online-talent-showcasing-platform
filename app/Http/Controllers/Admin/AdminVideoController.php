@@ -19,11 +19,23 @@ class AdminVideoController extends Controller
             ? $request->query('status')
             : 'pending';
 
+        // Mac dinh: cho duyet -> gui truoc duyet truoc; da duyet/tu choi -> moi nhat len dau
+        $sort = in_array($request->query('sort'), ['newest', 'oldest'], true)
+            ? $request->query('sort')
+            : ($status === 'pending' ? 'oldest' : 'newest');
+        // dung tham so `title` (khong dung `q`) de khong dung o tim kiem chung tren header
+        $q = trim((string) $request->query('title'));
+        $dir = $sort === 'newest' ? 'desc' : 'asc';
+
         return view('admin.videos', [
             'status' => $status,
+            'sort' => $sort,
+            'q' => $q,
             'videos' => Video::where('status', $status)
                 ->with(['user', 'category'])
-                ->oldest() // gui truoc duyet truoc
+                ->when($q !== '', fn ($query) => $query->where('title', 'like', '%'.$q.'%'))
+                ->orderBy('created_at', $dir)
+                ->orderBy('id', $dir)
                 ->paginate(10)
                 ->withQueryString(),
             'counts' => Video::selectRaw('status, count(*) as n')->groupBy('status')->pluck('n', 'status'),

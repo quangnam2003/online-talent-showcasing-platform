@@ -465,3 +465,58 @@
   document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(); });
   start();
 })();
+
+/* ── Kiem duyet (admin/videos): loc truc tiep khi go tim / doi sap xep ────
+     - go chu -> cho 250ms -> fetch trang cung URL, thay cac vung [data-live] (tab + danh sach + phan trang)
+     - xoa het chu -> tu ve danh sach chua loc (khong can Enter / F5)
+     - o nhap khong bi thay moi nen giu nguyen con tro; URL cap nhat bang replaceState de F5 / copy link van dung */
+(function () {
+  var form = document.getElementById('mod-filter');
+  if (!form || !window.fetch) return;
+  var input = form.querySelector('[name=title]');
+  var sort = form.querySelector('[name=sort]');
+  var clearBtn = form.querySelector('[data-clear]');
+  var timer = null, ctrl = null, lastUrl = null;
+
+  function liveEls() { return document.querySelectorAll('[data-live]'); }
+  function setBusy(on) { liveEls().forEach(function (el) { el.setAttribute('aria-busy', on ? 'true' : 'false'); el.style.opacity = on ? '.55' : ''; }); }
+  function syncClear() { if (clearBtn) clearBtn.hidden = input.value.trim() === ''; }
+
+  function buildUrl() {
+    var params = new URLSearchParams(new FormData(form));
+    if (!params.get('title') || !params.get('title').trim()) params.delete('title'); else params.set('title', params.get('title').trim());
+    return form.action.split('?')[0] + '?' + params.toString();
+  }
+
+  function refresh() {
+    var url = buildUrl();
+    if (ctrl) { ctrl.abort(); ctrl = null; } // huy request dang chay (vd: go roi xoa ngay)
+    if (url === lastUrl) { setBusy(false); return; }
+    ctrl = new AbortController();
+    setBusy(true);
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin', signal: ctrl.signal })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        liveEls().forEach(function (el) {
+          var fresh = doc.getElementById(el.id);
+          if (fresh) el.replaceWith(fresh);
+        });
+        lastUrl = url;
+        history.replaceState(null, '', url);
+        setBusy(false);
+      })
+      .catch(function (e) {
+        if (e.name === 'AbortError') return;
+        setBusy(false);
+        window.location.assign(url); // fetch loi -> tai trang thuong
+      });
+  }
+
+  lastUrl = buildUrl();
+  syncClear();
+  input.addEventListener('input', function () { syncClear(); clearTimeout(timer); timer = setTimeout(refresh, 250); });
+  sort.addEventListener('change', function () { clearTimeout(timer); refresh(); });
+  form.addEventListener('submit', function (e) { e.preventDefault(); clearTimeout(timer); refresh(); });
+  if (clearBtn) clearBtn.addEventListener('click', function () { input.value = ''; syncClear(); clearTimeout(timer); refresh(); input.focus(); });
+})();

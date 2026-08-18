@@ -8,17 +8,31 @@
 
 @section('content')
 {{-- ── Tab gach chan theo trang thai (mockup Moderation) ── --}}
-<div class="line-tabs">
+{{-- [data-live]: vung duoc JS thay moi khi go tim/doi sap xep (xem tsModFilter trong talentstage.js) --}}
+<div class="line-tabs" id="mod-tabs" data-live>
     @foreach (['pending' => 'Chờ duyệt', 'approved' => 'Đã duyệt', 'rejected' => 'Từ chối'] as $s => $label)
-        <a class="line-tab {{ $status === $s ? 'active' : '' }}" href="{{ route('admin.videos.index', ['status' => $s]) }}">
+        <a class="line-tab {{ $status === $s ? 'active' : '' }}" href="{{ route('admin.videos.index', array_filter(['status' => $s, 'title' => $q])) }}">
             {{ $label }} <span class="num">({{ $counts[$s] ?? 0 }})</span>
         </a>
     @endforeach
     <span class="meta" style="margin-left: auto">{{ $videos->total() }} mục</span>
 </div>
 
+{{-- ── Tim theo tieu de + sap xep: tu loc khi go (khong can Enter), xoa chu la ve danh sach day du ── --}}
+<form method="GET" action="{{ route('admin.videos.index') }}" id="mod-filter" role="search"
+      style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; margin-bottom: var(--space-4)">
+    <input type="hidden" name="status" value="{{ $status }}">
+    <input class="input" type="search" name="title" value="{{ $q }}" placeholder="Tìm theo tiêu đề…" autocomplete="off" style="max-width: 320px" aria-label="Tìm theo tiêu đề">
+    <select class="input" name="sort" style="width: auto" aria-label="Sắp xếp">
+        <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>Mới nhất → cũ nhất</option>
+        <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Cũ nhất → mới nhất</option>
+    </select>
+    <button type="button" class="btn btn-ghost btn-xs" data-clear {{ $q === '' ? 'hidden' : '' }}>Xoá lọc</button>
+    <noscript><button class="btn btn-secondary btn-xs"><x-icon name="search" size="13" /> Tìm</button></noscript>
+</form>
+
 {{-- ── Hang doi: card ngang, duyet nhanh ── --}}
-<div style="display: flex; flex-direction: column; gap: var(--space-3)">
+<div style="display: flex; flex-direction: column; gap: var(--space-3)" id="mod-list" data-live>
     @forelse ($videos as $video)
         <div class="card mod-row" style="gap: 0; padding: var(--space-3)" data-reveal-scope>
             {{-- hang chinh: thumbnail · thong tin · hanh dong --}}
@@ -81,10 +95,10 @@
         </div>
     @empty
         <div class="card" style="align-items: center; padding: var(--space-8)">
-            <span class="muted-i">Không có video nào ở trạng thái này.</span>
+            <span class="muted-i">{{ $q !== '' ? 'Không tìm thấy video nào có tiêu đề chứa "'.$q.'".' : 'Không có video nào ở trạng thái này.' }}</span>
         </div>
     @endforelse
-</div>
 
-@include('partials.pager', ['p' => $videos])
+    @include('partials.pager', ['p' => $videos])
+</div>
 @endsection
