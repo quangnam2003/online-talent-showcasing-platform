@@ -58,7 +58,7 @@ Token chung: `--ease-out` (cubic-bezier .22 1 .36 1), `--ease-spring` (nảy nh�
 | Trang | URL | Ghi chú |
 |---|---|---|
 | Trang chủ | `/` | Hero (`.ph-art` khi chưa có ảnh) + "Đang thịnh hành" + lưới video 4 cột + cuộc thi đang diễn ra |
-| Tìm kiếm | `/explore` | Ô tìm + sắp xếp + dãy `.cat-chip` lọc thể loại (giữ `q`/`sort`) |
+| Tìm kiếm | `/explore` | **Một ô tìm kiếm duy nhất (ở header)** — live search: gõ là kết quả cập nhật ngay (`[data-explore-root]`, controller trả partial `explore/_results` khi `$request->ajax()`); tìm theo tiêu đề, mô tả, **tên creator**, thể loại (`Video::scopeSearch`); hàng "Creator phù hợp"; chip thể loại + sắp xếp + phân trang cũng tải qua XHR, URL đồng bộ bằng `history.replaceState` |
 | Xem video | `/videos/{id}` | `.player` (video) hoặc `.player-audio` (bản thu âm: cover màu thể loại + `<audio>`), h1 tiêu đề, tác giả + Theo dõi, Thích, lượt xem, thời lượng, chấm sao, chip thể loại, bình luận + trả lời `.reveal`; cột phải: nhận xét mentor, quản lý, Xem tiếp |
 | Hồ sơ | `/users/{id}`, `/profile/edit` | h1 tên + tag vai trò + nơi ở + thành tích + 4 `.stat`; hành động cột phải; lưới video |
 | Đăng tiết mục | `/videos/create`, `/my-videos`, `/videos/{id}/edit` | `.dropzone` kéo thả (video **hoặc âm thanh**) → `.attach-card` kiểu "Your work" (xem trước · tên · loại/dung lượng/thời lượng · nút gỡ); gửi bằng XHR: `.progress` + trạng thái, lỗi theo trường `[data-error-for]`, thành công → chuyển tới danh sách kèm flash; panel `.steps` "tiết mục đi đâu sau khi gửi"; bảng trạng thái duyệt `.tag-status` |

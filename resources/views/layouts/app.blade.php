@@ -145,7 +145,7 @@
             <form class="search" method="GET" action="{{ url('/explore') }}" role="search">
                 <x-icon name="search" size="16" class="search-ico" />
                 <input class="input" type="search" name="q" value="{{ request('q') }}"
-                       placeholder="Tìm video, creator, thể loại…" aria-label="Tìm kiếm">
+                       placeholder="Tìm tiết mục, creator, thể loại, mô tả…" aria-label="Tìm kiếm">
             </form>
 
             {{-- chip the loai: moi the loai mot sac (--cat), chip dang chon duoc danh dau --}}

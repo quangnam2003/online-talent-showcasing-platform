@@ -108,12 +108,17 @@ class Video extends Model
         return $query->where('status', 'approved')->where('privacy', 'public');
     }
 
+    // Tim theo moi thu nguoi dung co the go: tieu de, mo ta, ten creator, ten/slug the loai
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
         return $query->when($term, function (Builder $q) use ($term) {
             $q->where(function (Builder $sub) use ($term) {
                 $sub->where('title', 'like', "%{$term}%")
-                    ->orWhere('description', 'like', "%{$term}%");
+                    ->orWhere('description', 'like', "%{$term}%")
+                    ->orWhereHas('user', fn (Builder $u) => $u->where('name', 'like', "%{$term}%"))
+                    ->orWhereHas('category', fn (Builder $c) => $c
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('slug', 'like', "%{$term}%"));
             });
         });
     }

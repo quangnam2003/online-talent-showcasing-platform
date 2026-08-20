@@ -349,6 +349,74 @@
     });
   });
 
+  /* ── tim kiem truc tiep (trang Tim kiem) ────────────────────────────────
+       Trang co [data-explore-root]: o tim kiem duy nhat o header — go den dau
+       ket qua ben duoi cap nhat den do (fetch partial, khong tai lai trang).
+       Chip the loai / sap xep / phan trang trong khoi ket qua cung duoc chan
+       lai va tai qua XHR. Khong co JS thi moi control van la form/link thuong. */
+  document.addEventListener('DOMContentLoaded', function () {
+    var root = document.querySelector('[data-explore-root]');
+    if (!root) return;
+    var input = document.querySelector('.ts-header .search input[name=q]');
+    var headerForm = input ? input.closest('form') : null;
+    var timer = null, ctrl = null, lastUrl = location.pathname + location.search;
+
+    function buildUrl(overrides) {
+      var sp = new URLSearchParams(location.search);
+      Object.keys(overrides).forEach(function (k) {
+        var v = overrides[k];
+        if (v === null || v === '') sp.delete(k); else sp.set(k, v);
+      });
+      sp.delete('page'); // doi tu khoa / bo loc → quay ve trang 1
+      var qs = sp.toString();
+      return location.pathname + (qs ? '?' + qs : '');
+    }
+    function load(url) {
+      if (url === lastUrl) return;
+      if (ctrl) ctrl.abort();
+      ctrl = new AbortController();
+      root.classList.add('is-searching');
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: ctrl.signal })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then(function (html) {
+          root.innerHTML = html;
+          root.classList.remove('is-searching');
+          lastUrl = url;
+          history.replaceState(null, '', url);
+        })
+        .catch(function (e) {
+          if (e.name === 'AbortError') return;
+          location.href = url; // XHR truc trac → dieu huong thuong
+        });
+    }
+
+    if (input) {
+      input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () { load(buildUrl({ q: input.value.trim() })); }, 300);
+      });
+      if (headerForm) headerForm.addEventListener('submit', function (e) {
+        e.preventDefault(); clearTimeout(timer);
+        load(buildUrl({ q: input.value.trim() }));
+      });
+    }
+    // chip the loai, "Xóa lọc", phan trang — link noi bo tro ve chinh trang nay
+    root.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href]');
+      if (!a || a.origin !== location.origin || a.pathname !== location.pathname) return;
+      e.preventDefault();
+      if (input) { var sp = new URLSearchParams(a.search); input.value = sp.get('q') || ''; }
+      load(a.pathname + a.search);
+    });
+    // sap xep: chan submit form, tai qua XHR
+    root.addEventListener('change', function (e) {
+      if (!e.target.matches('select[name=sort]')) return;
+      e.preventDefault();
+      load(buildUrl({ sort: e.target.value }));
+    });
+    root.addEventListener('submit', function (e) { e.preventDefault(); });
+  });
+
   /* ── hop thoai (.dialog-backdrop[data-dialog]): dong bang nut / Esc / bam nen ── */
   window.tsCloseDialog = function (el) {
     var box = el && el.closest ? el.closest('.dialog-backdrop') : el;

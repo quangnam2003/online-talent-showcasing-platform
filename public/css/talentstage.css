@@ -837,6 +837,10 @@ html.nav-collapsed .ts-menu-btn { background: var(--color-accent-100); color: va
 
 .ts-content { flex: 1; padding: var(--space-6) var(--space-8) var(--space-8); display: flex; flex-direction: column; gap: var(--space-6); } /* flex:1 → footer luon o day */
 
+/* trang Tim kiem: dang tai ket qua moi (live search) — mo nhe, chan bam nham */
+[data-explore-root] { transition: opacity var(--dur-2) var(--ease-out); }
+[data-explore-root].is-searching { opacity: 0.45; pointer-events: none; }
+
 /* noi dung vao trang: fade-rise so le theo thu tu khoi (backwards: sau khi
    chay xong khong ghi de transform → hover van hoat dong) */
 .ts-content > * { animation: ts-rise var(--dur-4) var(--ease-out) backwards; }
