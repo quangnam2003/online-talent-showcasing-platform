@@ -64,6 +64,8 @@ Reaction, comment, follow **không có màn hình riêng** — chúng là hành 
 
 > **Phạm vi giản lược (FR6):** không có bước "Request mentorship / Accept" — mentor mặc định chấp nhận mọi creator, hai vai trò đối diện nhắn được cho nhau ngay. Danh sách "Bắt đầu hội thoại mới" chỉ hiện người **đang hoạt động** và **chưa có hội thoại**; tài khoản bị khóa không nhận được tin. Khung chat hiển thị 50 tin gần nhất.
 
+> **Phạm vi giản lược (FR5):** bảng thảo luận (discussion board) thay cho "group chat" thời gian thực của spec gốc. Admin không tạo/tham gia nhóm — chỉ có quyền kiểm duyệt (xem bảng thảo luận, sửa/xóa nhóm, xóa thành viên, xóa bài vi phạm). Chủ nhóm quản lý được nhóm của mình: sửa tên/mô tả, xóa nhóm, xem danh sách thành viên, xóa thành viên, xóa bài đăng; chủ nhóm nhận thông báo khi có người tham gia.
+
 ## H. FR7 — Cuộc thi (2 màn hình)
 
 | # | Màn hình | Route | Ai truy cập | Use case / FR | Ghi chú |

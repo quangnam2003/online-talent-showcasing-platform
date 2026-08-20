@@ -80,12 +80,20 @@ Route::middleware('auth')->group(function () {
 
 /* ---------- FR5: Nhom & thao luan ---------- */
 Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
-Route::middleware('auth')->group(function () {
+// Tao / tham gia / roi / dang bai: creator & mentor (admin chi kiem duyet, khong sinh hoat)
+Route::middleware('role:creator,mentor')->group(function () {
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->whereNumber('group')->name('groups.join');
     Route::delete('/groups/{group}/leave', [GroupController::class, 'leave'])->whereNumber('group')->name('groups.leave');
     Route::post('/groups/{group}/posts', [GroupPostController::class, 'store'])->whereNumber('group')->name('groups.posts.store');
+});
+// Quan ly nhom: chu nhom hoac admin (kiem tra trong controller)
+Route::middleware('auth')->group(function () {
+    Route::put('/groups/{group}', [GroupController::class, 'update'])->whereNumber('group')->name('groups.update');
+    Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->whereNumber('group')->name('groups.destroy');
+    Route::delete('/groups/{group}/members/{user}', [GroupController::class, 'removeMember'])->whereNumber('group')->whereNumber('user')->name('groups.members.remove');
+    Route::delete('/groups/{group}/posts/{post}', [GroupPostController::class, 'destroy'])->whereNumber('group')->whereNumber('post')->name('groups.posts.destroy');
 });
 Route::get('/groups/{group}', [GroupController::class, 'show'])->whereNumber('group')->name('groups.show');
 
