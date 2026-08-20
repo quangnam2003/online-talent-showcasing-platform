@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\NewMessage;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -27,11 +29,12 @@ class MessageController extends Controller
         $me = auth()->user();
         $this->assertMessageable($user);
 
-        // Danh dau da doc nhung tin nguoi kia gui minh
+        // Danh dau da doc nhung tin nguoi kia gui minh + thong bao "tin nhan moi" tuong ung
         Message::where('sender_id', $user->id)
             ->where('receiver_id', $me->id)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
+        $this->markMessageNotificationsRead($user);
 
         return view('messages.index', [
             'threads' => $this->threads(),
@@ -51,13 +54,70 @@ class MessageController extends Controller
             'content.required' => 'Vui lòng nhập tin nhắn.',
         ]);
 
+        // Bao chuong CHI o tin dau cua mot "dot": neu nguoi nhan van con tin chua doc
+        // tu minh thi ho da co thong bao roi — gui moi tin mot thong bao se spam chuong.
+        $shouldNotify = ! Message::where('sender_id', auth()->id())
+            ->where('receiver_id', $user->id)
+            ->whereNull('read_at')
+            ->exists();
+
         Message::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $user->id,
             'content' => $data['content'],
         ]);
 
+        if ($shouldNotify) {
+            $user->notify(new NewMessage(auth()->user(), $data['content']));
+        }
+
         return redirect()->route('messages.show', $user);
+    }
+
+    /**
+     * FR6: polling nhe cho trang chat — JS goi vai giay/lan voi ?since=<id tin cuoi>.
+     * Tra tin moi hon (ca 2 chieu, phong khi mo nhieu tab); vi nguoi dung DANG mo hoi
+     * thoai nen tin nguoi kia gui duoc danh dau da doc luon (badge/chuong khong keu nua).
+     */
+    public function poll(Request $request, User $user): JsonResponse
+    {
+        $me = auth()->user();
+        $this->assertMessageable($user);
+
+        $sinceId = max(0, (int) $request->query('since', 0));
+
+        $items = Message::between($me, $user)
+            ->where('id', '>', $sinceId)
+            ->orderBy('id')
+            ->take(50)
+            ->get();
+
+        if ($items->isNotEmpty()) {
+            Message::where('sender_id', $user->id)
+                ->where('receiver_id', $me->id)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+            $this->markMessageNotificationsRead($user);
+        }
+
+        return response()->json([
+            'items' => $items->map(fn (Message $m) => [
+                'id' => $m->id,
+                'mine' => $m->sender_id === $me->id,
+                'content' => $m->content,
+                'at' => $m->created_at->format('d/m H:i'),
+            ])->values(),
+        ]);
+    }
+
+    // Da doc hoi thoai voi $partner → cac thong bao "tin nhan moi" cua nguoi do coi nhu da doc
+    private function markMessageNotificationsRead(User $partner): void
+    {
+        auth()->user()->unreadNotifications()
+            ->where('type', NewMessage::class)
+            ->get()
+            ->filter(fn ($n) => ($n->data['url'] ?? '') === '/messages/'.$partner->id)
+            ->each->markAsRead();
     }
 
     // FR6: chi nhan tin giua hai vai tro DOI DIEN creator <-> mentor

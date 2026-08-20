@@ -64,7 +64,8 @@
                 <a class="btn btn-ghost btn-xs" href="{{ route('users.show', $activeUser) }}">Xem hồ sơ</a>
             </div>
 
-            <div id="chatScroll" style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1; overflow-y: auto; max-height: 460px; padding-right: 4px">
+            <div id="chatScroll" data-chat-poll="{{ route('messages.poll', $activeUser) }}" data-chat-last="{{ $messages->last()?->id ?? 0 }}"
+                 style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1; overflow-y: auto; max-height: 460px; padding-right: 4px">
                 @forelse ($messages as $m)
                     <div class="bubble {{ $m->sender_id === $me->id ? 'me' : 'them' }}">
                         <div>{{ $m->content }}</div>

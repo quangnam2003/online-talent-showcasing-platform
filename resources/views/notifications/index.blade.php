@@ -15,6 +15,7 @@
                 'rejected' => ['x', 'bad'],
                 'follower' => ['user-plus', 'accent'],
                 'submitted' => ['upload', 'accent'],
+                'message' => ['message', 'accent'],
                 'comment' => ['message', 'accent'],
                 'reply' => ['message', 'accent'],
                 'like' => ['heart', 'accent'],

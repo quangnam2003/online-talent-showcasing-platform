@@ -461,6 +461,62 @@
   };
 })();
 
+/* ── chat gan thoi gian thuc: polling nhe /messages/{user}/poll ───────────
+     #chatScroll[data-chat-poll]: moi 6s hoi tin moi hon data-chat-last va
+     append bubble truc tiep (khong tai lai trang); tam dung khi tab an;
+     dang o day khung chat thi tu cuon xuong tin moi. */
+(function () {
+  document.addEventListener('DOMContentLoaded', function () {
+    var box = document.getElementById('chatScroll');
+    if (!box || !box.dataset.chatPoll) return;
+
+    var url = box.dataset.chatPoll;
+    var last = parseInt(box.dataset.chatLast || '0', 10) || 0;
+    var busy = false;
+
+    function nearBottom() {
+      return box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+    }
+    function append(m) {
+      var empty = box.querySelector('.muted-i'); // "Chưa có tin nhắn…"
+      if (empty) empty.remove();
+      var b = document.createElement('div');
+      b.className = 'bubble ' + (m.mine ? 'me' : 'them');
+      var body = document.createElement('div');
+      body.textContent = m.content; // textContent: an toan voi noi dung nguoi dung
+      var at = document.createElement('div');
+      at.className = 'at';
+      at.textContent = m.at;
+      b.appendChild(body);
+      b.appendChild(at);
+      box.appendChild(b);
+    }
+    async function tick() {
+      if (busy || document.hidden) return;
+      busy = true;
+      try {
+        var r = await fetch(url + '?since=' + last, {
+          credentials: 'same-origin',
+          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (r.ok) {
+          var data = await r.json();
+          var stick = nearBottom();
+          (data.items || []).forEach(function (m) {
+            if (m.id <= last) return;
+            last = m.id;
+            append(m);
+          });
+          if (stick) box.scrollTop = box.scrollHeight;
+        }
+      } catch (e) { /* mat mang tam thoi: lan poll sau thu lai */ }
+      busy = false;
+    }
+    setInterval(tick, 6000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+  });
+})();
+
 /* ── thong bao gan thoi gian thuc: polling nhe /notifications/poll ────────
      - Moi 8s hoi server (tam dung khi tab an, hoi ngay khi quay lai)
      - Cap nhat so chua doc tren chuong + sidebar

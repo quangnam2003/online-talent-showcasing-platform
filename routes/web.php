@@ -93,6 +93,7 @@ Route::get('/groups/{group}', [GroupController::class, 'show'])->whereNumber('gr
 Route::middleware('role:creator,mentor')->group(function () {
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{user}', [MessageController::class, 'show'])->whereNumber('user')->name('messages.show');
+    Route::get('/messages/{user}/poll', [MessageController::class, 'poll'])->whereNumber('user')->name('messages.poll');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->whereNumber('user')->name('messages.store');
 });
 
