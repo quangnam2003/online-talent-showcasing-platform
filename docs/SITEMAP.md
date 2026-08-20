@@ -62,6 +62,8 @@ Reaction, comment, follow **không có màn hình riêng** — chúng là hành 
 | 16 | Hộp thư | `/messages` | Creator, Mentor | FR6 | Danh sách hội thoại, badge chưa đọc (index `receiver_id + read_at` đã có sẵn) |
 | 17 | Hội thoại | `/messages/{user}` | Creator, Mentor | FR6 | Chat 1-1, đánh dấu `read_at` khi mở |
 
+> **Phạm vi giản lược (FR6):** không có bước "Request mentorship / Accept" — mentor mặc định chấp nhận mọi creator, hai vai trò đối diện nhắn được cho nhau ngay. Danh sách "Bắt đầu hội thoại mới" chỉ hiện người **đang hoạt động** và **chưa có hội thoại**; tài khoản bị khóa không nhận được tin. Khung chat hiển thị 50 tin gần nhất.
+
 ## H. FR7 — Cuộc thi (2 màn hình)
 
 | # | Màn hình | Route | Ai truy cập | Use case / FR | Ghi chú |

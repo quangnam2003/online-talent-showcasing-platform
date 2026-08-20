@@ -15,9 +15,11 @@ class MessageController extends Controller
     // FR6: hop thu — danh sach hoi thoai
     public function index(): View
     {
+        $threads = $this->threads();
+
         return view('messages.index', [
-            'threads' => $this->threads(),
-            'contacts' => $this->contacts(),
+            'threads' => $threads,
+            'contacts' => $this->contacts($threads),
             'activeUser' => null,
             'messages' => collect(),
         ]);
@@ -36,11 +38,15 @@ class MessageController extends Controller
             ->update(['read_at' => now()]);
         $this->markMessageNotificationsRead($user);
 
+        $threads = $this->threads();
+
         return view('messages.index', [
-            'threads' => $this->threads(),
-            'contacts' => $this->contacts(),
+            'threads' => $threads,
+            'contacts' => $this->contacts($threads),
             'activeUser' => $user,
-            'messages' => Message::between($me, $user)->orderBy('created_at')->get(),
+            // Chi tai 50 tin gan nhat (dao lai cho dung thu tu thoi gian) — hoi thoai dai
+            // khong keo ca lich su ve; tin cu hon van nam trong DB, khong hien o khung chat
+            'messages' => Message::between($me, $user)->latest('id')->take(50)->get()->reverse()->values(),
         ]);
     }
 
@@ -125,6 +131,7 @@ class MessageController extends Controller
     private function assertMessageable(User $user): void
     {
         abort_if($user->id === auth()->id(), 404);
+        abort_unless($user->is_active, 404); // nguoi bi khoa: khong hien, khong nhan tin
         abort_unless($this->isMessageablePair(auth()->user(), $user), 404);
     }
 
@@ -160,8 +167,9 @@ class MessageController extends Controller
             ->values();
     }
 
-    // Nguoi co the bat dau hoi thoai moi — chi vai tro doi dien (FR6)
-    private function contacts()
+    // Nguoi co the BAT DAU hoi thoai moi — vai tro doi dien (FR6), dang hoat dong,
+    // va chua co hoi thoai (nguoi da chat nam ben danh sach threads roi, khong lap lai)
+    private function contacts($threads)
     {
         $me = auth()->user();
 
@@ -170,6 +178,8 @@ class MessageController extends Controller
         }
 
         return User::where('role', $me->role === 'creator' ? 'mentor' : 'creator')
+            ->where('is_active', true)
+            ->whereNotIn('id', $threads->pluck('partner.id')->filter())
             ->orderBy('name')
             ->get();
     }

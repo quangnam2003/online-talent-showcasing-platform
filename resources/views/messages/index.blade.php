@@ -31,6 +31,7 @@
             <span class="muted-i">Chưa có hội thoại nào.</span>
         @endforelse
 
+        @if ($contacts->isNotEmpty()) {{-- da chat het voi moi nguoi thi khong hien khoi rong --}}
         <div class="card" style="padding: var(--space-3); gap: var(--space-2); margin-top: var(--space-2)">
             <div class="card-kicker">Bắt đầu hội thoại mới</div>
             @foreach ($contacts as $contact)
@@ -47,6 +48,7 @@
                 </a>
             @endforeach
         </div>
+        @endif
     </div>
 
     {{-- ── Cot phai: khung chat ── --}}
@@ -66,6 +68,9 @@
 
             <div id="chatScroll" data-chat-poll="{{ route('messages.poll', $activeUser) }}" data-chat-last="{{ $messages->last()?->id ?? 0 }}"
                  style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1; overflow-y: auto; max-height: 460px; padding-right: 4px">
+                @if ($messages->count() === 50)
+                    <span class="muted-i" style="align-self: center">Đang hiển thị 50 tin gần nhất.</span>
+                @endif
                 @forelse ($messages as $m)
                     <div class="bubble {{ $m->sender_id === $me->id ? 'me' : 'them' }}">
                         <div>{{ $m->content }}</div>
