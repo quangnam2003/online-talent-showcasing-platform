@@ -75,6 +75,7 @@ Repo này **đã có sẵn** file `.env` trỏ đúng database ở Bước 1b, k
 
 | Khóa | Giá trị |
 |---|---|
+| `APP_TIMEZONE` | `Asia/Ho_Chi_Minh` — giờ Việt Nam cho mốc cuộc thi & mọi thời gian hiển thị |
 | `DB_CONNECTION` | `mysql` |
 | `DB_DATABASE` | `talentstage` |
 | `DB_USERNAME` | `talentstage` |

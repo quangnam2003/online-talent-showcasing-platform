@@ -17,6 +17,7 @@ services:
       APP_DEBUG: "false"
       APP_URL: http://localhost:8000
       APP_LOCALE: vi
+      APP_TIMEZONE: Asia/Ho_Chi_Minh
       # Sinh key bằng: php artisan key:generate --show  rồi đặt vào .env (APP_KEY=base64:...)
       APP_KEY: ${APP_KEY:-}
       DB_CONNECTION: mysql
