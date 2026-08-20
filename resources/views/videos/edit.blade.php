@@ -29,10 +29,19 @@
         </label>
         <label class="field">
             <span class="label-up">Quyền xem</span>
-            <select class="input" name="privacy">
-                <option value="public" @selected(old('privacy', $video->privacy) === 'public')>Công khai</option>
-                <option value="private" @selected(old('privacy', $video->privacy) === 'private')>Riêng tư — chỉ mình tôi</option>
-            </select>
+            @if ($inActiveContest)
+                {{-- A2: dang du thi — khoa doi che do xem (select disabled khong submit → gui hidden) --}}
+                <input type="hidden" name="privacy" value="{{ $video->privacy }}">
+                <select class="input" disabled title="Video đang dự thi — không thể đổi chế độ xem">
+                    <option>{{ $video->privacy === 'public' ? 'Công khai' : 'Riêng tư — chỉ mình tôi' }}</option>
+                </select>
+                <span class="field-hint"><x-icon name="trophy" size="12" /> Video đang là bài dự thi — đổi chế độ xem và sửa nội dung bị khóa cho tới khi cuộc thi kết thúc.</span>
+            @else
+                <select class="input" name="privacy">
+                    <option value="public" @selected(old('privacy', $video->privacy) === 'public')>Công khai</option>
+                    <option value="private" @selected(old('privacy', $video->privacy) === 'private')>Riêng tư — chỉ mình tôi</option>
+                </select>
+            @endif
         </label>
     </div>
 

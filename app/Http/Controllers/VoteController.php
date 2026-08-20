@@ -20,6 +20,12 @@ class VoteController extends Controller
             return back()->with('error', 'Cuộc thi không trong giai đoạn bình chọn.');
         }
 
+        // A2: bai thi phai con xem duoc cong khai — video ve "cho duyet" / bi tu choi /
+        // chuyen rieng tu thi khong nhan phieu nua (nguoi vote bam vao se gap 404)
+        if (! $entry->video || ! $entry->video->isViewableBy(null)) {
+            return back()->with('error', 'Bài dự thi này đang tạm ẩn (video chờ duyệt lại hoặc không còn công khai) nên không thể bình chọn.');
+        }
+
         if ($entry->user_id === $me->id) {
             return back()->with('error', 'Bạn không thể bình chọn cho bài của chính mình.');
         }

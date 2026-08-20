@@ -155,6 +155,7 @@ class VideoController extends Controller
         return view('videos.edit', [
             'video' => $video,
             'categories' => Category::orderBy('name')->get(),
+            'inActiveContest' => $this->inActiveContest($video),
         ]);
     }
 
@@ -177,6 +178,30 @@ class VideoController extends Controller
             'thumbnail.image' => 'Ảnh bìa phải là tệp hình ảnh (JPG, PNG, WEBP…).',
             'thumbnail.max' => 'Ảnh bìa tối đa 4 MB.',
         ]);
+
+        // A2/FR7: video dang du thi (cuoc thi chua ket thuc) — khoa nhung thay doi
+        // lam bai thi bien mat khoi nguoi binh chon:
+        //  - chuyen sang rieng tu → nguoi vote bam vao bai thi se gap 404
+        //  - sua noi dung hien thi → video ve "cho duyet" va cung bi an
+        if ($this->inActiveContest($video)) {
+            if ($data['privacy'] === 'private' && $video->privacy !== 'private') {
+                return back()->withInput()->with('error',
+                    'Video "'.$video->title.'" đang là bài dự thi của một cuộc thi chưa kết thúc nên không thể chuyển sang riêng tư — người bình chọn sẽ không xem được bài thi. Bạn có thể đổi sau khi cuộc thi kết thúc.');
+            }
+
+            $contentChanged = ! auth()->user()->isAdmin()
+                && $video->status === 'approved'
+                && ($data['title'] !== $video->title
+                    || (string) ($data['description'] ?? '') !== (string) $video->description
+                    || (int) $data['category_id'] !== (int) $video->category_id
+                    || $request->hasFile('thumbnail')
+                    || $request->boolean('remove_thumbnail'));
+
+            if ($contentChanged) {
+                return back()->withInput()->with('error',
+                    'Video "'.$video->title.'" đang dự thi nên không thể sửa nội dung hiển thị (tiêu đề, mô tả, thể loại, ảnh bìa) — nội dung sửa phải duyệt lại và bài thi sẽ tạm ẩn khỏi cuộc thi. Bạn có thể sửa sau khi cuộc thi kết thúc.');
+            }
+        }
 
         if ($request->hasFile('thumbnail')) {
             // thay anh bia: xoa tep cu, luu tep moi
@@ -230,11 +255,7 @@ class VideoController extends Controller
         // Soft delete khong keo theo cascadeOnDelete cua contest_entries — neu xoa video
         // dang du thi, entry mo coi se lam trang cuoc thi loi 500. Chan xoa khi video
         // con nam trong cuoc thi chua ket thuc.
-        $inActiveContest = $video->contestEntries()
-            ->whereHas('contest', fn ($q) => $q->where('end_at', '>', now()))
-            ->exists();
-
-        if ($inActiveContest) {
+        if ($this->inActiveContest($video)) {
             return back()->with('error', 'Video "'.$video->title.'" đang là bài dự thi của một cuộc thi chưa kết thúc nên không thể xóa. Bạn có thể xóa sau khi cuộc thi kết thúc.');
         }
 
@@ -248,6 +269,14 @@ class VideoController extends Controller
     private function afterManageUrl(): string
     {
         return auth()->user()->isAdmin() ? route('admin.videos.index') : route('videos.mine');
+    }
+
+    // A2/FR7: video dang la bai du thi cua mot cuoc thi chua ket thuc?
+    private function inActiveContest(Video $video): bool
+    {
+        return $video->contestEntries()
+            ->whereHas('contest', fn ($q) => $q->where('end_at', '>', now()))
+            ->exists();
     }
 
     private function authorizeOwner(Video $video): void

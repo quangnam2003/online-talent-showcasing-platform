@@ -41,6 +41,9 @@
         <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap">
             @if ($myEntry)
                 <span class="tag tag-accent" style="font-size: 11px">Đã gửi bài ✓ — «{{ $myEntry->video->title }}»</span>
+                @unless ($myEntry->video->isViewableBy(null))
+                    <span class="muted-i">Bài của bạn đang tạm ẩn — video cần được duyệt và ở chế độ công khai thì mới nhận phiếu tiếp.</span>
+                @endunless
             @elseif ($me?->isCreator() && $contest->isAcceptingSubmissions())
                 @if ($eligibleVideos->isNotEmpty())
                     <form method="POST" action="{{ route('contests.entries.store', $contest) }}" style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap">
@@ -70,7 +73,11 @@
         @forelse ($leaderboard as $i => $entry)
             <div style="display: flex; align-items: baseline; gap: var(--space-3); padding-bottom: 6px; border-bottom: 1px solid var(--color-divider)">
                 <span class="rank-num" style="font-size: 20px; width: 26px">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                <a href="{{ route('videos.show', $entry->video) }}" style="flex: 1; font-size: 13px">{{ $entry->user->name }} — {{ \Illuminate\Support\Str::limit($entry->video->title, 28) }}</a>
+                @if ($entry->video->isViewableBy(null))
+                    <a href="{{ route('videos.show', $entry->video) }}" style="flex: 1; font-size: 13px">{{ $entry->user->name }} — {{ \Illuminate\Support\Str::limit($entry->video->title, 28) }}</a>
+                @else
+                    <span style="flex: 1; font-size: 13px; color: var(--color-neutral-600)">{{ $entry->user->name }} — {{ \Illuminate\Support\Str::limit($entry->video->title, 28) }} <span class="muted-i">(tạm ẩn)</span></span>
+                @endif
                 <span class="num" style="font-size: 13px; color: var(--color-neutral-700)">{{ number_format($entry->votes_count) }}</span>
             </div>
         @empty
@@ -84,16 +91,27 @@
     <h3 style="font-size: 20px; margin: 0">Bài dự thi <span class="meta num">({{ $entries->count() }})</span></h3>
     <div class="grid-4">
         @forelse ($entries as $entry)
-            <div class="card video-card" style="cursor: default; --cat: {{ $entry->video->category->colorVar() }}">
-                <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb" style="display: flex">@include('partials.thumb', ['video' => $entry->video])</a>
+            @php $entryLive = $entry->video->isViewableBy(null); /* A2: video con duoc xem cong khai? */ @endphp
+            <div class="card video-card" style="cursor: default; --cat: {{ $entry->video->category->colorVar() }}{{ $entryLive ? '' : '; opacity: .7' }}">
+                @if ($entryLive)
+                    <a href="{{ route('videos.show', $entry->video) }}" class="video-thumb" style="display: flex">@include('partials.thumb', ['video' => $entry->video])</a>
+                @else
+                    <div class="video-thumb" style="display: flex">@include('partials.thumb', ['video' => $entry->video])</div>
+                @endif
                 <div class="video-card-body" style="gap: var(--space-2)">
                     <span class="video-card-title" style="font-size: 16px">{{ $entry->video->title }}</span>
                     <span class="meta">{{ $entry->user->name }} · <span class="num">{{ number_format($entry->votes_count) }}</span> phiếu</span>
+
+                    @unless ($entryLive)
+                        <span class="tag tag-status" data-status="pending" style="align-self: flex-start" title="Video của bài thi đang chờ duyệt lại hoặc không còn công khai">Tạm ẩn — chờ duyệt lại</span>
+                    @endunless
 
                     @if ($contest->isVotingOpen())
                         @auth
                             @if ($votedEntryId === $entry->id)
                                 <span class="tag tag-accent" style="font-size: 10.5px; align-self: flex-start">Đã bình chọn ✓</span>
+                            @elseif (! $entryLive)
+                                {{-- bai tam an: khong nhan phieu moi --}}
                             @elseif ($votedEntryId !== null)
                                 <span class="muted-i" style="font-size: 11px">Đã dùng lượt bình chọn</span>
                             @elseif ($entry->user_id === $me->id)

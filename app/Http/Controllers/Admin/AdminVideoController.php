@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Video;
+use App\Notifications\EntryRemoved;
 use App\Notifications\VideoApproved;
 use App\Notifications\VideoRejected;
 use Illuminate\Http\RedirectResponse;
@@ -56,6 +57,17 @@ class AdminVideoController extends Controller
         $reason = trim((string) $request->input('reason'));
 
         $video->update(['status' => 'rejected']);
+
+        // A2/FR7: video dang du thi ma bi tu choi → go bai khoi cac cuoc thi chua ket thuc
+        // (phieu cua entry duoc xoa theo cascade — nguoi da vote duoc tra lai luot) + bao chu bai
+        $liveEntries = $video->contestEntries()->with('contest')
+            ->whereHas('contest', fn ($q) => $q->where('end_at', '>', now()))
+            ->get();
+        foreach ($liveEntries as $entry) {
+            $entry->delete();
+            $video->user->notify(new EntryRemoved($video, $entry->contest));
+        }
+
         $video->user->notify(new VideoRejected($video, $reason ?: null));
 
         return back()->with('success', 'Đã từ chối "'.$video->title.'"'.($reason ? ' kèm lý do.' : '.'));
