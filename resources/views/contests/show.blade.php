@@ -19,19 +19,22 @@
         @endif
         <p class="muted-i" style="margin: 0">Mỗi creator gửi một video đã được duyệt. Mỗi tài khoản bình chọn một lần cho một bài dự thi.</p>
 
-        {{-- May trang thai 4 pha tu 3 moc thoi gian --}}
+        {{-- May trang thai: 4 o = 4 GIAI DOAN (khong phai 4 moc) — o hien tai to sang,
+             o da qua danh dau ✓, nen khi "Đang nhận bài" thi o "Nhận bài" sang chu khong
+             phai "Đóng nộp bài" nhu ban cu --}}
         @php
+            $phaseIdx = (int) array_search($contest->status, ['upcoming', 'submission', 'voting', 'ended']);
             $phases = [
-                ['Mở nộp bài', $contest->start_at->format('d/m H:i'), 'upcoming'],
-                ['Đóng nộp bài', $contest->submission_deadline->format('d/m H:i'), 'submission'],
-                ['Bình chọn', $contest->submission_deadline->format('d/m').' — '.$contest->end_at->format('d/m'), 'voting'],
-                ['Công bố', $contest->end_at->format('d/m H:i'), 'ended'],
+                ['Sắp diễn ra', 'đến '.$contest->start_at->format('d/m H:i')],
+                ['Nhận bài', $contest->start_at->format('d/m').' — '.$contest->submission_deadline->format('d/m H:i')],
+                ['Bình chọn', $contest->submission_deadline->format('d/m').' — '.$contest->end_at->format('d/m H:i')],
+                ['Công bố', 'từ '.$contest->end_at->format('d/m H:i')],
             ];
         @endphp
         <div class="phase-strip">
-            @foreach ($phases as [$k, $v, $phase])
-                <div class="phase {{ $contest->status === $phase ? 'current' : '' }}">
-                    <div class="phase-k">{{ $k }}</div>
+            @foreach ($phases as $i => [$k, $v])
+                <div class="phase {{ $i === $phaseIdx ? 'current' : ($i < $phaseIdx ? 'done' : '') }}">
+                    <div class="phase-k">@if ($i < $phaseIdx)<x-icon name="check" size="10" /> @endif{{ $k }}</div>
                     <div class="phase-v">{{ $v }}</div>
                 </div>
             @endforeach
