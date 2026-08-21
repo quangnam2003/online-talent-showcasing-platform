@@ -110,6 +110,7 @@ Route::get('/contests', [ContestController::class, 'index'])->name('contests.ind
 Route::get('/contests/{contest}', [ContestController::class, 'show'])->whereNumber('contest')->name('contests.show');
 Route::middleware('auth')->group(function () {
     Route::post('/contests/{contest}/entries', [ContestEntryController::class, 'store'])->whereNumber('contest')->name('contests.entries.store');
+    Route::delete('/contests/{contest}/entries', [ContestEntryController::class, 'withdraw'])->whereNumber('contest')->name('contests.entries.withdraw');
     Route::post('/entries/{entry}/vote', [VoteController::class, 'store'])->whereNumber('entry')->name('entries.vote');
 });
 
@@ -126,6 +127,7 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::patch('/videos/{video}/reject', [AdminVideoController::class, 'reject'])->whereNumber('video')->name('videos.reject');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/toggle-active', [AdminUserController::class, 'toggleActive'])->whereNumber('user')->name('users.toggleActive');
+    Route::delete('/entries/{entry}', [ContestEntryController::class, 'disqualify'])->whereNumber('entry')->name('entries.destroy');
     Route::resource('categories', AdminCategoryController::class)->except(['show']);
     Route::resource('contests', AdminContestController::class)->except(['show']);
 });

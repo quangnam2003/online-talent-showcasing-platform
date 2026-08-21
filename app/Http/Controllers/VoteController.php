@@ -16,6 +16,16 @@ class VoteController extends Controller
         $me = auth()->user();
         $contest = $entry->contest;
 
+        // Ban to chuc dung ngoai cuoc binh chon
+        if ($me->isAdmin()) {
+            return back()->with('error', 'Ban tổ chức không tham gia bình chọn.');
+        }
+
+        // Chu bai bi khoa tai khoan → bai khong nhan phieu nua
+        if (! $entry->user || ! $entry->user->is_active) {
+            return back()->with('error', 'Bài dự thi này không còn hợp lệ (tài khoản chủ bài đã bị khóa).');
+        }
+
         if (! $contest->isVotingOpen()) {
             return back()->with('error', 'Cuộc thi không trong giai đoạn bình chọn.');
         }

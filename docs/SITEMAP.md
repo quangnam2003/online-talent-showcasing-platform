@@ -73,6 +73,9 @@ Reaction, comment, follow **không có màn hình riêng** — chúng là hành 
 | 18 | Danh sách cuộc thi | `/contests` | Tất cả | FR7 | Phân nhóm theo trạng thái từ 3 mốc: Sắp diễn ra → Đang nhận bài → Đang bình chọn → Đã kết thúc |
 | 19 | Chi tiết cuộc thi + Leaderboard | `/contests/{contest}` | Tất cả xem · nộp bài: Creator trong hạn · vote: đã đăng nhập, trong giai đoạn vote | FR7 Submit/Vote/Leaderboard | Nộp 1 video approved (unique per contest/user), vote 1 lần/contest, bảng xếp hạng theo `votes_count` |
 
+
+> **Phạm vi & luật cuộc thi (FR7):** mỗi tài khoản một phiếu; ban tổ chức (admin) không bình chọn; hòa phiếu → đồng hạng quán quân; không có phiếu → không có quán quân; bài của tài khoản bị khóa bị ẩn khỏi cuộc thi. Creator rút bài được trước khi kết thúc; admin loại bài vi phạm (chủ bài được thông báo). Actor "Scheduler" = lệnh `contests:announce` chạy mỗi giờ — công bố kết quả, thông báo người thắng và thí sinh, đóng dấu `announced_at`; cuộc thi đã kết thúc không sửa được mốc thời gian. Thể lệ/giải thưởng là mô tả tự do; "ban giám khảo chuyên môn" của spec gốc là hướng phát triển.
+
 ## I. Thông báo (1 màn hình)
 
 | # | Màn hình | Route | Ai truy cập | Use case / FR | Ghi chú |

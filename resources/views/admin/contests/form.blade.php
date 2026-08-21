@@ -7,6 +7,19 @@
 @section('screen-sub', 'Ba mốc thời gian phải theo thứ tự: mở nhận bài → hạn nộp bài → kết thúc (công bố).')
 
 @section('content')
+@php $ended = $contest && $contest->status === 'ended'; @endphp
+@if ($contest && ! $ended && ($contest->entries_count ?? 0) > 0)
+    <div class="flash flash-error" role="alert" style="max-width: 640px">
+        <x-icon name="info" size="16" />
+        <span>Cuộc thi đã có <strong>{{ $contest->entries_count }} bài dự thi</strong>{{ ($votesCount ?? 0) > 0 ? ' và <strong>'.$votesCount.' phiếu bầu</strong>' : '' }} — đổi mốc thời gian sẽ đổi trạng thái cuộc thi <strong>ngay lập tức</strong> (ví dụ kéo "kết thúc" về quá khứ sẽ chốt kết quả tức thì). Không thể dời "mở nộp bài" ra sau bài dự thi sớm nhất.</span>
+    </div>
+@endif
+@if ($ended)
+    <div class="flash" role="status" style="max-width: 640px">
+        <x-icon name="lock" size="16" />
+        <span>Cuộc thi đã kết thúc — kết quả đã công bố nên <strong>không thể sửa</strong>. Muốn tổ chức tiếp, hãy tạo cuộc thi mới.</span>
+    </div>
+@endif
 <form method="POST"
       action="{{ $contest ? route('admin.contests.update', $contest) : route('admin.contests.store') }}"
       style="display: flex; flex-direction: column; gap: var(--space-4); max-width: 640px">
@@ -47,7 +60,7 @@
     </div>
 
     <div style="display: flex; gap: var(--space-3)">
-        <button type="submit" class="btn btn-primary btn-sm">{{ $contest ? 'Lưu thay đổi' : 'Tạo cuộc thi' }}</button>
+        <button type="submit" class="btn btn-primary btn-sm" @disabled($ended)>{{ $contest ? 'Lưu thay đổi' : 'Tạo cuộc thi' }}</button>
         <a class="btn btn-ghost btn-sm" href="{{ route('admin.contests.index') }}">Hủy</a>
     </div>
 </form>

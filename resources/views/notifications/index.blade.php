@@ -17,6 +17,7 @@
                 'submitted' => ['upload', 'accent'],
                 'message' => ['message', 'accent'],
                 'group' => ['users', 'accent'],
+                'contest' => ['trophy', 'accent'],
                 'comment' => ['message', 'accent'],
                 'reply' => ['message', 'accent'],
                 'like' => ['heart', 'accent'],

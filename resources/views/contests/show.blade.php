@@ -44,6 +44,13 @@
         <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap">
             @if ($myEntry)
                 <span class="tag tag-accent" style="font-size: 11px">Đã gửi bài ✓ — «{{ $myEntry->video->title }}»</span>
+                @if ($contest->status !== 'ended')
+                    <form method="POST" action="{{ route('contests.entries.withdraw', $contest) }}"
+                          onsubmit="return confirm('Rút bài khỏi cuộc thi? Phiếu đã nhận sẽ bị hủy.')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-ghost btn-xs" style="color: var(--color-danger)">Rút bài</button>
+                    </form>
+                @endif
                 @unless ($myEntry->video->isViewableBy(null))
                     <span class="muted-i">Bài của bạn đang tạm ẩn — video cần được duyệt và ở chế độ công khai thì mới nhận phiếu tiếp.</span>
                 @endunless
@@ -92,6 +99,9 @@
 {{-- ── Luoi bai du thi + nut binh chon ── --}}
 <section style="display: flex; flex-direction: column; gap: var(--space-3)">
     <h3 style="font-size: 20px; margin: 0">Bài dự thi <span class="meta num">({{ $entries->count() }})</span></h3>
+    @if ($contest->status === 'ended' && $winnerIds->isEmpty() && $entries->isNotEmpty())
+        <div class="flash" role="status"><x-icon name="info" size="16" /><span>Cuộc thi kết thúc không có quán quân — không bài dự thi nào nhận được phiếu bình chọn.</span></div>
+    @endif
     <div class="grid-4">
         @forelse ($entries as $entry)
             @php $entryLive = $entry->video->isViewableBy(null); /* A2: video con duoc xem cong khai? */ @endphp
@@ -109,10 +119,21 @@
                         <span class="tag tag-status" data-status="pending" style="align-self: flex-start" title="Video của bài thi đang chờ duyệt lại hoặc không còn công khai">Tạm ẩn — chờ duyệt lại</span>
                     @endunless
 
+                    @if ($me?->isAdmin() && $contest->status !== 'ended')
+                        <form method="POST" action="{{ route('admin.entries.destroy', $entry) }}"
+                              onsubmit="return confirm('Loại bài \'{{ $entry->video->title }}\' khỏi cuộc thi? Phiếu đã nhận sẽ bị hủy và chủ bài được thông báo.')"
+                              style="align-self: flex-start">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-ghost btn-xs" style="color: var(--color-danger); padding-left: 0"><x-icon name="x" size="12" /> Loại bài (vi phạm)</button>
+                        </form>
+                    @endif
+
                     @if ($contest->isVotingOpen())
                         @auth
                             @if ($votedEntryId === $entry->id)
                                 <span class="tag tag-accent" style="font-size: 10.5px; align-self: flex-start">Đã bình chọn ✓</span>
+                            @elseif ($me->isAdmin())
+                                <span class="muted-i" style="font-size: 11px">Ban tổ chức không bình chọn</span>
                             @elseif (! $entryLive)
                                 {{-- bai tam an: khong nhan phieu moi --}}
                             @elseif ($votedEntryId !== null)
@@ -128,8 +149,8 @@
                         @else
                             <span class="muted-i" style="font-size: 11px"><a href="{{ route('login') }}">Đăng nhập</a> để bình chọn</span>
                         @endauth
-                    @elseif ($contest->status === 'ended' && $loop->first)
-                        <span class="tag tag-accent" style="font-size: 10.5px; align-self: flex-start">🏆 Quán quân</span>
+                    @elseif ($contest->status === 'ended' && $winnerIds->contains($entry->id))
+                        <span class="tag tag-accent" style="font-size: 10.5px; align-self: flex-start">🏆 Quán quân{{ $winnerIds->count() > 1 ? ' (đồng hạng)' : '' }}</span>
                     @endif
                 </div>
             </div>
@@ -139,7 +160,7 @@
             </div>
         @endforelse
     </div>
-    <span class="muted-i">Cuộc thi tự động chuyển giai đoạn: nhận bài → đóng nhận bài → bình chọn → công bố kết quả.</span>
+    <span class="muted-i">Cuộc thi tự động chuyển giai đoạn: nhận bài → đóng nhận bài → bình chọn → công bố kết quả. Thể lệ: mỗi tài khoản một phiếu; hòa phiếu → đồng hạng quán quân; không có phiếu → không có quán quân; kết quả được thông báo tới thí sinh sau khi cuộc thi kết thúc.</span>
 </section>
 @endsection
 

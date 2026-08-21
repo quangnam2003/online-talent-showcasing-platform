@@ -17,7 +17,29 @@ class Contest extends Model
             'start_at' => 'datetime',
             'submission_deadline' => 'datetime',
             'end_at' => 'datetime',
+            'announced_at' => 'datetime', // he thong dong dau (contests:announce), khong nam trong $fillable
         ];
+    }
+
+    /**
+     * Quan quan: cac bai co so phieu CAO NHAT va > 0 (khong phieu → khong quan quan),
+     * chu bai con hoat dong. Hoa phieu → dong hang (tra ve nhieu entry).
+     */
+    public function winners()
+    {
+        $active = fn ($q) => $q->where('is_active', true);
+
+        $top = (int) $this->entries()->whereHas('user', $active)->max('votes_count');
+        if ($top === 0) {
+            return collect();
+        }
+
+        return $this->entries()
+            ->where('votes_count', $top)
+            ->whereHas('user', $active)
+            ->with(['user', 'video'])
+            ->orderBy('created_at')
+            ->get();
     }
 
     public function entries(): HasMany

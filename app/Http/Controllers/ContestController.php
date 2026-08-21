@@ -32,10 +32,15 @@ class ContestController extends Controller
         // chan xoa video dang du thi) — tranh $entry->video null lam view loi 500
         $entries = $contest->entries()
             ->whereHas('video')
+            // an bai cua tai khoan bi khoa khoi luoi + bang xep hang
+            ->whereHas('user', fn ($u) => $u->where('is_active', true))
             ->with(['video.category', 'user'])
             ->orderByDesc('votes_count')
             ->orderBy('created_at')
             ->get();
+
+        // Da ket thuc: xac dinh quan quan (hoa phieu → dong hang; 0 phieu → khong co)
+        $winnerIds = $contest->status === 'ended' ? $contest->winners()->pluck('id') : collect();
 
         $myEntry = $me ? $entries->firstWhere('user_id', $me->id) : null;
 
@@ -58,6 +63,7 @@ class ContestController extends Controller
             'myEntry' => $myEntry,
             'eligibleVideos' => $eligibleVideos,
             'votedEntryId' => $myVote?->entry_id,
+            'winnerIds' => $winnerIds,
         ]);
     }
 }
