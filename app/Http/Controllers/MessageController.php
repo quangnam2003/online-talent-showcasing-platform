@@ -146,9 +146,11 @@ class MessageController extends Controller
     {
         $me = auth()->user();
 
+        // latest('id'): nhieu tin gui trong cung mot giay thi created_at bang nhau —
+        // id tang don dieu nen preview "tin cuoi" luon dung tin moi nhat
         $all = Message::where('sender_id', $me->id)
             ->orWhere('receiver_id', $me->id)
-            ->latest()
+            ->latest('id')
             ->get();
 
         return $all
@@ -160,10 +162,10 @@ class MessageController extends Controller
                     'unread' => $messages->where('receiver_id', $me->id)->whereNull('read_at')->count(),
                 ];
             })
-            // Loai hoi thoai sai dac ta FR6 (du lieu cu giua hai nguoi cung vai tro) —
-            // neu hien se dan toi trang 404 vi assertMessageable da chan
-            ->filter(fn ($t) => $t->partner !== null && $this->isMessageablePair($me, $t->partner))
-            ->sortByDesc(fn ($t) => $t->last->created_at)
+            // Loai hoi thoai sai dac ta FR6 (du lieu cu giua hai nguoi cung vai tro) va
+            // hoi thoai voi tai khoan bi khoa — neu hien, bam vao se 404 (assertMessageable chan)
+            ->filter(fn ($t) => $t->partner !== null && $t->partner->is_active && $this->isMessageablePair($me, $t->partner))
+            ->sortByDesc(fn ($t) => $t->last->id)
             ->values();
     }
 
